@@ -1,0 +1,28 @@
+@import url('./base.css');
+
+/* Classes page styles */
+
+.container > .card > .kicker {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.container > .card > h2 {
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.6rem;
+}
+
+#classes-container .class-card {
+  margin-bottom: 1rem;
+}
+
+#classes-container .class-card h3 {
+  font-size: 0.95rem;
+  margin-bottom: 0.4rem;
+}
+
+#classes-container .class-card .term-list {
+  margin-top: 0.5rem;
+}

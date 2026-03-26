@@ -1,0 +1,34 @@
+@import url('./base.css');
+
+/* Dashboard page styles */
+
+.dashboard-sidebar .kicker {
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.dashboard-sidebar h2 {
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dashboard-main .card h2 {
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 25%, transparent);
+  margin-bottom: 0.9rem;
+}
+
+.dashboard-main .form-inline .btn-primary,
+.dashboard-main .form-stack .btn-primary {
+  white-space: nowrap;
+}
+
+.dashboard-main .form-inline input,
+.dashboard-main .form-inline select {
+  flex: 1;
+  min-width: 120px;
+}

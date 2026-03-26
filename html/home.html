@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home | RFA.Learning</title>
+  <link rel="stylesheet" href="../css/home.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-brand">
+      <span class="brand-icon"></span>
+      <h1>RFA<span class="brand-dot">.</span>Learning</h1>
+    </div>
+    <nav>
+      <a href="/clases">Clases</a>
+      <button class="btn btn-small btn-ghost" data-theme-toggle type="button">Modo claro</button>
+      <button id="logout-btn" class="btn btn-small btn-danger">Salir</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <!-- Hero bienvenida -->
+    <section class="home-hero">
+      <div class="home-hero-copy">
+        <span class="kicker">Dashboard</span>
+        <h2 id="welcome">Cargando...</h2>
+        <p id="greeting-sub" class="hero-sub">Continua tu aprendizaje del lenguaje del futbol.</p>
+        <a href="/clases" class="btn btn-primary hero-cta">Ir a clases</a>
+      </div>
+      <div class="home-hero-visual">
+        <div class="progress-ring-wrap">
+          <svg class="progress-ring" viewBox="0 0 120 120">
+            <defs>
+              <linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="var(--primary)"/>
+                <stop offset="100%" stop-color="var(--accent)"/>
+              </linearGradient>
+            </defs>
+            <circle class="progress-ring-bg" cx="60" cy="60" r="52"></circle>
+            <circle class="progress-ring-fill" cx="60" cy="60" r="52" stroke-dasharray="326.73" stroke-dashoffset="326.73"></circle>
+          </svg>
+          <div class="progress-ring-label">
+            <strong id="progress-pct">0%</strong>
+            <span>completado</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="home-stats">
+      <div class="stat-card">
+        <span>Nivel actual</span>
+        <strong id="stat-level">--</strong>
+      </div>
+      <div class="stat-card">
+        <span>Clases completadas</span>
+        <strong id="stat-completed">0</strong>
+      </div>
+      <div class="stat-card">
+        <span>Puntaje total</span>
+        <strong id="stat-score">0</strong>
+      </div>
+      <div class="stat-card">
+        <span>Racha activa</span>
+        <strong id="stat-streak">0</strong>
+      </div>
+    </section>
+
+    <!-- Progreso detallado -->
+    <div class="home-grid">
+      <section class="card home-section">
+        <div class="section-head">
+          <span class="kicker">Progreso</span>
+          <h3>Avance por nivel</h3>
+        </div>
+        <div id="level-bars" class="level-bars">
+          <!-- JS -->
+        </div>
+      </section>
+
+      <section class="card home-section">
+        <div class="section-head">
+          <span class="kicker">Actividad</span>
+          <h3>Clases completadas</h3>
+        </div>
+        <ul id="completed-list" class="completed-list">
+          <li class="empty-state">Sin clases completadas aun</li>
+        </ul>
+      </section>
+    </div>
+  </main>
+
+  <script src="../js/theme.js"></script>
+  <script src="../js/home.js"></script>
+</body>
+</html>
+

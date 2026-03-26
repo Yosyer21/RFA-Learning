@@ -1,0 +1,7 @@
+{
+  "projectName": "RFA.Learning",
+  "port": 3000,
+  "defaultLanguage": "es",
+  "registrationEnabled": false,
+  "sessionSecret": "rfa-learning-dev-secret-change-this"
+}

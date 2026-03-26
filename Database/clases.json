@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "title": "Basic Football Vocabulary",
+    "category": "Vocabulary",
+    "level": "Beginner",
+    "content": [
+      {
+        "spanish": "portero",
+        "english": "goalkeeper"
+      },
+      {
+        "spanish": "defensa",
+        "english": "defender"
+      },
+      {
+        "spanish": "mediocampista",
+        "english": "midfielder"
+      },
+      {
+        "spanish": "delantero",
+        "english": "striker"
+      }
+    ]
+  }
+]

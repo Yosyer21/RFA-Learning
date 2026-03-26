@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | RFA.Learning</title>
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-brand">
+      <span class="brand-icon"></span>
+      <h1>Dashboard Admin</h1>
+    </div>
+    <nav>
+      <a href="/home">Home</a>
+      <a href="/clases">Clases</a>
+      <button class="btn btn-small btn-ghost" data-theme-toggle type="button">Modo claro</button>
+      <button id="logout-btn" class="btn btn-small btn-danger">Salir</button>
+    </nav>
+  </header>
+
+  <main class="container dashboard-layout">
+    <aside class="card dashboard-sidebar">
+      <span class="kicker">Panel admin</span>
+      <h2>Control central</h2>
+      <p class="hint">Gestiona usuarios, clases y seguimiento desde una sola vista.</p>
+      <nav class="dashboard-nav">
+        <a href="#stats-section">Estadisticas</a>
+        <a href="#users-section">Usuarios</a>
+        <a href="#classes-section">Clases</a>
+      </nav>
+    </aside>
+
+    <section class="dashboard-main">
+      <section id="stats-section" class="card">
+        <h2>Estadisticas</h2>
+        <div id="stats-cards" class="stats-grid"></div>
+        <pre id="stats-data" class="pre-box">Cargando...</pre>
+      </section>
+
+      <section id="users-section" class="card">
+        <h2>Usuarios</h2>
+        <form id="create-user-form" class="form-inline">
+          <input name="name" placeholder="Nombre" required>
+          <input name="username" placeholder="Usuario" required>
+          <input name="password" placeholder="Contrasena" required>
+          <select name="role">
+            <option value="student">student</option>
+            <option value="admin">admin</option>
+          </select>
+          <button class="btn btn-primary" type="submit">Crear</button>
+        </form>
+        <p id="user-message" class="hint"></p>
+        <div id="users-list"></div>
+      </section>
+
+      <section id="classes-section" class="card">
+        <h2>Clases</h2>
+        <form id="create-class-form" class="form-stack">
+          <input name="title" placeholder="Titulo" required>
+          <input name="category" placeholder="Categoria (ej: Vocabulary)" required>
+          <input name="level" placeholder="Nivel (ej: Beginner)" required>
+          <textarea
+            name="content"
+            placeholder="Contenido en formato: espanol|english (una linea por termino)"
+            rows="5"
+            required
+          ></textarea>
+          <button class="btn btn-primary" type="submit">Crear clase</button>
+        </form>
+        <p id="class-message" class="hint"></p>
+        <div id="classes-list"></div>
+      </section>
+    </section>
+  </main>
+
+  <script src="../js/theme.js"></script>
+  <script src="../js/dashboard.js"></script>
+</body>
+</html>
+

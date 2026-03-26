@@ -1,0 +1,11 @@
+[
+  {
+    "id": 1,
+    "name": "Admin",
+    "username": "admin",
+    "password": "(hashed on bootstrap)",
+    "role": "admin",
+    "active": true,
+    "mustChangePassword": true
+  }
+]

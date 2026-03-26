@@ -1,0 +1,21 @@
+{
+    "name":  "rfa-learning",
+    "version":  "1.0.0",
+    "description":  "RFA.Learning web platform with role-based access",
+    "main":  "server/app.js",
+    "scripts":  {
+                    "start":  "node server/app.js",
+                    "dev":  "node --watch server/app.js"
+                },
+    "keywords":  [
+
+                 ],
+    "author":  "",
+    "license":  "ISC",
+    "type":  "commonjs",
+    "dependencies":  {
+                         "bcrypt":  "^6.0.0",
+                         "express":  "^5.2.1",
+                         "express-session":  "^1.19.0"
+                     }
+}
