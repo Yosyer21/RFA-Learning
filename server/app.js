@@ -73,8 +73,9 @@ async function startServer() {
     res.status(404).json({ message: 'Route not found' });
   });
 
-  app.listen(PORT, () => {
-    console.log(`RFA.Learning running on http://localhost:${PORT}`);
+  const HOST = '0.0.0.0';
+  app.listen(PORT, HOST, () => {
+    console.log(`RFA.Learning running on http://${HOST}:${PORT}`);
   });
 }
 
