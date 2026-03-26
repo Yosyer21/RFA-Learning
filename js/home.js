@@ -59,27 +59,27 @@ function renderCompletedList(classes, completedIds) {
 }
 
 async function loadHome() {
-  const meResponse = await fetch('/api/auth/me');
-  if (!meResponse.ok) {
-    window.location.href = '/login';
-    return;
-  }
+  showLoading();
+  const meResult = await apiJson('/api/auth/me');
+  if (!meResult) { hideLoading(); return; }
 
-  const meData = await meResponse.json();
-  const name = meData.user.name;
+  const name = meResult.data.user.name;
   document.getElementById('welcome').textContent = `${getGreeting()}, ${name}`;
 
   // Fetch progress & classes in parallel
   const [progressRes, classesRes] = await Promise.all([
-    fetch('/api/classes/progress'),
-    fetch('/api/classes')
+    apiJson('/api/classes/progress'),
+    apiJson('/api/classes'),
   ]);
 
-  const progress = await progressRes.json();
-  const classes = await classesRes.json();
+  hideLoading();
 
+  const progress = progressRes?.data || {};
+  const classes = classesRes?.data?.data || classesRes?.data || [];
+
+  const classesArray = Array.isArray(classes) ? classes : [];
   const completedIds = progress.completedClasses || [];
-  const totalClasses = classes.length || 1;
+  const totalClasses = classesArray.length || 1;
   const pct = Math.round((completedIds.length / totalClasses) * 100);
 
   // Stat cards
@@ -92,10 +92,10 @@ async function loadHome() {
   setRingProgress(pct);
 
   // Level bars
-  renderLevelBars(classes, completedIds);
+  renderLevelBars(classesArray, completedIds);
 
   // Completed list
-  renderCompletedList(classes, completedIds);
+  renderCompletedList(classesArray, completedIds);
 }
 
 document.getElementById('logout-btn')?.addEventListener('click', async () => {

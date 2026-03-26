@@ -4,8 +4,7 @@ const usersList = document.getElementById('users-list');
 const classesList = document.getElementById('classes-list');
 const createUserForm = document.getElementById('create-user-form');
 const createClassForm = document.getElementById('create-class-form');
-const userMessage = document.getElementById('user-message');
-const classMessage = document.getElementById('class-message');
+const csvImportForm = document.getElementById('csv-import-form');
 
 function smoothSectionNav() {
   document.querySelectorAll('.dashboard-nav a').forEach((link) => {
@@ -20,30 +19,11 @@ function smoothSectionNav() {
   });
 }
 
-async function secureFetch(url, options) {
-  const response = await fetch(url, options);
-
-  if (response.status === 401 || response.status === 403) {
-    window.location.href = '/login';
-    return null;
-  }
-
-  return response;
-}
-
-async function readJson(response) {
-  try {
-    return await response.json();
-  } catch (_error) {
-    return { message: 'Unexpected response' };
-  }
-}
-
 async function loadStats() {
-  const response = await secureFetch('/api/admin/stats');
-  if (!response) return;
+  const result = await apiJson('/api/admin/stats');
+  if (!result) return;
 
-  const data = await readJson(response);
+  const data = result.data;
   const items = [
     ['Usuarios', data.totalUsers ?? 0],
     ['Admins', data.totalAdmins ?? 0],
@@ -67,6 +47,12 @@ async function loadStats() {
   statsData.textContent = JSON.stringify(data, null, 2);
 }
 
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text || '';
+  return div.innerHTML;
+}
+
 function userRow(user) {
   const roleBadge = user.role === 'admin' ? 'badge-admin' : 'badge-student';
   const stateBadge = user.active ? 'badge-active' : 'badge-inactive';
@@ -74,8 +60,8 @@ function userRow(user) {
   return `
     <article class="entity-card">
       <div class="entity-header">
-        <strong>${user.name}</strong>
-        <span>${user.username}</span>
+        <strong>${escapeHtml(user.name)}</strong>
+        <span>${escapeHtml(user.username)}</span>
       </div>
       <div class="entity-meta">
         <span class="badge ${roleBadge}">${user.role}</span>
@@ -83,8 +69,8 @@ function userRow(user) {
         <span class="badge">${user.mustChangePassword ? 'forzar password' : 'password normal'}</span>
       </div>
       <form class="form-inline user-edit-form" data-id="${user.id}">
-        <input name="name" value="${user.name}" required>
-        <input name="username" value="${user.username}" required>
+        <input name="name" value="${escapeHtml(user.name)}" required>
+        <input name="username" value="${escapeHtml(user.username)}" required>
         <select name="role">
           <option value="student" ${user.role === 'student' ? 'selected' : ''}>student</option>
           <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>admin</option>
@@ -97,7 +83,7 @@ function userRow(user) {
           <option value="false" ${!user.mustChangePassword ? 'selected' : ''}>normal</option>
           <option value="true" ${user.mustChangePassword ? 'selected' : ''}>forzar password</option>
         </select>
-        <input name="password" placeholder="Nueva contrasena (opcional)">
+        <input name="password" placeholder="Nueva contraseña (opcional)">
         <button class="btn btn-small" type="submit">Guardar</button>
         <button class="btn btn-small btn-danger" type="button" data-delete-id="${user.id}">Eliminar</button>
       </form>
@@ -113,14 +99,14 @@ function classRow(lesson) {
   return `
     <article class="entity-card">
       <div class="entity-header">
-        <strong>${lesson.title}</strong>
-        <span>${lesson.category} - ${lesson.level}</span>
+        <strong>${escapeHtml(lesson.title)}</strong>
+        <span>${escapeHtml(lesson.category)} - ${escapeHtml(lesson.level)}</span>
       </div>
       <form class="form-stack class-edit-form" data-id="${lesson.id}">
-        <input name="title" value="${lesson.title}" required>
-        <input name="category" value="${lesson.category}" required>
-        <input name="level" value="${lesson.level}" required>
-        <textarea name="content" rows="4" required>${contentText}</textarea>
+        <input name="title" value="${escapeHtml(lesson.title)}" required>
+        <input name="category" value="${escapeHtml(lesson.category)}" required>
+        <input name="level" value="${escapeHtml(lesson.level)}" required>
+        <textarea name="content" rows="4" required>${escapeHtml(contentText)}</textarea>
         <div class="form-inline">
           <button class="btn btn-small" type="submit">Guardar</button>
           <button class="btn btn-small btn-danger" type="button" data-delete-class-id="${lesson.id}">Eliminar</button>
@@ -130,12 +116,29 @@ function classRow(lesson) {
   `;
 }
 
-async function loadUsers() {
-  const response = await secureFetch('/api/users');
-  if (!response) return;
+async function loadUsers(page = 1) {
+  const result = await apiJson(`/api/users?page=${page}&limit=20`);
+  if (!result) return;
 
-  const users = await readJson(response);
+  const { data: users, pagination } = result.data;
   usersList.innerHTML = users.map(userRow).join('');
+
+  // Render pagination
+  let paginationHtml = '';
+  if (pagination && pagination.pages > 1) {
+    paginationHtml = '<div class="pagination" style="margin-top:0.8rem;">';
+    paginationHtml += `<button ${pagination.page <= 1 ? 'disabled' : ''} data-upage="${pagination.page - 1}">&laquo;</button>`;
+    for (let i = Math.max(1, pagination.page - 2); i <= Math.min(pagination.pages, pagination.page + 2); i++) {
+      paginationHtml += `<button class="${i === pagination.page ? 'active' : ''}" data-upage="${i}">${i}</button>`;
+    }
+    paginationHtml += `<button ${pagination.page >= pagination.pages ? 'disabled' : ''} data-upage="${pagination.page + 1}">&raquo;</button>`;
+    paginationHtml += '</div>';
+  }
+  usersList.insertAdjacentHTML('beforeend', paginationHtml);
+
+  usersList.querySelectorAll('button[data-upage]').forEach((btn) => {
+    btn.addEventListener('click', () => loadUsers(parseInt(btn.dataset.upage)));
+  });
 
   usersList.querySelectorAll('.user-edit-form').forEach((form) => {
     form.addEventListener('submit', async (event) => {
@@ -147,37 +150,37 @@ async function loadUsers() {
       body.mustChangePassword = body.mustChangePassword === 'true';
       if (!body.password) delete body.password;
 
-      const updateResponse = await secureFetch(`/api/users/${form.dataset.id}`, {
+      const updateResult = await apiJson(`/api/users/${form.dataset.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
 
-      if (!updateResponse) return;
-      const updateData = await readJson(updateResponse);
-      userMessage.textContent = updateResponse.ok ? 'Usuario actualizado' : (updateData.message || 'Error al actualizar usuario');
-      await Promise.all([loadUsers(), loadStats()]);
+      if (!updateResult) return;
+      showToast(updateResult.ok ? 'Usuario actualizado' : (updateResult.data.message || 'Error'), updateResult.ok ? 'success' : 'error');
+      await Promise.all([loadUsers(page), loadStats()]);
     });
   });
 
   usersList.querySelectorAll('button[data-delete-id]').forEach((button) => {
     button.addEventListener('click', async () => {
-      const delResponse = await secureFetch(`/api/users/${button.dataset.deleteId}`, { method: 'DELETE' });
-      if (!delResponse) return;
-
-      const delData = await readJson(delResponse);
-      userMessage.textContent = delResponse.ok ? 'Usuario eliminado' : (delData.message || 'Error al eliminar usuario');
-      await Promise.all([loadUsers(), loadStats()]);
+      if (!confirm('¿Eliminar este usuario?')) return;
+      const delResult = await apiJson(`/api/users/${button.dataset.deleteId}`, { method: 'DELETE' });
+      if (!delResult) return;
+      showToast(delResult.ok ? 'Usuario eliminado' : (delResult.data.message || 'Error'), delResult.ok ? 'success' : 'error');
+      await Promise.all([loadUsers(page), loadStats()]);
     });
   });
 }
 
-async function loadClasses() {
-  const response = await secureFetch('/api/classes');
-  if (!response) return;
+async function loadClasses(page = 1) {
+  const result = await apiJson(`/api/classes?page=${page}&limit=20`);
+  if (!result) return;
 
-  const classes = await readJson(response);
+  const { data: classes, pagination } = result.data;
   classesList.innerHTML = classes.map(classRow).join('');
+
+  renderPagination('classes-pagination', pagination, loadClasses);
 
   classesList.querySelectorAll('.class-edit-form').forEach((form) => {
     form.addEventListener('submit', async (event) => {
@@ -186,27 +189,25 @@ async function loadClasses() {
       const formData = new FormData(form);
       const body = Object.fromEntries(formData.entries());
 
-      const updateResponse = await secureFetch(`/api/classes/${form.dataset.id}`, {
+      const updateResult = await apiJson(`/api/classes/${form.dataset.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
 
-      if (!updateResponse) return;
-      const updateData = await readJson(updateResponse);
-      classMessage.textContent = updateResponse.ok ? 'Clase actualizada' : (updateData.message || 'Error al actualizar clase');
-      await Promise.all([loadClasses(), loadStats()]);
+      if (!updateResult) return;
+      showToast(updateResult.ok ? 'Clase actualizada' : (updateResult.data.message || 'Error'), updateResult.ok ? 'success' : 'error');
+      await Promise.all([loadClasses(page), loadStats()]);
     });
   });
 
   classesList.querySelectorAll('button[data-delete-class-id]').forEach((button) => {
     button.addEventListener('click', async () => {
-      const delResponse = await secureFetch(`/api/classes/${button.dataset.deleteClassId}`, { method: 'DELETE' });
-      if (!delResponse) return;
-
-      const delData = await readJson(delResponse);
-      classMessage.textContent = delResponse.ok ? 'Clase eliminada' : (delData.message || 'Error al eliminar clase');
-      await Promise.all([loadClasses(), loadStats()]);
+      if (!confirm('¿Eliminar esta clase?')) return;
+      const delResult = await apiJson(`/api/classes/${button.dataset.deleteClassId}`, { method: 'DELETE' });
+      if (!delResult) return;
+      showToast(delResult.ok ? 'Clase eliminada' : (delResult.data.message || 'Error'), delResult.ok ? 'success' : 'error');
+      await Promise.all([loadClasses(page), loadStats()]);
     });
   });
 }
@@ -216,18 +217,21 @@ createUserForm?.addEventListener('submit', async (event) => {
   const formData = new FormData(createUserForm);
   const body = Object.fromEntries(formData.entries());
 
-  const response = await secureFetch('/api/users', {
+  const submitBtn = createUserForm.querySelector('button[type="submit"]');
+  setButtonLoading(submitBtn, true);
+
+  const result = await apiJson('/api/users', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
 
-  if (!response) return;
+  setButtonLoading(submitBtn, false);
 
-  const data = await readJson(response);
-  userMessage.textContent = response.ok ? 'Usuario creado' : (data.message || 'Error al crear usuario');
+  if (!result) return;
+  showToast(result.ok ? 'Usuario creado' : (result.data.message || 'Error'), result.ok ? 'success' : 'error');
 
-  if (response.ok) {
+  if (result.ok) {
     createUserForm.reset();
     await Promise.all([loadUsers(), loadStats()]);
   }
@@ -238,19 +242,49 @@ createClassForm?.addEventListener('submit', async (event) => {
   const formData = new FormData(createClassForm);
   const body = Object.fromEntries(formData.entries());
 
-  const response = await secureFetch('/api/classes', {
+  const submitBtn = createClassForm.querySelector('button[type="submit"]');
+  setButtonLoading(submitBtn, true);
+
+  const result = await apiJson('/api/classes', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
 
-  if (!response) return;
+  setButtonLoading(submitBtn, false);
 
-  const data = await readJson(response);
-  classMessage.textContent = response.ok ? 'Clase creada' : (data.message || 'Error al crear clase');
+  if (!result) return;
+  showToast(result.ok ? 'Clase creada' : (result.data.message || 'Error'), result.ok ? 'success' : 'error');
 
-  if (response.ok) {
+  if (result.ok) {
     createClassForm.reset();
+    await Promise.all([loadClasses(), loadStats()]);
+  }
+});
+
+csvImportForm?.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const fileInput = csvImportForm.querySelector('input[type="file"]');
+  if (!fileInput.files.length) return;
+
+  const formData = new FormData();
+  formData.append('file', fileInput.files[0]);
+
+  const submitBtn = csvImportForm.querySelector('button[type="submit"]');
+  setButtonLoading(submitBtn, true);
+
+  const result = await apiJson('/api/classes/import-csv', {
+    method: 'POST',
+    body: formData,
+  });
+
+  setButtonLoading(submitBtn, false);
+
+  if (!result) return;
+  showToast(result.ok ? result.data.message : (result.data.message || 'Error al importar'), result.ok ? 'success' : 'error');
+
+  if (result.ok) {
+    csvImportForm.reset();
     await Promise.all([loadClasses(), loadStats()]);
   }
 });

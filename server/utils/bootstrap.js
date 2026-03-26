@@ -1,6 +1,8 @@
 const { query } = require('./db');
 const { initDatabase } = require('./init-db');
 const { hashPassword } = require('./hash');
+const { runMigrations } = require('./migrator');
+const { log } = require('./logger');
 
 async function ensureConfig() {
   const defaults = {
@@ -67,9 +69,11 @@ async function ensureClasses() {
 
 async function bootstrapDatabase() {
   await initDatabase();
+  await runMigrations();
   const config = await ensureConfig();
   await ensureUsers();
   await ensureClasses();
+  log.info('Database bootstrap complete');
   return config;
 }
 

@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard | RFA.Learning</title>
   <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/shared.css">
 </head>
 <body>
+  <a href="#stats-section" class="skip-link">Ir al dashboard</a>
   <header class="topbar">
     <div class="topbar-brand">
       <span class="brand-icon"></span>
@@ -71,11 +73,20 @@
         </form>
         <p id="class-message" class="hint"></p>
         <div id="classes-list"></div>
+        <div id="classes-pagination"></div>
+
+        <h3 style="margin-top:1.5rem;">Importar clases desde CSV</h3>
+        <form id="csv-import-form" class="csv-upload">
+          <input type="file" name="file" accept=".csv" required>
+          <button class="btn btn-small btn-primary" type="submit">Importar</button>
+        </form>
+        <p id="csv-message" class="hint"></p>
       </section>
     </section>
   </main>
 
   <script src="../js/theme.js"></script>
+  <script src="../js/shared.js"></script>
   <script src="../js/dashboard.js"></script>
 </body>
 </html>

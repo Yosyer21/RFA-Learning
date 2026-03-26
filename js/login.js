@@ -1,32 +1,45 @@
 const form = document.getElementById('login-form');
-const errorEl = document.getElementById('error');
 
 form?.addEventListener('submit', async (event) => {
   event.preventDefault();
-  errorEl.textContent = '';
 
-  const formData = new FormData(form);
-  const body = Object.fromEntries(formData.entries());
+  const usernameInput = document.getElementById('username');
+  const passwordInput = document.getElementById('password');
 
-  const response = await fetch('/api/auth/login', {
+  let valid = true;
+  valid = validateField(usernameInput, { required: true, requiredMessage: 'Usuario requerido' }) && valid;
+  valid = validateField(passwordInput, { required: true, requiredMessage: 'Contraseña requerida' }) && valid;
+  if (!valid) return;
+
+  const submitBtn = form.querySelector('button[type="submit"]');
+  setButtonLoading(submitBtn, true);
+
+  const result = await apiJson('/api/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    body: JSON.stringify({
+      username: usernameInput.value.trim(),
+      password: passwordInput.value,
+    }),
   });
 
-  const data = await response.json();
+  setButtonLoading(submitBtn, false);
 
-  if (!response.ok) {
-    errorEl.textContent = data.message || 'Error de autenticacion';
+  if (!result) return;
+
+  if (!result.ok) {
+    showToast(result.data.message || 'Error de autenticación', 'error');
     return;
   }
 
-  if (data.user.mustChangePassword) {
+  showToast('Bienvenido', 'success', 2000);
+
+  if (result.data.user.mustChangePassword) {
     window.location.href = '/change-password';
     return;
   }
 
-  if (data.user.role === 'admin') {
+  if (result.data.user.role === 'admin') {
     window.location.href = '/dashboard';
     return;
   }

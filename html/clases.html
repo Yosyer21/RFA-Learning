@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Clases | RFA.Learning</title>
   <link rel="stylesheet" href="../css/clases.css">
+  <link rel="stylesheet" href="../css/shared.css">
 </head>
 <body>
+  <a href="#classes-container" class="skip-link">Ir a las clases</a>
   <header class="topbar">
     <div class="topbar-brand">
       <span class="brand-icon"></span>
@@ -16,6 +18,7 @@
       <a href="/home">Home</a>
       <a href="/dashboard" id="dashboard-link" class="hidden">Dashboard</a>
       <button class="btn btn-small btn-ghost" data-theme-toggle type="button">Modo claro</button>
+      <a href="/profile" class="btn btn-small btn-ghost">Perfil</a>
       <button id="logout-btn" class="btn btn-small btn-danger">Salir</button>
     </nav>
   </header>
@@ -25,11 +28,27 @@
       <span class="kicker">Modulos</span>
       <h2>Modulo disponible</h2>
       <p id="classes-summary" class="hint"></p>
+
+      <div class="filter-bar">
+        <input id="search-input" type="search" placeholder="Buscar clase..." aria-label="Buscar clases">
+        <select id="filter-category" aria-label="Filtrar por categoría">
+          <option value="">Todas las categorías</option>
+        </select>
+        <select id="filter-level" aria-label="Filtrar por nivel">
+          <option value="">Todos los niveles</option>
+          <option value="Beginner">Beginner</option>
+          <option value="Intermediate">Intermediate</option>
+          <option value="Advanced">Advanced</option>
+        </select>
+      </div>
+
       <div id="classes-container"></div>
+      <div id="classes-pagination"></div>
     </section>
   </main>
 
   <script src="../js/theme.js"></script>
+  <script src="../js/shared.js"></script>
   <script src="../js/clases.js"></script>
 </body>
 </html>

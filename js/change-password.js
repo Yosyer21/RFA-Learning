@@ -1,36 +1,53 @@
 const form = document.getElementById('change-password-form');
-const messageEl = document.getElementById('message');
+const newPasswordInput = document.getElementById('newPassword');
+
+newPasswordInput?.addEventListener('input', () => {
+  renderPasswordStrength('password-strength-container', newPasswordInput.value);
+});
 
 form?.addEventListener('submit', async (event) => {
   event.preventDefault();
-  messageEl.textContent = '';
 
-  const formData = new FormData(form);
-  const body = Object.fromEntries(formData.entries());
+  const currentInput = document.getElementById('currentPassword');
+  let valid = true;
+  valid = validateField(currentInput, { required: true, requiredMessage: 'Contraseña actual requerida' }) && valid;
+  valid = validateField(newPasswordInput, {
+    required: true,
+    minLength: 8,
+    pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+    patternMessage: 'Debe tener mayúscula, minúscula y número',
+  }) && valid;
+  if (!valid) return;
 
-  const response = await fetch('/api/auth/change-password', {
+  const submitBtn = form.querySelector('button[type="submit"]');
+  setButtonLoading(submitBtn, true);
+
+  const result = await apiJson('/api/auth/change-password', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    body: JSON.stringify({
+      currentPassword: currentInput.value,
+      newPassword: newPasswordInput.value,
+    }),
   });
 
-  const data = await response.json();
+  setButtonLoading(submitBtn, false);
 
-  if (!response.ok) {
-    messageEl.classList.add('error');
-    messageEl.textContent = data.message || 'Error al actualizar contrasena';
+  if (!result) return;
+
+  if (!result.ok) {
+    showToast(result.data.message || 'Error al actualizar contraseña', 'error');
     return;
   }
 
-  messageEl.classList.remove('error');
-  messageEl.textContent = 'Contrasena actualizada. Redirigiendo...';
+  showToast('Contraseña actualizada. Redirigiendo...', 'success');
 
-  const meResponse = await fetch('/api/auth/me');
-  const meData = await meResponse.json();
-
-  if (meData.user.role === 'admin') {
-    window.location.href = '/dashboard';
-  } else {
-    window.location.href = '/home';
-  }
+  const meResult = await apiJson('/api/auth/me');
+  setTimeout(() => {
+    if (meResult?.data?.user?.role === 'admin') {
+      window.location.href = '/dashboard';
+    } else {
+      window.location.href = '/home';
+    }
+  }, 1500);
 });
