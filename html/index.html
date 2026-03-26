@@ -8,44 +8,44 @@
   <link rel="stylesheet" href="../css/shared.css">
 </head>
 <body>
-  <a href="#resumen" class="skip-link">Ir al contenido</a>
+  <a href="#resumen" class="skip-link" data-i18n="skip.content">Ir al contenido</a>
   <header class="topbar topbar-landing">
     <div class="topbar-brand">
       <span class="brand-icon"></span>
       <h1>RFA<span class="brand-dot">.</span>Learning</h1>
     </div>
     <nav>
-      <a href="#resumen">Contenido</a>
-      <a href="#funcionalidades">Funciones</a>
-      <a href="#galeria">Visual</a>
-      <a href="/login" class="btn btn-nav">Iniciar sesion</a>
+      <a href="#resumen" data-i18n="nav.contenido">Contenido</a>
+      <a href="#funcionalidades" data-i18n="nav.funciones">Funciones</a>
+      <a href="#galeria" data-i18n="nav.visual">Visual</a>
+      <a href="/login" class="btn btn-nav" data-i18n="nav.login">Iniciar sesion</a>
     </nav>
   </header>
 
   <main class="landing">
     <section class="hero-shell">
       <div class="hero-copy-panel reveal">
-        <p class="kicker"><span class="kicker-line"></span>Football Language System</p>
-        <h1>Lenguaje profesional de futbol en <span class="gradient-text">una sola plataforma</span></h1>
-        <p class="hero-lead">RFA.Learning integra traduccion, analisis y educacion deportiva para mejorar la comunicacion entre jugadores, entrenadores y analistas.</p>
+        <p class="kicker"><span class="kicker-line"></span><span data-i18n="landing.heroKicker">Football Language System</span></p>
+        <h1><span data-i18n="landing.heroTitle">Lenguaje profesional de futbol en </span><span class="gradient-text" data-i18n="landing.heroTitleHighlight">una sola plataforma</span></h1>
+        <p class="hero-lead" data-i18n="landing.heroLead">RFA.Learning integra traduccion, analisis y educacion deportiva para mejorar la comunicacion entre jugadores, entrenadores y analistas.</p>
         <div class="hero-tags">
-          <span>ES-EN</span>
-          <span>Analisis</span>
-          <span>Educacion</span>
-          <span>Scouting</span>
+          <span data-i18n="landing.tag1">ES-EN</span>
+          <span data-i18n="landing.tag2">Analisis</span>
+          <span data-i18n="landing.tag3">Educacion</span>
+          <span data-i18n="landing.tag4">Scouting</span>
         </div>
         <div class="hero-actions">
-          <button id="go-login" class="btn btn-primary-cta">Iniciar sesion</button>
-          <a href="#resumen" class="btn btn-ghost">Ver resumen</a>
+          <button id="go-login" class="btn btn-primary-cta" data-i18n="landing.loginBtn">Iniciar sesion</button>
+          <a href="#resumen" class="btn btn-ghost" data-i18n="landing.viewSummary">Ver resumen</a>
         </div>
         <div class="hero-notes">
           <article>
-            <strong>Comprension bilingue</strong>
-            <span>Terminologia tecnica y comunicacion aplicada.</span>
+            <strong data-i18n="landing.bilingualTitle">Comprension bilingue</strong>
+            <span data-i18n="landing.bilingualDesc">Terminologia tecnica y comunicacion aplicada.</span>
           </article>
           <article>
-            <strong>Uso formativo</strong>
-            <span>Enfoque para academias, staff tecnico y jugadores.</span>
+            <strong data-i18n="landing.formativeTitle">Uso formativo</strong>
+            <span data-i18n="landing.formativeDesc">Enfoque para academias, staff tecnico y jugadores.</span>
           </article>
         </div>
       </div>
@@ -56,23 +56,23 @@
             <div class="hero-track" data-slide-track>
               <figure class="hero-slide">
                 <img src="../assets/1.jpeg" alt="Entrenamiento de futbol en campo" loading="eager">
-                <figcaption>Entrenamiento tecnico y desarrollo coordinativo.</figcaption>
+                <figcaption data-i18n="landing.sliderCaption1">Entrenamiento tecnico y desarrollo coordinativo.</figcaption>
               </figure>
               <figure class="hero-slide">
                 <img src="../assets/8.jpeg" alt="Entrenador guiando practica en cancha" loading="lazy">
-                <figcaption>Comunicacion directa entre entrenador y jugador.</figcaption>
+                <figcaption data-i18n="landing.sliderCaption2">Comunicacion directa entre entrenador y jugador.</figcaption>
               </figure>
               <figure class="hero-slide">
                 <img src="../assets/14.jpeg" alt="Jugador en conduccion de balon" loading="lazy">
-                <figcaption>Aplicacion de conceptos en contexto real.</figcaption>
+                <figcaption data-i18n="landing.sliderCaption3">Aplicacion de conceptos en contexto real.</figcaption>
               </figure>
             </div>
             <div class="slider-progress"><span data-slide-progress></span></div>
           </div>
           <div class="hero-slider-controls">
-            <button class="slider-btn" type="button" data-slide-prev aria-label="Imagen anterior">&#8592; Anterior</button>
+            <button class="slider-btn" type="button" data-slide-prev data-i18n-aria="landing.prevAria" aria-label="Imagen anterior" data-i18n="landing.sliderPrev">&#8592; Anterior</button>
             <div class="slider-dots" data-slide-dots></div>
-            <button class="slider-btn" type="button" data-slide-next aria-label="Siguiente imagen">Siguiente &#8594;</button>
+            <button class="slider-btn" type="button" data-slide-next data-i18n-aria="landing.nextAria" aria-label="Siguiente imagen" data-i18n="landing.sliderNext">Siguiente &#8594;</button>
           </div>
         </div>
       </div>
@@ -80,138 +80,138 @@
 
     <section class="stats-strip reveal">
       <article>
-        <strong>500+</strong>
-        <span>Terminos tecnicos</span>
+        <strong data-i18n="landing.stat1">500+</strong>
+        <span data-i18n="landing.stat1Label">Terminos tecnicos</span>
       </article>
       <article>
-        <strong>2</strong>
-        <span>Idiomas soportados</span>
+        <strong data-i18n="landing.stat2">2</strong>
+        <span data-i18n="landing.stat2Label">Idiomas soportados</span>
       </article>
       <article>
-        <strong>5</strong>
-        <span>Modulos integrados</span>
+        <strong data-i18n="landing.stat3">5</strong>
+        <span data-i18n="landing.stat3Label">Modulos integrados</span>
       </article>
       <article>
-        <strong>100%</strong>
-        <span>Enfoque deportivo</span>
+        <strong data-i18n="landing.stat4">100%</strong>
+        <span data-i18n="landing.stat4Label">Enfoque deportivo</span>
       </article>
     </section>
 
     <section class="signal-strip reveal">
       <article>
         <div class="signal-icon" data-icon="01"></div>
-        <strong>Comprension bilingue</strong>
-        <span>Lenguaje tecnico del futbol en espanol e ingles.</span>
+        <strong data-i18n="landing.signal1Title">Comprension bilingue</strong>
+        <span data-i18n="landing.signal1Desc">Lenguaje tecnico del futbol en espanol e ingles.</span>
       </article>
       <article>
         <div class="signal-icon" data-icon="02"></div>
-        <strong>Aplicacion real</strong>
-        <span>Util para academias, entrenadores y analistas.</span>
+        <strong data-i18n="landing.signal2Title">Aplicacion real</strong>
+        <span data-i18n="landing.signal2Desc">Util para academias, entrenadores y analistas.</span>
       </article>
       <article>
         <div class="signal-icon" data-icon="03"></div>
-        <strong>Enfoque profesional</strong>
-        <span>Terminologia, analisis y educacion en una sola vista.</span>
+        <strong data-i18n="landing.signal3Title">Enfoque profesional</strong>
+        <span data-i18n="landing.signal3Desc">Terminologia, analisis y educacion en una sola vista.</span>
       </article>
     </section>
 
     <section id="resumen" class="landing-section split-section reveal">
       <div class="section-label">
-        <span>Resumen</span>
-        <h2>Descripcion</h2>
+        <span data-i18n="landing.summaryLabel">Resumen</span>
+        <h2 data-i18n="landing.summaryTitle">Descripcion</h2>
       </div>
       <div class="section-body">
-        <p>El Football Language System (FLS) es una plataforma disenada para facilitar la comprension, traduccion y analisis del lenguaje del futbol en espanol e ingles.</p>
-        <p class="hint">Permite acceder a terminologia tecnica, tactica y comunicativa utilizada en el futbol profesional.</p>
+        <p data-i18n="landing.summaryP1">El Football Language System (FLS) es una plataforma disenada para facilitar la comprension, traduccion y analisis del lenguaje del futbol en espanol e ingles.</p>
+        <p class="hint" data-i18n="landing.summaryP2">Permite acceder a terminologia tecnica, tactica y comunicativa utilizada en el futbol profesional.</p>
       </div>
     </section>
 
     <section class="landing-section split-section reveal">
       <div class="section-label">
-        <span>Proposito</span>
-        <h2>Objetivo Del Sistema</h2>
+        <span data-i18n="landing.purposeLabel">Proposito</span>
+        <h2 data-i18n="landing.purposeTitle">Objetivo Del Sistema</h2>
       </div>
       <div class="section-body">
         <ul class="idea-list">
-          <li>Traducir terminos del futbol en tiempo real.</li>
-          <li>Comprender el lenguaje tecnico del deporte.</li>
-          <li>Analizar jugadas y partidos.</li>
-          <li>Apoyar procesos de scouting y desarrollo de jugadores.</li>
-          <li>Facilitar la educacion deportiva.</li>
+          <li data-i18n="landing.purpose1">Traducir terminos del futbol en tiempo real.</li>
+          <li data-i18n="landing.purpose2">Comprender el lenguaje tecnico del deporte.</li>
+          <li data-i18n="landing.purpose3">Analizar jugadas y partidos.</li>
+          <li data-i18n="landing.purpose4">Apoyar procesos de scouting y desarrollo de jugadores.</li>
+          <li data-i18n="landing.purpose5">Facilitar la educacion deportiva.</li>
         </ul>
       </div>
     </section>
 
     <section id="funcionalidades" class="landing-section reveal">
       <div class="section-heading">
-        <span>Capacidades</span>
-        <h2>Funcionalidades Principales</h2>
+        <span data-i18n="landing.featuresLabel">Capacidades</span>
+        <h2 data-i18n="landing.featuresTitle">Funcionalidades Principales</h2>
       </div>
       <div class="term-grid feature-grid">
         <article>
-          <em>01</em><strong>Traductor de terminos (ES-EN)</strong><span>Traduccion instantanea de palabras y frases tecnicas.</span>
+          <em>01</em><strong data-i18n="landing.feature1">Traductor de terminos (ES-EN)</strong><span data-i18n="landing.feature1Desc">Traduccion instantanea de palabras y frases tecnicas.</span>
         </article>
         <article>
-          <em>02</em><strong>Base de datos de vocabulario</strong><span>Organizacion por categorias y acceso rapido.</span>
+          <em>02</em><strong data-i18n="landing.feature2">Base de datos de vocabulario</strong><span data-i18n="landing.feature2Desc">Organizacion por categorias y acceso rapido.</span>
         </article>
         <article>
-          <em>03</em><strong>Modulo de analisis</strong><span>Interpretacion de jugadas e identificacion de acciones.</span>
+          <em>03</em><strong data-i18n="landing.feature3">Modulo de analisis</strong><span data-i18n="landing.feature3Desc">Interpretacion de jugadas e identificacion de acciones.</span>
         </article>
         <article>
-          <em>04</em><strong>Perfil de jugador (opcional)</strong><span>Seguimiento tecnico, tactico, fisico y psicologico.</span>
+          <em>04</em><strong data-i18n="landing.feature4">Perfil de jugador (opcional)</strong><span data-i18n="landing.feature4Desc">Seguimiento tecnico, tactico, fisico y psicologico.</span>
         </article>
         <article>
-          <em>05</em><strong>Sistema educativo</strong><span>Aprendizaje interactivo con ejemplos y explicaciones claras.</span>
+          <em>05</em><strong data-i18n="landing.feature5">Sistema educativo</strong><span data-i18n="landing.feature5Desc">Aprendizaje interactivo con ejemplos y explicaciones claras.</span>
         </article>
       </div>
     </section>
 
     <section class="landing-section reveal">
       <div class="section-heading">
-        <span>Usuarios</span>
-        <h2>Para Quien Es Esta Plataforma</h2>
+        <span data-i18n="landing.audienceLabel">Usuarios</span>
+        <h2 data-i18n="landing.audienceTitle">Para Quien Es Esta Plataforma</h2>
       </div>
       <div class="audience-grid">
         <article>
-          <strong>Jugadores</strong><span>Comprension del lenguaje tecnico y toma de decisiones en campo.</span>
+          <strong data-i18n="landing.audience1">Jugadores</strong><span data-i18n="landing.audience1Desc">Comprension del lenguaje tecnico y toma de decisiones en campo.</span>
         </article>
         <article>
-          <strong>Entrenadores</strong><span>Mejor comunicacion, explicacion de conceptos y estructura de sesiones.</span>
+          <strong data-i18n="landing.audience2">Entrenadores</strong><span data-i18n="landing.audience2Desc">Mejor comunicacion, explicacion de conceptos y estructura de sesiones.</span>
         </article>
         <article>
-          <strong>Analistas deportivos</strong><span>Vocabulario consistente para lectura, reporte y analisis.</span>
+          <strong data-i18n="landing.audience3">Analistas deportivos</strong><span data-i18n="landing.audience3Desc">Vocabulario consistente para lectura, reporte y analisis.</span>
         </article>
         <article>
-          <strong>Academias de futbol</strong><span>Base educativa para programas bilingues y formativos.</span>
+          <strong data-i18n="landing.audience4">Academias de futbol</strong><span data-i18n="landing.audience4Desc">Base educativa para programas bilingues y formativos.</span>
         </article>
         <article>
-          <strong>Desarrolladores</strong><span>Soporte para productos deportivos, IA y sistemas de scouting.</span>
+          <strong data-i18n="landing.audience5">Desarrolladores</strong><span data-i18n="landing.audience5Desc">Soporte para productos deportivos, IA y sistemas de scouting.</span>
         </article>
       </div>
     </section>
 
     <section id="galeria" class="landing-section reveal">
       <div class="section-heading">
-        <span>Visual</span>
-        <h2>Experiencia En Campo</h2>
+        <span data-i18n="landing.galleryLabel">Visual</span>
+        <h2 data-i18n="landing.galleryTitle">Experiencia En Campo</h2>
       </div>
       <div class="index-gallery">
         <article class="gallery-item gallery-wide">
           <img src="../assets/8.jpeg" alt="Entrenador explicando ejercicio de futbol" loading="lazy">
           <div class="gallery-overlay">
-            <span>Contexto real de formacion</span>
+            <span data-i18n="landing.gallery1">Contexto real de formacion</span>
           </div>
         </article>
         <article class="gallery-item">
           <img src="../assets/14.jpeg" alt="Jugador conduciendo balon en entrenamiento" loading="lazy">
           <div class="gallery-overlay">
-            <span>Aplicacion individual</span>
+            <span data-i18n="landing.gallery2">Aplicacion individual</span>
           </div>
         </article>
         <article class="gallery-item gallery-tall">
           <img src="../assets/10.jpeg" alt="Ninos realizando ejercicio de control de balon" loading="lazy">
           <div class="gallery-overlay">
-            <span>Desarrollo tecnico</span>
+            <span data-i18n="landing.gallery3">Desarrollo tecnico</span>
           </div>
         </article>
       </div>
@@ -220,13 +220,13 @@
     <section class="landing-section cta-strip reveal">
       <div class="cta-glow"></div>
       <div class="section-heading">
-        <span>Acceso</span>
-        <h2>Accede a la plataforma</h2>
+        <span data-i18n="landing.ctaLabel">Acceso</span>
+        <h2 data-i18n="landing.ctaTitle">Accede a la plataforma</h2>
       </div>
-      <p>Inicia sesion para utilizar las herramientas de gestion y aprendizaje de RFA.Learning.</p>
+      <p data-i18n="landing.ctaDesc">Inicia sesion para utilizar las herramientas de gestion y aprendizaje de RFA.Learning.</p>
       <div class="hero-actions">
-        <button id="go-login-bottom" class="btn btn-primary-cta">Entrar ahora</button>
-        <a href="/login" class="btn btn-ghost">Acceso directo</a>
+        <button id="go-login-bottom" class="btn btn-primary-cta" data-i18n="landing.ctaBtn">Entrar ahora</button>
+        <a href="/login" class="btn btn-ghost" data-i18n="landing.ctaDirect">Acceso directo</a>
       </div>
     </section>
   </main>
@@ -234,10 +234,11 @@
   <footer class="landing-footer reveal">
     <div class="footer-inner">
       <p class="footer-brand">RFA<span class="brand-dot">.</span>Learning</p>
-      <p class="footer-copy">Football Language System &mdash; Plataforma de lenguaje deportivo.</p>
+      <p class="footer-copy" data-i18n="landing.footerDesc">Football Language System &mdash; Plataforma de lenguaje deportivo.</p>
     </div>
   </footer>
 
+  <script src="../js/i18n.js"></script>
   <script src="../js/theme.js"></script>
   <script src="../js/index.js"></script>
 </body>

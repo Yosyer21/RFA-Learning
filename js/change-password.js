@@ -10,12 +10,12 @@ form?.addEventListener('submit', async (event) => {
 
   const currentInput = document.getElementById('currentPassword');
   let valid = true;
-  valid = validateField(currentInput, { required: true, requiredMessage: 'Contraseña actual requerida' }) && valid;
+  valid = validateField(currentInput, { required: true, requiredMessage: t('cp.currentRequired') }) && valid;
   valid = validateField(newPasswordInput, {
     required: true,
     minLength: 8,
     pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-    patternMessage: 'Debe tener mayúscula, minúscula y número',
+    patternMessage: t('cp.passwordPattern'),
   }) && valid;
   if (!valid) return;
 
@@ -36,11 +36,11 @@ form?.addEventListener('submit', async (event) => {
   if (!result) return;
 
   if (!result.ok) {
-    showToast(result.data.message || 'Error al actualizar contraseña', 'error');
+    showToast(result.data.message || t('cp.error'), 'error');
     return;
   }
 
-  showToast('Contraseña actualizada. Redirigiendo...', 'success');
+  showToast(t('cp.success'), 'success');
 
   const meResult = await apiJson('/api/auth/me');
   setTimeout(() => {

@@ -1,8 +1,8 @@
 function getGreeting() {
   const h = new Date().getHours();
-  if (h < 12) return 'Buenos dias';
-  if (h < 19) return 'Buenas tardes';
-  return 'Buenas noches';
+  if (h < 12) return t('home.greetMorning');
+  if (h < 19) return t('home.greetAfternoon');
+  return t('home.greetEvening');
 }
 
 function setRingProgress(pct) {
@@ -46,7 +46,7 @@ function renderCompletedList(classes, completedIds) {
 
   const done = classes.filter(c => completedIds.includes(c.id));
   if (done.length === 0) {
-    list.innerHTML = '<li class="empty-state">Sin clases completadas aun</li>';
+    list.innerHTML = `<li class="empty-state">${t('home.noCompleted')}</li>`;
     return;
   }
 

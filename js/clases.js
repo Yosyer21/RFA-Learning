@@ -28,7 +28,7 @@ async function loadClasses(page = 1) {
   const { data: classes, pagination } = result.data;
   const container = document.getElementById('classes-container');
   const summary = document.getElementById('classes-summary');
-  summary.textContent = `${pagination.total} módulo(s) disponible(s)`;
+  summary.textContent = t('classes.modulesAvailable', pagination.total);
 
   // Populate category filter
   classes.forEach((c) => allCategories.add(c.category));
@@ -57,7 +57,7 @@ async function loadClasses(page = 1) {
             .join('')}
         </ul>
         <button class="btn btn-small btn-primary quiz-btn" data-class-id="${lesson.id}" style="margin-top:0.8rem;">
-          Tomar Quiz
+          ${t('classes.takeQuiz')}
         </button>
       </article>
     `
@@ -81,7 +81,7 @@ function escapeHtml(text) {
 function startQuiz(classId, classes) {
   const lesson = classes.find((c) => c.id === classId);
   if (!lesson || !lesson.content?.length) {
-    showToast('Esta clase no tiene contenido para quiz', 'warning');
+    showToast(t('classes.noQuizContent'), 'warning');
     return;
   }
 
@@ -91,22 +91,22 @@ function startQuiz(classId, classes) {
   const overlay = document.createElement('div');
   overlay.className = 'quiz-overlay';
   overlay.innerHTML = `
-    <div class="quiz-modal" role="dialog" aria-label="Quiz: ${escapeHtml(lesson.title)}">
-      <h2>Quiz: ${escapeHtml(lesson.title)}</h2>
-      <p class="hint">Traduce al inglés cada término</p>
+    <div class="quiz-modal" role="dialog" aria-label="${t('classes.quizTitle', escapeHtml(lesson.title))}">
+      <h2>${t('classes.quizTitle', escapeHtml(lesson.title))}</h2>
+      <p class="hint">${t('classes.quizHint')}</p>
       <form id="quiz-form">
         ${questions
           .map(
             (q, i) => `
           <div class="quiz-question">
             <label for="q${i}">${i + 1}. ${escapeHtml(q.spanish)}</label>
-            <input id="q${i}" name="q${i}" placeholder="English translation" required autocomplete="off">
+            <input id="q${i}" name="q${i}" placeholder="${t('classes.quizPlaceholder')}" required autocomplete="off">
           </div>`
           )
           .join('')}
         <div style="display:flex;gap:0.6rem;margin-top:1rem;">
-          <button type="submit" class="btn btn-primary">Enviar respuestas</button>
-          <button type="button" class="btn btn-ghost quiz-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">${t('classes.submitAnswers')}</button>
+          <button type="button" class="btn btn-ghost quiz-cancel">${t('ui.cancel')}</button>
         </div>
       </form>
       <div id="quiz-results" style="display:none;"></div>
@@ -140,7 +140,7 @@ function startQuiz(classId, classes) {
     setButtonLoading(submitBtn, false);
 
     if (!result || !result.ok) {
-      showToast(result?.data?.message || 'Error al enviar quiz', 'error');
+      showToast(result?.data?.message || t('classes.quizError'), 'error');
       return;
     }
 
@@ -153,23 +153,23 @@ function startQuiz(classId, classes) {
     resultsDiv.style.display = 'block';
     resultsDiv.innerHTML = `
       <div class="quiz-result ${passed ? 'passed' : 'failed'}">
-        <h3>${passed ? '¡Aprobado!' : 'No aprobado'}</h3>
+        <h3>${passed ? t('classes.quizPassed') : t('classes.quizFailed')}</h3>
         <p><strong>${score}/${total}</strong> (${percentage}%)</p>
-        ${passed ? '<p>La clase fue marcada como completada.</p>' : '<p>Necesitas 70% para aprobar. ¡Inténtalo de nuevo!</p>'}
+        ${passed ? `<p>${t('classes.classCompleted')}</p>` : `<p>${t('classes.need70')}</p>`}
       </div>
       <div style="margin-top:1rem;">
         ${graded
           .map(
             (a) => `<div class="quiz-answer ${a.correct ? 'correct' : 'incorrect'}">
-            ${escapeHtml(a.spanish)}: tu respuesta "${escapeHtml(a.answer)}" ${a.correct ? '✓' : `✕ (correcto: ${escapeHtml(a.expected)})`}
+            ${escapeHtml(a.spanish)}: ${t('classes.yourAnswer')} "${escapeHtml(a.answer)}" ${a.correct ? '✓' : `✕ (${t('classes.correct')}: ${escapeHtml(a.expected)})`}
           </div>`
           )
           .join('')}
       </div>
-      <button class="btn btn-ghost" style="margin-top:1rem;" onclick="this.closest('.quiz-overlay').remove()">Cerrar</button>
+      <button class="btn btn-ghost" style="margin-top:1rem;" onclick="this.closest('.quiz-overlay').remove()">${t('ui.close')}</button>
     `;
 
-    showToast(passed ? '¡Quiz aprobado!' : 'Quiz no aprobado', passed ? 'success' : 'warning');
+    showToast(passed ? t('classes.quizPassedToast') : t('classes.quizFailedToast'), passed ? 'success' : 'warning');
   });
 }
 

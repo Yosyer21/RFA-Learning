@@ -24,7 +24,7 @@ function showToast(message, type = 'info', duration = 4000) {
   toast.innerHTML = `
     <span class="toast-icon">${TOAST_ICONS[type] || ''}</span>
     <span>${message}</span>
-    <button class="toast-close" aria-label="Cerrar">&times;</button>
+    <button class="toast-close" aria-label="${t('ui.close')}">&times;</button>
   `;
 
   toast.querySelector('.toast-close').addEventListener('click', () => removeToast(toast));
@@ -63,7 +63,7 @@ function setButtonLoading(btn, loading) {
   if (loading) {
     btn.classList.add('btn-loading');
     btn.dataset.originalText = btn.textContent;
-    btn.textContent = 'Cargando...';
+    btn.textContent = t('ui.loading');
   } else {
     btn.classList.remove('btn-loading');
     btn.textContent = btn.dataset.originalText || btn.textContent;
@@ -78,7 +78,7 @@ function getPasswordStrength(password) {
   if (/[a-z]/.test(password)) strength++;
   if (/[0-9]/.test(password)) strength++;
 
-  const labels = ['', 'Débil', 'Regular', 'Buena', 'Fuerte'];
+  const labels = ['', t('password.weak'), t('password.fair'), t('password.good'), t('password.strong')];
   return { score: strength, label: labels[strength] || '' };
 }
 
@@ -115,7 +115,7 @@ async function apiFetch(url, options = {}) {
 
     return response;
   } catch (err) {
-    showToast('Error de conexión', 'error');
+    showToast(t('ui.connectionError'), 'error');
     return null;
   }
 }
@@ -127,7 +127,7 @@ async function apiJson(url, options = {}) {
   try {
     return { ok: response.ok, status: response.status, data: await response.json() };
   } catch {
-    return { ok: response.ok, status: response.status, data: { message: 'Respuesta inesperada' } };
+    return { ok: response.ok, status: response.status, data: { message: t('ui.unexpectedResponse') } };
   }
 }
 
@@ -137,11 +137,11 @@ function validateField(input, rules = {}) {
   let error = '';
 
   if (rules.required && !value) {
-    error = rules.requiredMessage || 'Campo requerido';
+    error = rules.requiredMessage || t('validation.required');
   } else if (rules.minLength && value.length < rules.minLength) {
-    error = `Mínimo ${rules.minLength} caracteres`;
+    error = t('validation.minChars', rules.minLength);
   } else if (rules.pattern && !rules.pattern.test(value)) {
-    error = rules.patternMessage || 'Formato inválido';
+    error = rules.patternMessage || t('validation.invalidFormat');
   }
 
   const errorEl = input.parentElement?.querySelector('.field-error');

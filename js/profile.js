@@ -5,14 +5,14 @@ async function loadProfile() {
   const user = meResult.data.user;
   document.getElementById('profile-name').value = user.name;
   document.getElementById('profile-username').value = user.username;
-  document.getElementById('profile-role').value = user.role === 'admin' ? 'Administrador' : 'Estudiante';
+  document.getElementById('profile-role').value = user.role === 'admin' ? t('profile.roleAdmin') : t('profile.roleStudent');
 
   // Load quiz history
   const historyResult = await apiJson('/api/classes/quiz/history');
   const container = document.getElementById('quiz-history');
 
   if (!historyResult || !historyResult.data.length) {
-    container.innerHTML = '<p class="hint">Sin quizzes realizados aún</p>';
+    container.innerHTML = `<p class="hint">${t('profile.noQuizzes')}</p>`;
     return;
   }
 
@@ -32,7 +32,7 @@ document.getElementById('profile-form')?.addEventListener('submit', async (event
   event.preventDefault();
   const nameInput = document.getElementById('profile-name');
 
-  if (!validateField(nameInput, { required: true, requiredMessage: 'Nombre requerido' })) return;
+  if (!validateField(nameInput, { required: true, requiredMessage: t('profile.nameRequired') })) return;
 
   const submitBtn = event.target.querySelector('button[type="submit"]');
   setButtonLoading(submitBtn, true);
@@ -46,9 +46,9 @@ document.getElementById('profile-form')?.addEventListener('submit', async (event
   setButtonLoading(submitBtn, false);
 
   if (result?.ok) {
-    showToast('Perfil actualizado', 'success');
+    showToast(t('profile.updated'), 'success');
   } else {
-    showToast(result?.data?.message || 'Error al actualizar', 'error');
+    showToast(result?.data?.message || t('profile.updateError'), 'error');
   }
 });
 

@@ -8,51 +8,51 @@
   <link rel="stylesheet" href="../css/shared.css">
 </head>
 <body>
-  <a href="#profile-main" class="skip-link">Ir al contenido</a>
+  <a href="#profile-main" class="skip-link" data-i18n="skip.content">Ir al contenido</a>
   <header class="topbar">
     <div class="topbar-brand">
       <span class="brand-icon"></span>
       <h1>RFA<span class="brand-dot">.</span>Learning</h1>
     </div>
     <nav>
-      <a href="/home">Home</a>
-      <a href="/clases">Clases</a>
-      <button class="btn btn-small btn-ghost" data-theme-toggle type="button">Modo claro</button>
-      <button id="logout-btn" class="btn btn-small btn-danger">Salir</button>
+      <a href="/home" data-i18n="nav.home">Home</a>
+      <a href="/clases" data-i18n="nav.clases">Clases</a>
+      <button id="logout-btn" class="btn btn-small btn-danger" data-i18n="nav.salir">Salir</button>
     </nav>
   </header>
 
   <main id="profile-main" class="container">
     <section class="card" style="max-width:600px;margin:0 auto;">
-      <span class="kicker">Mi cuenta</span>
-      <h2>Perfil</h2>
+      <span class="kicker" data-i18n="profile.kicker">Mi cuenta</span>
+      <h2 data-i18n="profile.title">Perfil</h2>
 
       <form id="profile-form" style="margin-top:1rem;">
-        <label for="profile-name">Nombre</label>
+        <label for="profile-name" data-i18n="profile.name">Nombre</label>
         <input id="profile-name" name="name" required aria-required="true" style="width:100%;padding:0.55rem 0.8rem;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);margin-bottom:0.5rem;">
         <div class="field-error" aria-live="polite"></div>
 
-        <label>Usuario</label>
+        <label data-i18n="profile.username">Usuario</label>
         <input id="profile-username" disabled style="width:100%;padding:0.55rem 0.8rem;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--muted);margin-bottom:0.5rem;opacity:0.6;">
 
-        <label>Rol</label>
+        <label data-i18n="profile.role">Rol</label>
         <input id="profile-role" disabled style="width:100%;padding:0.55rem 0.8rem;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--muted);margin-bottom:1rem;opacity:0.6;">
 
-        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <button type="submit" class="btn btn-primary" data-i18n="profile.save">Guardar cambios</button>
       </form>
 
       <hr style="border-color:var(--border);margin:1.5rem 0;">
 
-      <h3>Historial de quizzes</h3>
+      <h3 data-i18n="profile.quizHistory">Historial de quizzes</h3>
       <div id="quiz-history">
-        <p class="hint">Cargando...</p>
+        <p class="hint" data-i18n="ui.loading">Cargando...</p>
       </div>
 
       <hr style="border-color:var(--border);margin:1.5rem 0;">
 
-      <a href="/change-password" class="btn btn-ghost">Cambiar contraseña</a>
+      <a href="/change-password" class="btn btn-ghost" data-i18n="profile.changePassword">Cambiar contraseña</a>
     </section>
   </main>
+  <script src="../js/i18n.js"></script>
   <script src="../js/theme.js"></script>
   <script src="../js/shared.js"></script>
   <script src="../js/profile.js"></script>

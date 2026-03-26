@@ -8,86 +8,86 @@
   <link rel="stylesheet" href="../css/shared.css">
 </head>
 <body>
-  <a href="#stats-section" class="skip-link">Ir al dashboard</a>
+  <a href="#stats-section" class="skip-link" data-i18n="skip.dashboard">Ir al dashboard</a>
   <header class="topbar">
     <div class="topbar-brand">
       <span class="brand-icon"></span>
-      <h1>Dashboard Admin</h1>
+      <h1 data-i18n="dashboard.title">Dashboard Admin</h1>
     </div>
     <nav>
-      <a href="/home">Home</a>
-      <a href="/clases">Clases</a>
-      <button class="btn btn-small btn-ghost" data-theme-toggle type="button">Modo claro</button>
-      <button id="logout-btn" class="btn btn-small btn-danger">Salir</button>
+      <a href="/home" data-i18n="nav.home">Home</a>
+      <a href="/clases" data-i18n="nav.clases">Clases</a>
+      <button id="logout-btn" class="btn btn-small btn-danger" data-i18n="nav.salir">Salir</button>
     </nav>
   </header>
 
   <main class="container dashboard-layout">
     <aside class="card dashboard-sidebar">
-      <span class="kicker">Panel admin</span>
-      <h2>Control central</h2>
-      <p class="hint">Gestiona usuarios, clases y seguimiento desde una sola vista.</p>
+      <span class="kicker" data-i18n="dashboard.kicker">Panel admin</span>
+      <h2 data-i18n="dashboard.subtitle">Control central</h2>
+      <p class="hint" data-i18n="dashboard.hint">Gestiona usuarios, clases y seguimiento desde una sola vista.</p>
       <nav class="dashboard-nav">
-        <a href="#stats-section">Estadisticas</a>
-        <a href="#users-section">Usuarios</a>
-        <a href="#classes-section">Clases</a>
+        <a href="#stats-section" data-i18n="dashboard.stats">Estadisticas</a>
+        <a href="#users-section" data-i18n="dashboard.users">Usuarios</a>
+        <a href="#classes-section" data-i18n="dashboard.classes">Clases</a>
       </nav>
     </aside>
 
     <section class="dashboard-main">
       <section id="stats-section" class="card">
-        <h2>Estadisticas</h2>
+        <h2 data-i18n="dashboard.stats">Estadisticas</h2>
         <div id="stats-cards" class="stats-grid"></div>
-        <pre id="stats-data" class="pre-box">Cargando...</pre>
+        <pre id="stats-data" class="pre-box" data-i18n="ui.loading">Cargando...</pre>
       </section>
 
       <section id="users-section" class="card">
-        <h2>Usuarios</h2>
+        <h2 data-i18n="dashboard.users">Usuarios</h2>
         <form id="create-user-form" class="form-inline">
-          <input name="name" placeholder="Nombre" required>
-          <input name="username" placeholder="Usuario" required>
-          <input name="password" placeholder="Contrasena" required>
+          <input name="name" placeholder="Nombre" data-i18n-placeholder="dashboard.namePlaceholder" required>
+          <input name="username" placeholder="Usuario" data-i18n-placeholder="dashboard.usernamePlaceholder" required>
+          <input name="password" placeholder="Contrasena" data-i18n-placeholder="dashboard.passwordPlaceholder" required>
           <select name="role">
             <option value="student">student</option>
             <option value="admin">admin</option>
           </select>
-          <button class="btn btn-primary" type="submit">Crear</button>
+          <button class="btn btn-primary" type="submit" data-i18n="dashboard.createUser">Crear</button>
         </form>
         <p id="user-message" class="hint"></p>
         <div id="users-list"></div>
       </section>
 
       <section id="classes-section" class="card">
-        <h2>Clases</h2>
+        <h2 data-i18n="dashboard.classes">Clases</h2>
         <form id="create-class-form" class="form-stack">
-          <input name="title" placeholder="Titulo" required>
-          <input name="category" placeholder="Categoria (ej: Vocabulary)" required>
-          <input name="level" placeholder="Nivel (ej: Beginner)" required>
+          <input name="title" placeholder="Titulo" data-i18n-placeholder="dashboard.titlePlaceholder" required>
+          <input name="category" placeholder="Categoria (ej: Vocabulary)" data-i18n-placeholder="dashboard.categoryPlaceholder" required>
+          <input name="level" placeholder="Nivel (ej: Beginner)" data-i18n-placeholder="dashboard.levelPlaceholder" required>
           <textarea
             name="content"
             placeholder="Contenido en formato: espanol|english (una linea por termino)"
+            data-i18n-placeholder="dashboard.contentPlaceholder"
             rows="5"
             required
           ></textarea>
-          <button class="btn btn-primary" type="submit">Crear clase</button>
+          <button class="btn btn-primary" type="submit" data-i18n="dashboard.createClass">Crear clase</button>
         </form>
         <p id="class-message" class="hint"></p>
         <div id="classes-list"></div>
         <div id="classes-pagination"></div>
 
-        <h3 style="margin-top:1.5rem;">Importar clases desde CSV</h3>
+        <h3 style="margin-top:1.5rem;" data-i18n="dashboard.importCsv">Importar clases desde CSV</h3>
         <form id="csv-import-form" class="csv-upload">
           <input type="file" name="file" accept=".csv" required>
-          <button class="btn btn-small btn-primary" type="submit">Importar</button>
+          <button class="btn btn-small btn-primary" type="submit" data-i18n="dashboard.import">Importar</button>
         </form>
         <p id="csv-message" class="hint"></p>
       </section>
     </section>
   </main>
 
+  <script src="../js/i18n.js"></script>
   <script src="../js/theme.js"></script>
   <script src="../js/shared.js"></script>
   <script src="../js/dashboard.js"></script>
 </body>
 </html>
-

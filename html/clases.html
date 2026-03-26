@@ -8,34 +8,33 @@
   <link rel="stylesheet" href="../css/shared.css">
 </head>
 <body>
-  <a href="#classes-container" class="skip-link">Ir a las clases</a>
+  <a href="#classes-container" class="skip-link" data-i18n="skip.classes">Ir a las clases</a>
   <header class="topbar">
     <div class="topbar-brand">
       <span class="brand-icon"></span>
-      <h1>Clases</h1>
+      <h1 data-i18n="classes.title">Clases</h1>
     </div>
     <nav>
-      <a href="/home">Home</a>
-      <a href="/dashboard" id="dashboard-link" class="hidden">Dashboard</a>
-      <button class="btn btn-small btn-ghost" data-theme-toggle type="button">Modo claro</button>
-      <a href="/profile" class="btn btn-small btn-ghost">Perfil</a>
-      <button id="logout-btn" class="btn btn-small btn-danger">Salir</button>
+      <a href="/home" data-i18n="nav.home">Home</a>
+      <a href="/dashboard" id="dashboard-link" class="hidden" data-i18n="nav.dashboard">Dashboard</a>
+      <a href="/profile" class="btn btn-small btn-ghost" data-i18n="nav.perfil">Perfil</a>
+      <button id="logout-btn" class="btn btn-small btn-danger" data-i18n="nav.salir">Salir</button>
     </nav>
   </header>
 
   <main class="container">
     <section class="card">
-      <span class="kicker">Modulos</span>
-      <h2>Modulo disponible</h2>
+      <span class="kicker" data-i18n="classes.kicker">Modulos</span>
+      <h2 data-i18n="classes.subtitle">Modulo disponible</h2>
       <p id="classes-summary" class="hint"></p>
 
       <div class="filter-bar">
-        <input id="search-input" type="search" placeholder="Buscar clase..." aria-label="Buscar clases">
-        <select id="filter-category" aria-label="Filtrar por categoría">
-          <option value="">Todas las categorías</option>
+        <input id="search-input" type="search" placeholder="Buscar clase..." data-i18n-placeholder="classes.searchPlaceholder" data-i18n-aria="classes.searchPlaceholder" aria-label="Buscar clases">
+        <select id="filter-category" data-i18n-aria="classes.allCategories" aria-label="Filtrar por categoría">
+          <option value="" data-i18n="classes.allCategories">Todas las categorías</option>
         </select>
-        <select id="filter-level" aria-label="Filtrar por nivel">
-          <option value="">Todos los niveles</option>
+        <select id="filter-level" data-i18n-aria="classes.allLevels" aria-label="Filtrar por nivel">
+          <option value="" data-i18n="classes.allLevels">Todos los niveles</option>
           <option value="Beginner">Beginner</option>
           <option value="Intermediate">Intermediate</option>
           <option value="Advanced">Advanced</option>
@@ -47,9 +46,9 @@
     </section>
   </main>
 
+  <script src="../js/i18n.js"></script>
   <script src="../js/theme.js"></script>
   <script src="../js/shared.js"></script>
   <script src="../js/clases.js"></script>
 </body>
 </html>
-

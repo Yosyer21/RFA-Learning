@@ -25,12 +25,12 @@ async function loadStats() {
 
   const data = result.data;
   const items = [
-    ['Usuarios', data.totalUsers ?? 0],
-    ['Admins', data.totalAdmins ?? 0],
-    ['Students', data.totalStudents ?? 0],
-    ['Activos', data.activeStudents ?? 0],
-    ['Clases', data.totalClasses ?? 0],
-    ['Registros progreso', data.progressRecords ?? 0],
+    [t('dashboard.statUsers'), data.totalUsers ?? 0],
+    [t('dashboard.statAdmins'), data.totalAdmins ?? 0],
+    [t('dashboard.statStudents'), data.totalStudents ?? 0],
+    [t('dashboard.statActive'), data.activeStudents ?? 0],
+    [t('dashboard.statClasses'), data.totalClasses ?? 0],
+    [t('dashboard.statProgress'), data.progressRecords ?? 0],
   ];
 
   statsCards.innerHTML = items
@@ -65,8 +65,8 @@ function userRow(user) {
       </div>
       <div class="entity-meta">
         <span class="badge ${roleBadge}">${user.role}</span>
-        <span class="badge ${stateBadge}">${user.active ? 'activo' : 'inactivo'}</span>
-        <span class="badge">${user.mustChangePassword ? 'forzar password' : 'password normal'}</span>
+        <span class="badge ${stateBadge}">${user.active ? t('dashboard.active') : t('dashboard.inactive')}</span>
+        <span class="badge">${user.mustChangePassword ? t('dashboard.forcePassword') : t('dashboard.normalPassword')}</span>
       </div>
       <form class="form-inline user-edit-form" data-id="${user.id}">
         <input name="name" value="${escapeHtml(user.name)}" required>
@@ -83,9 +83,9 @@ function userRow(user) {
           <option value="false" ${!user.mustChangePassword ? 'selected' : ''}>normal</option>
           <option value="true" ${user.mustChangePassword ? 'selected' : ''}>forzar password</option>
         </select>
-        <input name="password" placeholder="Nueva contraseña (opcional)">
-        <button class="btn btn-small" type="submit">Guardar</button>
-        <button class="btn btn-small btn-danger" type="button" data-delete-id="${user.id}">Eliminar</button>
+        <input name="password" placeholder="${t('dashboard.newPasswordPlaceholder')}">
+        <button class="btn btn-small" type="submit">${t('dashboard.save')}</button>
+        <button class="btn btn-small btn-danger" type="button" data-delete-id="${user.id}">${t('ui.delete')}</button>
       </form>
     </article>
   `;
@@ -108,8 +108,8 @@ function classRow(lesson) {
         <input name="level" value="${escapeHtml(lesson.level)}" required>
         <textarea name="content" rows="4" required>${escapeHtml(contentText)}</textarea>
         <div class="form-inline">
-          <button class="btn btn-small" type="submit">Guardar</button>
-          <button class="btn btn-small btn-danger" type="button" data-delete-class-id="${lesson.id}">Eliminar</button>
+          <button class="btn btn-small" type="submit">${t('dashboard.save')}</button>
+          <button class="btn btn-small btn-danger" type="button" data-delete-class-id="${lesson.id}">${t('ui.delete')}</button>
         </div>
       </form>
     </article>
@@ -157,17 +157,17 @@ async function loadUsers(page = 1) {
       });
 
       if (!updateResult) return;
-      showToast(updateResult.ok ? 'Usuario actualizado' : (updateResult.data.message || 'Error'), updateResult.ok ? 'success' : 'error');
+      showToast(updateResult.ok ? t('dashboard.userUpdated') : (updateResult.data.message || 'Error'), updateResult.ok ? 'success' : 'error');
       await Promise.all([loadUsers(page), loadStats()]);
     });
   });
 
   usersList.querySelectorAll('button[data-delete-id]').forEach((button) => {
     button.addEventListener('click', async () => {
-      if (!confirm('¿Eliminar este usuario?')) return;
+      if (!confirm(t('dashboard.deleteUserConfirm'))) return;
       const delResult = await apiJson(`/api/users/${button.dataset.deleteId}`, { method: 'DELETE' });
       if (!delResult) return;
-      showToast(delResult.ok ? 'Usuario eliminado' : (delResult.data.message || 'Error'), delResult.ok ? 'success' : 'error');
+      showToast(delResult.ok ? t('dashboard.userDeleted') : (delResult.data.message || 'Error'), delResult.ok ? 'success' : 'error');
       await Promise.all([loadUsers(page), loadStats()]);
     });
   });
@@ -196,17 +196,17 @@ async function loadClasses(page = 1) {
       });
 
       if (!updateResult) return;
-      showToast(updateResult.ok ? 'Clase actualizada' : (updateResult.data.message || 'Error'), updateResult.ok ? 'success' : 'error');
+      showToast(updateResult.ok ? t('dashboard.classUpdated') : (updateResult.data.message || 'Error'), updateResult.ok ? 'success' : 'error');
       await Promise.all([loadClasses(page), loadStats()]);
     });
   });
 
   classesList.querySelectorAll('button[data-delete-class-id]').forEach((button) => {
     button.addEventListener('click', async () => {
-      if (!confirm('¿Eliminar esta clase?')) return;
+      if (!confirm(t('dashboard.deleteClassConfirm'))) return;
       const delResult = await apiJson(`/api/classes/${button.dataset.deleteClassId}`, { method: 'DELETE' });
       if (!delResult) return;
-      showToast(delResult.ok ? 'Clase eliminada' : (delResult.data.message || 'Error'), delResult.ok ? 'success' : 'error');
+      showToast(delResult.ok ? t('dashboard.classDeleted') : (delResult.data.message || 'Error'), delResult.ok ? 'success' : 'error');
       await Promise.all([loadClasses(page), loadStats()]);
     });
   });
@@ -229,7 +229,7 @@ createUserForm?.addEventListener('submit', async (event) => {
   setButtonLoading(submitBtn, false);
 
   if (!result) return;
-  showToast(result.ok ? 'Usuario creado' : (result.data.message || 'Error'), result.ok ? 'success' : 'error');
+  showToast(result.ok ? t('dashboard.userCreated') : (result.data.message || 'Error'), result.ok ? 'success' : 'error');
 
   if (result.ok) {
     createUserForm.reset();
@@ -254,7 +254,7 @@ createClassForm?.addEventListener('submit', async (event) => {
   setButtonLoading(submitBtn, false);
 
   if (!result) return;
-  showToast(result.ok ? 'Clase creada' : (result.data.message || 'Error'), result.ok ? 'success' : 'error');
+  showToast(result.ok ? t('dashboard.classCreated') : (result.data.message || 'Error'), result.ok ? 'success' : 'error');
 
   if (result.ok) {
     createClassForm.reset();
@@ -281,7 +281,7 @@ csvImportForm?.addEventListener('submit', async (event) => {
   setButtonLoading(submitBtn, false);
 
   if (!result) return;
-  showToast(result.ok ? result.data.message : (result.data.message || 'Error al importar'), result.ok ? 'success' : 'error');
+  showToast(result.ok ? result.data.message : (result.data.message || t('dashboard.importError')), result.ok ? 'success' : 'error');
 
   if (result.ok) {
     csvImportForm.reset();

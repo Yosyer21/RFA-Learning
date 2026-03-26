@@ -8,17 +8,16 @@
   <link rel="stylesheet" href="../css/shared.css">
 </head>
 <body>
-  <a href="#welcome" class="skip-link">Ir al contenido</a>
+  <a href="#welcome" class="skip-link" data-i18n="skip.content">Ir al contenido</a>
   <header class="topbar">
     <div class="topbar-brand">
       <span class="brand-icon"></span>
       <h1>RFA<span class="brand-dot">.</span>Learning</h1>
     </div>
     <nav>
-      <a href="/clases">Clases</a>
-      <button class="btn btn-small btn-ghost" data-theme-toggle type="button">Modo claro</button>
-      <a href="/profile" class="btn btn-small btn-ghost">Perfil</a>
-      <button id="logout-btn" class="btn btn-small btn-danger">Salir</button>
+      <a href="/clases" data-i18n="nav.clases">Clases</a>
+      <a href="/profile" class="btn btn-small btn-ghost" data-i18n="nav.perfil">Perfil</a>
+      <button id="logout-btn" class="btn btn-small btn-danger" data-i18n="nav.salir">Salir</button>
     </nav>
   </header>
 
@@ -26,10 +25,10 @@
     <!-- Hero bienvenida -->
     <section class="home-hero">
       <div class="home-hero-copy">
-        <span class="kicker">Dashboard</span>
-        <h2 id="welcome">Cargando...</h2>
-        <p id="greeting-sub" class="hero-sub">Continua tu aprendizaje del lenguaje del futbol.</p>
-        <a href="/clases" class="btn btn-primary hero-cta">Ir a clases</a>
+        <span class="kicker" data-i18n="home.kicker">Dashboard</span>
+        <h2 id="welcome" data-i18n="ui.loading">Cargando...</h2>
+        <p id="greeting-sub" class="hero-sub" data-i18n="home.subtitle">Continua tu aprendizaje del lenguaje del futbol.</p>
+        <a href="/clases" class="btn btn-primary hero-cta" data-i18n="home.goToClasses">Ir a clases</a>
       </div>
       <div class="home-hero-visual">
         <div class="progress-ring-wrap">
@@ -45,7 +44,7 @@
           </svg>
           <div class="progress-ring-label">
             <strong id="progress-pct">0%</strong>
-            <span>completado</span>
+            <span data-i18n="home.completed">completado</span>
           </div>
         </div>
       </div>
@@ -54,19 +53,19 @@
     <!-- Stats -->
     <section class="home-stats">
       <div class="stat-card">
-        <span>Nivel actual</span>
+        <span data-i18n="home.statLevel">Nivel actual</span>
         <strong id="stat-level">--</strong>
       </div>
       <div class="stat-card">
-        <span>Clases completadas</span>
+        <span data-i18n="home.statCompleted">Clases completadas</span>
         <strong id="stat-completed">0</strong>
       </div>
       <div class="stat-card">
-        <span>Puntaje total</span>
+        <span data-i18n="home.statScore">Puntaje total</span>
         <strong id="stat-score">0</strong>
       </div>
       <div class="stat-card">
-        <span>Racha activa</span>
+        <span data-i18n="home.statStreak">Racha activa</span>
         <strong id="stat-streak">0</strong>
       </div>
     </section>
@@ -75,8 +74,8 @@
     <div class="home-grid">
       <section class="card home-section">
         <div class="section-head">
-          <span class="kicker">Progreso</span>
-          <h3>Avance por nivel</h3>
+          <span class="kicker" data-i18n="home.progressKicker">Progreso</span>
+          <h3 data-i18n="home.progressTitle">Avance por nivel</h3>
         </div>
         <div id="level-bars" class="level-bars">
           <!-- JS -->
@@ -85,19 +84,19 @@
 
       <section class="card home-section">
         <div class="section-head">
-          <span class="kicker">Actividad</span>
-          <h3>Clases completadas</h3>
+          <span class="kicker" data-i18n="home.activityKicker">Actividad</span>
+          <h3 data-i18n="home.activityTitle">Clases completadas</h3>
         </div>
         <ul id="completed-list" class="completed-list">
-          <li class="empty-state">Sin clases completadas aun</li>
+          <li class="empty-state" data-i18n="home.noCompleted">Sin clases completadas aun</li>
         </ul>
       </section>
     </div>
   </main>
 
+  <script src="../js/i18n.js"></script>
   <script src="../js/theme.js"></script>
   <script src="../js/shared.js"></script>
   <script src="../js/home.js"></script>
 </body>
 </html>
-

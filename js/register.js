@@ -12,13 +12,13 @@ form?.addEventListener('submit', async (event) => {
   const usernameInput = document.getElementById('username');
 
   let valid = true;
-  valid = validateField(nameInput, { required: true, requiredMessage: 'Nombre requerido' }) && valid;
+  valid = validateField(nameInput, { required: true, requiredMessage: t('register.nameRequired') }) && valid;
   valid = validateField(usernameInput, { required: true, minLength: 3 }) && valid;
   valid = validateField(passwordInput, {
     required: true,
     minLength: 8,
     pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-    patternMessage: 'Debe tener mayúscula, minúscula y número',
+    patternMessage: t('register.passwordPattern'),
   }) && valid;
 
   if (!valid) return;
@@ -43,11 +43,11 @@ form?.addEventListener('submit', async (event) => {
   if (!result) return;
 
   if (!result.ok) {
-    showToast(result.data.message || 'Error al registrar', 'error');
+    showToast(result.data.message || t('register.error'), 'error');
     return;
   }
 
-  showToast('Cuenta creada exitosamente', 'success');
+  showToast(t('register.success'), 'success');
   setTimeout(() => {
     window.location.href = '/home';
   }, 1000);

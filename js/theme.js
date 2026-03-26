@@ -12,7 +12,9 @@
 
   function updateButtonState(theme) {
     document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
-      button.textContent = theme === 'light' ? 'Modo oscuro' : 'Modo claro';
+      button.textContent = theme === 'light'
+        ? (typeof t === 'function' ? t('theme.dark') : 'Modo oscuro')
+        : (typeof t === 'function' ? t('theme.light') : 'Modo claro');
     });
   }
 

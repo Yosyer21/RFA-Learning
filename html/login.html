@@ -8,39 +8,38 @@
   <link rel="stylesheet" href="../css/shared.css">
 </head>
 <body>
-  <a href="#login-form" class="skip-link">Ir al formulario</a>
+  <a href="#login-form" class="skip-link" data-i18n="skip.form">Ir al formulario</a>
   <header class="topbar topbar-landing">
     <div class="topbar-brand">
       <span class="brand-icon"></span>
       <h1>RFA<span class="brand-dot">.</span>Learning</h1>
     </div>
     <nav>
-      <a href="/">Inicio</a>
-      <button class="btn btn-small btn-ghost" data-theme-toggle type="button">Modo claro</button>
+      <a href="/" data-i18n="nav.inicio">Inicio</a>
     </nav>
   </header>
 
   <main class="container auth-page">
     <form id="login-form" class="card form login-card">
       <div class="login-header">
-        <span class="kicker">Acceso</span>
-        <h1>Iniciar sesion</h1>
+        <span class="kicker" data-i18n="login.kicker">Acceso</span>
+        <h1 data-i18n="login.title">Iniciar sesion</h1>
       </div>
-      <label for="username">Usuario</label>
-      <input id="username" name="username" placeholder="Tu nombre de usuario" required>
+      <label for="username" data-i18n="login.username">Usuario</label>
+      <input id="username" name="username" placeholder="Tu nombre de usuario" data-i18n-placeholder="login.usernamePlaceholder" required>
 
-      <label for="password">Contrasena</label>
-      <input id="password" name="password" type="password" placeholder="Tu contrasena" required>
+      <label for="password" data-i18n="login.password">Contrasena</label>
+      <input id="password" name="password" type="password" placeholder="Tu contrasena" data-i18n-placeholder="login.passwordPlaceholder" required>
 
-      <button type="submit" class="btn btn-primary">Entrar</button>
+      <button type="submit" class="btn btn-primary" data-i18n="login.submit">Entrar</button>
       <p id="error" class="message error"></p>
-      <p class="hint">Admin inicial: admin / Admin1234</p>
-      <p class="hint" style="margin-top:0.5rem;text-align:center;"><a href="/register">Crear cuenta nueva</a></p>
+      <p class="hint" data-i18n="login.hint">Admin inicial: admin / Admin1234</p>
+      <p class="hint" style="margin-top:0.5rem;text-align:center;"><a href="/register" data-i18n="login.createAccount">Crear cuenta nueva</a></p>
     </form>
   </main>
+  <script src="../js/i18n.js"></script>
   <script src="../js/theme.js"></script>
   <script src="../js/shared.js"></script>
   <script src="../js/login.js"></script>
 </body>
 </html>
-

@@ -7,8 +7,8 @@ form?.addEventListener('submit', async (event) => {
   const passwordInput = document.getElementById('password');
 
   let valid = true;
-  valid = validateField(usernameInput, { required: true, requiredMessage: 'Usuario requerido' }) && valid;
-  valid = validateField(passwordInput, { required: true, requiredMessage: 'Contraseña requerida' }) && valid;
+  valid = validateField(usernameInput, { required: true, requiredMessage: t('login.usernameRequired') }) && valid;
+  valid = validateField(passwordInput, { required: true, requiredMessage: t('login.passwordRequired') }) && valid;
   if (!valid) return;
 
   const submitBtn = form.querySelector('button[type="submit"]');
@@ -28,11 +28,11 @@ form?.addEventListener('submit', async (event) => {
   if (!result) return;
 
   if (!result.ok) {
-    showToast(result.data.message || 'Error de autenticación', 'error');
+    showToast(result.data.message || t('login.authError'), 'error');
     return;
   }
 
-  showToast('Bienvenido', 'success', 2000);
+  showToast(t('login.welcome'), 'success', 2000);
 
   if (result.data.user.mustChangePassword) {
     window.location.href = '/change-password';

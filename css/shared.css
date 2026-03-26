@@ -1,3 +1,18 @@
+/* ── Language Toggle ── */
+.btn-lang {
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  background: var(--primary, #6c5ce7);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-lang:hover { opacity: 0.85; }
+
 /* ── Toast Notifications ── */
 .toast-container {
   position: fixed;
