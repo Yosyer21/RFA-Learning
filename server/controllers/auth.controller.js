@@ -1,4 +1,4 @@
-const { readJson, writeJson } = require('../utils/db');
+const { query } = require('../utils/db');
 const { comparePassword, hashPassword } = require('../utils/hash');
 const { normalizeText, publicUser } = require('../utils/helpers');
 
@@ -10,8 +10,11 @@ async function login(req, res) {
     return res.status(400).json({ message: 'Username and password are required' });
   }
 
-  const users = await readJson('users.json', []);
-  const user = users.find((item) => item.username.toLowerCase() === username);
+  const result = await query(
+    'SELECT id, name, username, password, role, active, must_change_password FROM users WHERE LOWER(username) = $1',
+    [username]
+  );
+  const user = result.rows[0];
 
   if (!user || !user.active) {
     return res.status(401).json({ message: 'Invalid credentials' });
@@ -27,7 +30,7 @@ async function login(req, res) {
     name: user.name,
     username: user.username,
     role: user.role,
-    mustChangePassword: Boolean(user.mustChangePassword),
+    mustChangePassword: Boolean(user.must_change_password),
   };
 
   return res.json({
@@ -52,8 +55,8 @@ async function changePassword(req, res) {
     return res.status(400).json({ message: 'New password must have at least 8 characters' });
   }
 
-  const users = await readJson('users.json', []);
-  const user = users.find((item) => item.id === req.session.user.id);
+  const result = await query('SELECT id, password FROM users WHERE id = $1', [req.session.user.id]);
+  const user = result.rows[0];
 
   if (!user) {
     return res.status(404).json({ message: 'User not found' });
@@ -64,9 +67,8 @@ async function changePassword(req, res) {
     return res.status(401).json({ message: 'Current password is incorrect' });
   }
 
-  user.password = await hashPassword(newPassword);
-  user.mustChangePassword = false;
-  await writeJson('users.json', users);
+  const hashedPassword = await hashPassword(newPassword);
+  await query('UPDATE users SET password = $1, must_change_password = false WHERE id = $2', [hashedPassword, user.id]);
 
   req.session.user.mustChangePassword = false;
   return res.json({ message: 'Password updated' });
@@ -88,7 +90,11 @@ function me(req, res) {
 }
 
 async function seedStatus(_req, res) {
-  const users = await readJson('users.json', []);
+  const result = await query('SELECT id, name, username, role, active, must_change_password FROM users');
+  const users = result.rows.map((row) => ({
+    ...row,
+    mustChangePassword: row.must_change_password,
+  }));
   res.json({
     users: users.map(publicUser),
     hasAdmin: users.some((user) => user.role === 'admin'),

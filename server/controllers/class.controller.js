@@ -1,4 +1,4 @@
-const { readJson, writeJson, nextId } = require('../utils/db');
+const { query } = require('../utils/db');
 const { normalizeText } = require('../utils/helpers');
 
 function parseContent(rawContent) {
@@ -22,12 +22,11 @@ function parseContent(rawContent) {
 }
 
 async function getClasses(_req, res) {
-  const classes = await readJson('clases.json', []);
-  return res.json(classes);
+  const result = await query('SELECT * FROM classes ORDER BY id');
+  return res.json(result.rows);
 }
 
 async function createClass(req, res) {
-  const classes = await readJson('clases.json', []);
   const title = normalizeText(req.body.title);
   const category = normalizeText(req.body.category) || 'Vocabulary';
   const level = normalizeText(req.body.level) || 'Beginner';
@@ -37,63 +36,63 @@ async function createClass(req, res) {
     return res.status(400).json({ message: 'Title is required' });
   }
 
-  const newClass = {
-    id: nextId(classes),
-    title,
-    category,
-    level,
-    content,
-  };
+  const result = await query(
+    'INSERT INTO classes (title, category, level, content) VALUES ($1, $2, $3, $4) RETURNING *',
+    [title, category, level, JSON.stringify(content)]
+  );
 
-  classes.push(newClass);
-  await writeJson('clases.json', classes);
-  return res.status(201).json(newClass);
+  return res.status(201).json(result.rows[0]);
 }
 
 async function updateClass(req, res) {
-  const classes = await readJson('clases.json', []);
   const id = Number(req.params.id);
-  const item = classes.find((entry) => entry.id === id);
 
-  if (!item) {
+  const existing = await query('SELECT * FROM classes WHERE id = $1', [id]);
+  if (existing.rows.length === 0) {
     return res.status(404).json({ message: 'Class not found' });
   }
 
-  const title = normalizeText(req.body.title);
-  const category = normalizeText(req.body.category);
-  const level = normalizeText(req.body.level);
+  const item = existing.rows[0];
+  const title = normalizeText(req.body.title) || item.title;
+  const category = normalizeText(req.body.category) || item.category;
+  const level = normalizeText(req.body.level) || item.level;
+  let content = item.content;
 
-  if (title) item.title = title;
-  if (category) item.category = category;
-  if (level) item.level = level;
   if (Array.isArray(req.body.content) || typeof req.body.content === 'string') {
-    item.content = parseContent(req.body.content);
+    content = parseContent(req.body.content);
   }
 
-  await writeJson('clases.json', classes);
-  return res.json(item);
+  const result = await query(
+    'UPDATE classes SET title = $1, category = $2, level = $3, content = $4 WHERE id = $5 RETURNING *',
+    [title, category, level, JSON.stringify(content), id]
+  );
+
+  return res.json(result.rows[0]);
 }
 
 async function deleteClass(req, res) {
-  const classes = await readJson('clases.json', []);
   const id = Number(req.params.id);
 
-  if (!classes.some((item) => item.id === id)) {
+  const result = await query('DELETE FROM classes WHERE id = $1 RETURNING id', [id]);
+  if (result.rows.length === 0) {
     return res.status(404).json({ message: 'Class not found' });
   }
 
-  await writeJson('clases.json', classes.filter((item) => item.id !== id));
   return res.json({ message: 'Class deleted' });
 }
 
 async function getProgress(req, res) {
-  const progress = await readJson('progress.json', []);
-
   if (req.user.role === 'admin') {
-    return res.json(progress);
+    const result = await query('SELECT id, user_id AS "userId", completed_classes AS "completedClasses", current_level AS "currentLevel", score FROM progress');
+    return res.json(result.rows);
   }
 
-  const ownProgress = progress.find((item) => item.userId === req.user.id) || {
+  const result = await query(
+    'SELECT id, user_id AS "userId", completed_classes AS "completedClasses", current_level AS "currentLevel", score FROM progress WHERE user_id = $1',
+    [req.user.id]
+  );
+
+  const ownProgress = result.rows[0] || {
     userId: req.user.id,
     completedClasses: [],
     currentLevel: 'Beginner',
@@ -104,25 +103,34 @@ async function getProgress(req, res) {
 }
 
 async function updateProgress(req, res) {
-  const progress = await readJson('progress.json', []);
   const userId = req.user.role === 'admin' && req.body.userId ? Number(req.body.userId) : req.user.id;
 
-  let entry = progress.find((item) => item.userId === userId);
-  if (!entry) {
-    entry = {
-      userId,
-      completedClasses: [],
-      currentLevel: 'Beginner',
-      score: 0,
-    };
-    progress.push(entry);
+  const existing = await query('SELECT * FROM progress WHERE user_id = $1', [userId]);
+  let entry;
+
+  if (existing.rows.length === 0) {
+    const completedClasses = Array.isArray(req.body.completedClasses) ? req.body.completedClasses : [];
+    const currentLevel = normalizeText(req.body.currentLevel) || 'Beginner';
+    const score = typeof req.body.score === 'number' ? req.body.score : 0;
+
+    const result = await query(
+      'INSERT INTO progress (user_id, completed_classes, current_level, score) VALUES ($1, $2, $3, $4) RETURNING user_id AS "userId", completed_classes AS "completedClasses", current_level AS "currentLevel", score',
+      [userId, JSON.stringify(completedClasses), currentLevel, score]
+    );
+    entry = result.rows[0];
+  } else {
+    const current = existing.rows[0];
+    const completedClasses = Array.isArray(req.body.completedClasses) ? req.body.completedClasses : current.completed_classes;
+    const currentLevel = normalizeText(req.body.currentLevel) || current.current_level;
+    const score = typeof req.body.score === 'number' ? req.body.score : current.score;
+
+    const result = await query(
+      'UPDATE progress SET completed_classes = $1, current_level = $2, score = $3 WHERE user_id = $4 RETURNING user_id AS "userId", completed_classes AS "completedClasses", current_level AS "currentLevel", score',
+      [JSON.stringify(completedClasses), currentLevel, score, userId]
+    );
+    entry = result.rows[0];
   }
 
-  if (Array.isArray(req.body.completedClasses)) entry.completedClasses = req.body.completedClasses;
-  if (normalizeText(req.body.currentLevel)) entry.currentLevel = normalizeText(req.body.currentLevel);
-  if (typeof req.body.score === 'number') entry.score = req.body.score;
-
-  await writeJson('progress.json', progress);
   return res.json(entry);
 }
 

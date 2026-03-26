@@ -1,19 +1,20 @@
-const { readJson } = require('../utils/db');
+const { query } = require('../utils/db');
 
 async function dashboardStats(_req, res) {
-  const users = await readJson('users.json', []);
-  const classes = await readJson('clases.json', []);
-  const progress = await readJson('progress.json', []);
+  const usersResult = await query('SELECT role, active FROM users');
+  const classesResult = await query('SELECT COUNT(*) FROM classes');
+  const progressResult = await query('SELECT COUNT(*) FROM progress');
 
-  const activeStudents = users.filter((user) => user.role === 'student' && user.active).length;
+  const users = usersResult.rows;
+  const activeStudents = users.filter((u) => u.role === 'student' && u.active).length;
 
   return res.json({
     totalUsers: users.length,
-    totalAdmins: users.filter((user) => user.role === 'admin').length,
-    totalStudents: users.filter((user) => user.role === 'student').length,
+    totalAdmins: users.filter((u) => u.role === 'admin').length,
+    totalStudents: users.filter((u) => u.role === 'student').length,
     activeStudents,
-    totalClasses: classes.length,
-    progressRecords: progress.length,
+    totalClasses: parseInt(classesResult.rows[0].count, 10),
+    progressRecords: parseInt(progressResult.rows[0].count, 10),
   });
 }
 

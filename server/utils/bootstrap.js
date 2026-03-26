@@ -1,4 +1,5 @@
-const { readJson, writeJson } = require('./db');
+const { query } = require('./db');
+const { initDatabase } = require('./init-db');
 const { hashPassword } = require('./hash');
 
 async function ensureConfig() {
@@ -10,84 +11,65 @@ async function ensureConfig() {
     sessionSecret: 'rfa-learning-dev-secret-change-this',
   };
 
-  const config = await readJson('config.json', null);
-  if (!config || typeof config !== 'object') {
-    await writeJson('config.json', defaults);
-    return defaults;
+  const result = await query('SELECT key, value FROM config');
+  const existing = {};
+  for (const row of result.rows) {
+    existing[row.key] = row.value;
   }
 
-  const merged = { ...defaults, ...config };
-  await writeJson('config.json', merged);
-  return merged;
+  const config = { ...defaults, ...existing };
+
+  for (const [key, value] of Object.entries(config)) {
+    await query(
+      `INSERT INTO config (key, value) VALUES ($1, $2)
+       ON CONFLICT (key) DO UPDATE SET value = $2`,
+      [key, JSON.stringify(value)]
+    );
+  }
+
+  return config;
 }
 
 async function ensureUsers() {
-  const users = await readJson('users.json', []);
+  const result = await query('SELECT COUNT(*) FROM users');
+  const count = parseInt(result.rows[0].count, 10);
 
-  if (!Array.isArray(users) || users.length === 0) {
-    const defaultAdmin = {
-      id: 1,
-      name: 'Admin',
-      username: 'admin',
-      password: await hashPassword('Admin1234'),
-      role: 'admin',
-      active: true,
-      mustChangePassword: true,
-    };
-
-    await writeJson('users.json', [defaultAdmin]);
-    return;
+  if (count === 0) {
+    const hashedPassword = await hashPassword('Admin1234');
+    await query(
+      `INSERT INTO users (name, username, password, role, active, must_change_password)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      ['Admin', 'admin', hashedPassword, 'admin', true, true]
+    );
+    console.log('Default admin user created (admin / Admin1234)');
   }
-
-  const normalizedUsers = users.map((user) => ({
-    ...user,
-    mustChangePassword:
-      typeof user.mustChangePassword === 'boolean'
-        ? user.mustChangePassword
-        : user.username === 'admin',
-  }));
-
-  await writeJson('users.json', normalizedUsers);
 }
 
 async function ensureClasses() {
-  const classes = await readJson('clases.json', []);
-  if (!Array.isArray(classes) || classes.length === 0) {
-    await writeJson('clases.json', [
-      {
-        id: 1,
-        title: 'Basic Football Vocabulary',
-        category: 'Vocabulary',
-        level: 'Beginner',
-        content: [
-          { spanish: 'portero', english: 'goalkeeper' },
-          { spanish: 'defensa', english: 'defender' },
-          { spanish: 'mediocampista', english: 'midfielder' },
-          { spanish: 'delantero', english: 'striker' },
-        ],
-      },
+  const result = await query('SELECT COUNT(*) FROM classes');
+  const count = parseInt(result.rows[0].count, 10);
+
+  if (count === 0) {
+    const content = JSON.stringify([
+      { spanish: 'portero', english: 'goalkeeper' },
+      { spanish: 'defensa', english: 'defender' },
+      { spanish: 'mediocampista', english: 'midfielder' },
+      { spanish: 'delantero', english: 'striker' },
     ]);
-    return;
+
+    await query(
+      `INSERT INTO classes (title, category, level, content)
+       VALUES ($1, $2, $3, $4)`,
+      ['Basic Football Vocabulary', 'Vocabulary', 'Beginner', content]
+    );
   }
-
-  await writeJson('clases.json', classes);
-}
-
-async function ensureProgress() {
-  const progress = await readJson('progress.json', []);
-  if (!Array.isArray(progress)) {
-    await writeJson('progress.json', []);
-    return;
-  }
-
-  await writeJson('progress.json', progress);
 }
 
 async function bootstrapDatabase() {
+  await initDatabase();
   const config = await ensureConfig();
   await ensureUsers();
   await ensureClasses();
-  await ensureProgress();
   return config;
 }
 

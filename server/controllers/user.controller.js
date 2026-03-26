@@ -1,15 +1,25 @@
-const { readJson, writeJson, nextId } = require('../utils/db');
+const { query } = require('../utils/db');
 const { hashPassword } = require('../utils/hash');
 const { normalizeText, publicUser } = require('../utils/helpers');
 
+function mapUser(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    username: row.username,
+    password: row.password,
+    role: row.role,
+    active: row.active,
+    mustChangePassword: row.must_change_password,
+  };
+}
+
 async function getUsers(_req, res) {
-  const users = await readJson('users.json', []);
-  return res.json(users.map(publicUser));
+  const result = await query('SELECT id, name, username, role, active, must_change_password FROM users ORDER BY id');
+  return res.json(result.rows.map(mapUser).map(publicUser));
 }
 
 async function createUser(req, res) {
-  const users = await readJson('users.json', []);
-
   const name = normalizeText(req.body.name);
   const username = normalizeText(req.body.username).toLowerCase();
   const password = normalizeText(req.body.password);
@@ -25,76 +35,73 @@ async function createUser(req, res) {
     return res.status(400).json({ message: 'Invalid role' });
   }
 
-  if (users.some((user) => user.username.toLowerCase() === username)) {
+  const existing = await query('SELECT id FROM users WHERE LOWER(username) = $1', [username]);
+  if (existing.rows.length > 0) {
     return res.status(409).json({ message: 'Username already exists' });
   }
 
-  const newUser = {
-    id: nextId(users),
-    name,
-    username,
-    password: await hashPassword(password),
-    role,
-    active,
-    mustChangePassword,
-  };
+  const hashedPassword = await hashPassword(password);
+  const result = await query(
+    'INSERT INTO users (name, username, password, role, active, must_change_password) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+    [name, username, hashedPassword, role, active, mustChangePassword]
+  );
 
-  users.push(newUser);
-  await writeJson('users.json', users);
-
-  return res.status(201).json(publicUser(newUser));
+  return res.status(201).json(publicUser(mapUser(result.rows[0])));
 }
 
 async function updateUser(req, res) {
-  const users = await readJson('users.json', []);
   const id = Number(req.params.id);
-  const user = users.find((item) => item.id === id);
 
-  if (!user) {
+  const existing = await query('SELECT * FROM users WHERE id = $1', [id]);
+  if (existing.rows.length === 0) {
     return res.status(404).json({ message: 'User not found' });
   }
 
-  const name = normalizeText(req.body.name);
-  const username = normalizeText(req.body.username).toLowerCase();
+  const user = existing.rows[0];
+  const name = normalizeText(req.body.name) || user.name;
+  const username = normalizeText(req.body.username).toLowerCase() || user.username;
   const role = normalizeText(req.body.role).toLowerCase();
+  const finalRole = ['admin', 'student'].includes(role) ? role : user.role;
+  const active = typeof req.body.active === 'boolean' ? req.body.active : user.active;
+  const mustChangePassword = typeof req.body.mustChangePassword === 'boolean' ? req.body.mustChangePassword : user.must_change_password;
 
-  if (name) user.name = name;
-  if (username && users.some((item) => item.id !== user.id && item.username.toLowerCase() === username)) {
-    return res.status(409).json({ message: 'Username already exists' });
-  }
-  if (username) user.username = username;
-  if (['admin', 'student'].includes(role)) user.role = role;
-  if (typeof req.body.active === 'boolean') user.active = req.body.active;
-  if (typeof req.body.mustChangePassword === 'boolean') {
-    user.mustChangePassword = req.body.mustChangePassword;
+  if (username !== user.username) {
+    const dup = await query('SELECT id FROM users WHERE LOWER(username) = $1 AND id != $2', [username, id]);
+    if (dup.rows.length > 0) {
+      return res.status(409).json({ message: 'Username already exists' });
+    }
   }
 
+  let password = user.password;
   if (normalizeText(req.body.password)) {
-    user.password = await hashPassword(req.body.password);
+    password = await hashPassword(req.body.password);
   }
 
-  await writeJson('users.json', users);
-  return res.json(publicUser(user));
+  const result = await query(
+    'UPDATE users SET name = $1, username = $2, password = $3, role = $4, active = $5, must_change_password = $6 WHERE id = $7 RETURNING *',
+    [name, username, password, finalRole, active, mustChangePassword, id]
+  );
+
+  return res.json(publicUser(mapUser(result.rows[0])));
 }
 
 async function deleteUser(req, res) {
-  const users = await readJson('users.json', []);
   const id = Number(req.params.id);
-  const user = users.find((item) => item.id === id);
 
-  if (!user) {
+  const existing = await query('SELECT id, role FROM users WHERE id = $1', [id]);
+  if (existing.rows.length === 0) {
     return res.status(404).json({ message: 'User not found' });
   }
 
+  const user = existing.rows[0];
   if (user.role === 'admin') {
-    const admins = users.filter((item) => item.role === 'admin' && item.id !== user.id);
-    if (!admins.length) {
+    const admins = await query('SELECT id FROM users WHERE role = $1 AND id != $2', ['admin', id]);
+    if (admins.rows.length === 0) {
       return res.status(400).json({ message: 'At least one admin must remain' });
     }
   }
 
-  const filtered = users.filter((item) => item.id !== id);
-  await writeJson('users.json', filtered);
+  await query('DELETE FROM users WHERE id = $1', [id]);
   return res.json({ message: 'User deleted' });
 }
 

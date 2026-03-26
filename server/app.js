@@ -11,6 +11,7 @@ const userRoutes = require('./routes/user.routes');
 const classRoutes = require('./routes/class.routes');
 const adminRoutes = require('./routes/admin.routes');
 const { bootstrapDatabase } = require('./utils/bootstrap');
+const { pool } = require('./utils/db');
 
 const app = express();
 
@@ -80,4 +81,9 @@ async function startServer() {
 startServer().catch((error) => {
   console.error('Failed to start server:', error);
   process.exit(1);
+});
+
+process.on('SIGTERM', () => {
+  pool.end();
+  process.exit(0);
 });
