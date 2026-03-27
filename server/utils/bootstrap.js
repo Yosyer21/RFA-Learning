@@ -4,6 +4,7 @@ const { hashPassword } = require('./hash');
 const { runMigrations } = require('./migrator');
 const { log } = require('./logger');
 const { footballSeedClasses } = require('./football-classes');
+const { enrichLessonContent } = require('./content');
 
 async function ensureConfig() {
   const defaults = {
@@ -68,11 +69,33 @@ async function ensureClasses() {
 
   if (count === 0) {
     for (const lesson of footballSeedClasses) {
+      const enriched = enrichLessonContent(lesson);
       await query(
         `INSERT INTO classes (title, category, level, content)
          VALUES ($1, $2, $3, $4)`,
-        [lesson.title, lesson.category, lesson.level, JSON.stringify(lesson.content)]
+        [enriched.title, enriched.category, enriched.level, JSON.stringify(enriched.content)]
       );
+    }
+    return;
+  }
+
+  const classesResult = await query('SELECT id, title, category, content FROM classes ORDER BY id');
+  for (const row of classesResult.rows) {
+    if (!Array.isArray(row.content) || row.content.length === 0) {
+      continue;
+    }
+
+    const enriched = enrichLessonContent({
+      title: row.title,
+      category: row.category,
+      content: row.content,
+    });
+
+    const currentJson = JSON.stringify(row.content);
+    const enrichedJson = JSON.stringify(enriched.content);
+
+    if (currentJson !== enrichedJson) {
+      await query('UPDATE classes SET content = $1 WHERE id = $2', [enrichedJson, row.id]);
     }
   }
 }

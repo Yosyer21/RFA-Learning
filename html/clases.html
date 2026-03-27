@@ -28,6 +28,18 @@
       <h2 data-i18n="classes.subtitle">Modulo disponible</h2>
       <p class="hint" data-i18n="classes.pageHint">Explora cada módulo, revisa una vista previa y abre el quiz cuando quieras practicar.</p>
       <div id="classes-summary" class="classes-summary" aria-live="polite"></div>
+      <div id="classes-highlights" class="classes-highlights" aria-live="polite"></div>
+
+      <div class="speech-control">
+        <div class="speech-control-copy">
+          <label for="speech-language" data-i18n="classes.voiceLabel">Voz de pronunciaciÃ³n</label>
+          <p class="hint" data-i18n="classes.voiceHelp">Elige si quieres escuchar el tÃ©rmino en espaÃ±ol o en inglÃ©s.</p>
+        </div>
+        <select id="speech-language" class="speech-language">
+          <option value="en" data-i18n="classes.voiceEnglish">InglÃ©s</option>
+          <option value="es" data-i18n="classes.voiceSpanish">EspaÃ±ol</option>
+        </select>
+      </div>
 
       <div class="filter-bar">
         <input id="search-input" type="search" placeholder="Buscar clase..." data-i18n-placeholder="classes.searchPlaceholder" data-i18n-aria="classes.searchPlaceholder" aria-label="Buscar clases">

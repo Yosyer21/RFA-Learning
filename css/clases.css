@@ -18,6 +18,41 @@
   margin: 0.9rem 0 1rem;
 }
 
+.classes-highlights {
+  margin: 0 0 1.2rem;
+}
+
+.speech-control {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  padding: 0.95rem 1rem;
+  margin: 0 0 1rem;
+  border: 1px solid color-mix(in srgb, var(--border) 35%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface-2) 18%, transparent);
+}
+
+.speech-control-copy {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.speech-control-copy label {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.speech-language {
+  min-width: 180px;
+  padding: 0.7rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--border) 38%, transparent);
+  background: color-mix(in srgb, var(--surface-1) 82%, transparent);
+  color: var(--text);
+}
+
 .classes-summary-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -43,6 +78,36 @@
 .summary-chip strong {
   font-family: 'Archivo', sans-serif;
   font-size: 1.18rem;
+}
+
+.class-highlights-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.highlight-card {
+  padding: 0.95rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--border) 35%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface-2) 20%, transparent);
+  display: grid;
+  gap: 0.5rem;
+}
+
+.highlight-card h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.highlight-card p {
+  margin: 0;
+}
+
+.highlight-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 #classes-container {
@@ -109,11 +174,96 @@
   margin: 0;
 }
 
+.term-list .term-item {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.term-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.term-copy {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.term-spanish {
+  font-size: 0.82rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.term-english {
+  font-size: 0.98rem;
+  color: var(--text);
+}
+
+.term-audio-btn {
+  border: 1px solid color-mix(in srgb, var(--border) 34%, transparent);
+  background: color-mix(in srgb, var(--surface-2) 22%, transparent);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.76rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.term-audio-btn:hover {
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+  color: var(--accent);
+}
+
+.term-example {
+  border-left: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  padding-left: 0.75rem;
+  display: grid;
+  gap: 0.22rem;
+}
+
+.term-example-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.term-example-en,
+.term-example-es {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.term-example-es {
+  color: var(--muted);
+}
+
 .class-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.6rem;
   justify-content: flex-end;
+}
+
+.favorite-btn {
+  position: relative;
+}
+
+.favorite-active {
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+  color: var(--accent);
+}
+
+.class-card-focus {
+  outline: 2px solid color-mix(in srgb, var(--accent) 65%, white);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
 }
 
 .class-toggle {
@@ -125,7 +275,20 @@
     grid-template-columns: 1fr;
   }
 
+  .class-highlights-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .speech-control {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .class-card-header {
+    flex-direction: column;
+  }
+
+  .term-head {
     flex-direction: column;
   }
 

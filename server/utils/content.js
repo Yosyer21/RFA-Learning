@@ -5,12 +5,80 @@ function normalizePair(item) {
 
   const spanish = String(item.spanish ?? '').trim();
   const english = String(item.english ?? '').trim();
+  const example = String(item.example ?? '').trim();
+  const exampleSpanish = String(item.exampleSpanish ?? item.exampleEs ?? '').trim();
 
   if (!spanish || !english) {
     return null;
   }
 
-  return { spanish, english };
+  const normalized = { spanish, english };
+  if (example) {
+    normalized.example = example;
+  }
+  if (exampleSpanish) {
+    normalized.exampleSpanish = exampleSpanish;
+  }
+
+  return normalized;
+}
+
+function normalizeDisplayText(value) {
+  return String(value ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function buildExamplePair(lesson = {}, item = {}) {
+  const existingEnglish = String(item.example ?? '').trim();
+  const existingSpanish = String(item.exampleSpanish ?? item.exampleEs ?? '').trim();
+
+  if (existingEnglish || existingSpanish) {
+    return {
+      example: existingEnglish || '',
+      exampleSpanish: existingSpanish || '',
+    };
+  }
+
+  const englishTerm = String(item.english ?? '').trim();
+  const spanishTerm = String(item.spanish ?? '').trim();
+  const categoryKey = normalizeDisplayText(lesson.category);
+
+  const templates = {
+    posiciones: {
+      example: `The coach points to the "${englishTerm}" during the tactical drill.`,
+      exampleSpanish: `El entrenador señala al "${spanishTerm}" durante el ejercicio táctico.`,
+    },
+    acciones: {
+      example: `The team practices the "${englishTerm}" in every session.`,
+      exampleSpanish: `El equipo practica el "${spanishTerm}" en cada sesión.`,
+    },
+    arbitraje: {
+      example: `The referee can stop play for "${englishTerm}".`,
+      exampleSpanish: `El árbitro puede detener el juego por "${spanishTerm}".`,
+    },
+    tactica: {
+      example: `They switch to "${englishTerm}" to control the match.`,
+      exampleSpanish: `Cambian a "${spanishTerm}" para controlar el partido.`,
+    },
+    analisis: {
+      example: `The analyst tracks "${englishTerm}" to measure performance.`,
+      exampleSpanish: `El analista registra "${spanishTerm}" para medir el rendimiento.`,
+    },
+    comunicacion: {
+      example: `The commentator describes the moment as "${englishTerm}".`,
+      exampleSpanish: `El comentarista describe la jugada como "${spanishTerm}".`,
+    },
+  };
+
+  return templates[categoryKey] || {
+    example: `The coach uses "${englishTerm}" in context.`,
+    exampleSpanish: `El entrenador usa "${spanishTerm}" en contexto.`,
+  };
 }
 
 function parseClassContent(rawContent) {
@@ -40,6 +108,30 @@ function parseClassContent(rawContent) {
     })
     .map(normalizePair)
     .filter(Boolean);
+}
+
+function enrichLessonContent(lesson = {}) {
+  const content = Array.isArray(lesson.content) ? lesson.content : [];
+
+  return {
+    ...lesson,
+    content: content.map((item) => {
+      const normalized = normalizePair(item);
+      if (!normalized) {
+        return null;
+      }
+
+      const example = buildExamplePair(lesson, item);
+      if (example.example) {
+        normalized.example = example.example;
+      }
+      if (example.exampleSpanish) {
+        normalized.exampleSpanish = example.exampleSpanish;
+      }
+
+      return normalized;
+    }).filter(Boolean),
+  };
 }
 
 function parseCsvRows(text) {
@@ -127,6 +219,8 @@ function parseCsv(text) {
 }
 
 module.exports = {
+  buildExamplePair,
+  enrichLessonContent,
   parseClassContent,
   parseCsv,
   parseCsvRows,

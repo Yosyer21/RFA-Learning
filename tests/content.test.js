@@ -1,4 +1,4 @@
-const { parseClassContent, parseCsv } = require('../server/utils/content');
+const { parseClassContent, parseCsv, enrichLessonContent } = require('../server/utils/content');
 
 describe('content utils', () => {
   test('parses class content from pipe-separated text', () => {
@@ -12,12 +12,12 @@ describe('content utils', () => {
 
   test('parses class content from array input', () => {
     const result = parseClassContent([
-      { spanish: '  pase  ', english: ' short pass ' },
+      { spanish: '  pase  ', english: ' short pass ', example: 'The team uses a short pass.' },
       { spanish: '', english: 'ignored' },
     ]);
 
     expect(result).toEqual([
-      { spanish: 'pase', english: 'short pass' },
+      { spanish: 'pase', english: 'short pass', example: 'The team uses a short pass.' },
     ]);
   });
 
@@ -33,5 +33,20 @@ describe('content utils', () => {
         english: 'short pass',
       },
     ]);
+  });
+
+  test('enriches lesson content with examples', () => {
+    const result = enrichLessonContent({
+      title: 'Acciones del Juego',
+      category: 'Acciones',
+      content: [{ spanish: 'pase corto', english: 'short pass' }],
+    });
+
+    expect(result.content[0]).toMatchObject({
+      spanish: 'pase corto',
+      english: 'short pass',
+      example: 'The team practices the "short pass" in every session.',
+      exampleSpanish: 'El equipo practica el "pase corto" en cada sesión.',
+    });
   });
 });
