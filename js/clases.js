@@ -212,9 +212,14 @@ function renderTermList(lesson, terms, className = 'term-list') {
                   <span class="term-spanish">${escapeHtml(item.spanish)}</span>
                   <strong class="term-english">${escapeHtml(item.english)}</strong>
                 </div>
-                <button class="term-audio-btn" type="button" data-pronounce-en="${escapeHtml(item.english)}" data-pronounce-es="${escapeHtml(item.spanish)}" aria-label="${t('classes.listen')}: ${escapeHtml(item.spanish)} / ${escapeHtml(item.english)}">
-                  ${t('classes.listen')}
-                </button>
+                <div class="term-audio-actions">
+                  <button class="term-audio-btn" type="button" data-pronounce-en="${escapeHtml(item.english)}" data-pronounce-es="${escapeHtml(item.spanish)}" aria-label="${t('classes.listen')}: ${escapeHtml(item.spanish)} / ${escapeHtml(item.english)}">
+                    ${t('classes.listen')}
+                  </button>
+                  <button class="term-audio-btn term-audio-btn-secondary" type="button" data-pronounce-mode="es" data-pronounce-es="${escapeHtml(item.spanish)}" aria-label="${t('classes.listenSpanish')}: ${escapeHtml(item.spanish)}">
+                    ${t('classes.listenSpanish')}
+                  </button>
+                </div>
               </div>
               <div class="term-example">
                 <span class="term-example-label">${t('classes.example')}</span>
@@ -458,7 +463,7 @@ async function loadClasses(page = 1) {
 
   container.querySelectorAll('.term-audio-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
-      const mode = getSpeechMode();
+      const mode = btn.dataset.pronounceMode || getSpeechMode();
       const text = mode === 'es'
         ? (btn.dataset.pronounceEs || btn.dataset.pronounceEn || '')
         : (btn.dataset.pronounceEn || btn.dataset.pronounceEs || '');
