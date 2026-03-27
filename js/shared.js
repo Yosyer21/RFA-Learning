@@ -1,4 +1,13 @@
 // ── Toast Notifications ──
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 const toastContainer = (() => {
   let container = document.querySelector('.toast-container');
   if (!container) {
@@ -21,13 +30,22 @@ const TOAST_ICONS = {
 function showToast(message, type = 'info', duration = 4000) {
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
-  toast.innerHTML = `
-    <span class="toast-icon">${TOAST_ICONS[type] || ''}</span>
-    <span>${message}</span>
-    <button class="toast-close" aria-label="${t('ui.close')}">&times;</button>
-  `;
+  const icon = document.createElement('span');
+  icon.className = 'toast-icon';
+  icon.textContent = TOAST_ICONS[type] || '';
 
-  toast.querySelector('.toast-close').addEventListener('click', () => removeToast(toast));
+  const text = document.createElement('span');
+  text.textContent = message;
+
+  const close = document.createElement('button');
+  close.className = 'toast-close';
+  close.type = 'button';
+  close.setAttribute('aria-label', t('ui.close'));
+  close.textContent = '×';
+
+  toast.append(icon, text, close);
+
+  close.addEventListener('click', () => removeToast(toast));
   toastContainer.appendChild(toast);
 
   if (duration > 0) {
@@ -187,3 +205,5 @@ function renderPagination(containerId, pagination, onPageChange) {
     });
   });
 }
+
+window.escapeHtml = escapeHtml;

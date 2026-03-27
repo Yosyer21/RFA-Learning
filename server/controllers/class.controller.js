@@ -1,25 +1,6 @@
-const { query } = require('../utils/db');
+const { query, withTransaction } = require('../utils/db');
 const { normalizeText, matchesTranslation } = require('../utils/helpers');
-
-function parseContent(rawContent) {
-  if (Array.isArray(rawContent)) {
-    return rawContent;
-  }
-
-  if (typeof rawContent !== 'string') {
-    return [];
-  }
-
-  return rawContent
-    .split('\n')
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const [spanish, english] = line.split('|').map((item) => (item || '').trim());
-      return { spanish, english };
-    })
-    .filter((item) => item.spanish && item.english);
-}
+const { parseClassContent, parseCsv } = require('../utils/content');
 
 async function getClasses(req, res) {
   const { search, category, level, page, limit } = req.query;
@@ -81,7 +62,11 @@ async function getClasses(req, res) {
 
 async function createClass(req, res) {
   const { title, category, level } = req.body;
-  const content = parseContent(req.body.content);
+  const content = parseClassContent(req.body.content);
+
+  if (content.length === 0) {
+    return res.status(400).json({ message: 'El contenido de la clase no puede estar vacío' });
+  }
 
   const result = await query(
     'INSERT INTO classes (title, category, level, content) VALUES ($1, $2, $3, $4) RETURNING *',
@@ -106,7 +91,10 @@ async function updateClass(req, res) {
   let content = item.content;
 
   if (req.body.content !== undefined) {
-    content = parseContent(req.body.content);
+    content = parseClassContent(req.body.content);
+    if (content.length === 0) {
+      return res.status(400).json({ message: 'El contenido de la clase no puede estar vacío' });
+    }
   }
 
   const result = await query(
@@ -152,31 +140,32 @@ async function getProgress(req, res) {
 async function updateProgress(req, res) {
   const userId = req.user.role === 'admin' && req.body.userId ? Number(req.body.userId) : req.user.id;
 
-  const existing = await query('SELECT * FROM progress WHERE user_id = $1', [userId]);
-  let entry;
+  const entry = await withTransaction(async (client) => {
+    const existing = await client.query('SELECT * FROM progress WHERE user_id = $1 FOR UPDATE', [userId]);
 
-  if (existing.rows.length === 0) {
-    const completedClasses = Array.isArray(req.body.completedClasses) ? req.body.completedClasses : [];
-    const currentLevel = normalizeText(req.body.currentLevel) || 'Beginner';
-    const score = typeof req.body.score === 'number' ? req.body.score : 0;
+    if (existing.rows.length === 0) {
+      const completedClasses = Array.isArray(req.body.completedClasses) ? req.body.completedClasses : [];
+      const currentLevel = normalizeText(req.body.currentLevel) || 'Beginner';
+      const score = typeof req.body.score === 'number' ? req.body.score : 0;
 
-    const result = await query(
-      'INSERT INTO progress (user_id, completed_classes, current_level, score) VALUES ($1, $2, $3, $4) RETURNING user_id AS "userId", completed_classes AS "completedClasses", current_level AS "currentLevel", score',
-      [userId, JSON.stringify(completedClasses), currentLevel, score]
-    );
-    entry = result.rows[0];
-  } else {
+      const result = await client.query(
+        'INSERT INTO progress (user_id, completed_classes, current_level, score) VALUES ($1, $2, $3, $4) RETURNING user_id AS "userId", completed_classes AS "completedClasses", current_level AS "currentLevel", score',
+        [userId, JSON.stringify(completedClasses), currentLevel, score]
+      );
+      return result.rows[0];
+    }
+
     const current = existing.rows[0];
     const completedClasses = Array.isArray(req.body.completedClasses) ? req.body.completedClasses : current.completed_classes;
     const currentLevel = normalizeText(req.body.currentLevel) || current.current_level;
     const score = typeof req.body.score === 'number' ? req.body.score : current.score;
 
-    const result = await query(
+    const result = await client.query(
       'UPDATE progress SET completed_classes = $1, current_level = $2, score = $3 WHERE user_id = $4 RETURNING user_id AS "userId", completed_classes AS "completedClasses", current_level AS "currentLevel", score',
       [JSON.stringify(completedClasses), currentLevel, score, userId]
     );
-    entry = result.rows[0];
-  }
+    return result.rows[0];
+  });
 
   return res.json(entry);
 }
@@ -187,55 +176,54 @@ async function importClassesCsv(req, res) {
   }
 
   const csvText = req.file.buffer.toString('utf-8');
-  const lines = csvText.split('\n').map((l) => l.trim()).filter(Boolean);
+  const rows = parseCsv(csvText);
 
-  if (lines.length < 2) {
+  if (rows.length === 0) {
     return res.status(400).json({ message: 'El CSV debe tener al menos un encabezado y una fila' });
   }
 
-  // Expect header: title,category,level,spanish,english
-  const header = lines[0].toLowerCase().split(',').map((h) => h.trim());
-  const titleIdx = header.indexOf('title');
-  const catIdx = header.indexOf('category');
-  const levelIdx = header.indexOf('level');
-  const spIdx = header.indexOf('spanish');
-  const enIdx = header.indexOf('english');
-
-  if (titleIdx === -1 || spIdx === -1 || enIdx === -1) {
+  if (!Object.prototype.hasOwnProperty.call(rows[0], 'title')
+    || !Object.prototype.hasOwnProperty.call(rows[0], 'spanish')
+    || !Object.prototype.hasOwnProperty.call(rows[0], 'english')) {
     return res.status(400).json({ message: 'El CSV debe tener columnas: title, spanish, english (category y level opcionales)' });
   }
 
-  // Group by title
   const classesMap = {};
-  for (let i = 1; i < lines.length; i++) {
-    const cols = lines[i].split(',').map((c) => c.trim());
-    const title = cols[titleIdx];
+  for (const row of rows) {
+    const title = row.title;
     if (!title) continue;
 
     if (!classesMap[title]) {
       classesMap[title] = {
         title,
-        category: cols[catIdx] || 'Vocabulary',
-        level: cols[levelIdx] || 'Beginner',
+        category: row.category || 'Vocabulary',
+        level: row.level || 'Beginner',
         content: [],
       };
     }
 
-    const spanish = cols[spIdx];
-    const english = cols[enIdx];
+    const spanish = row.spanish;
+    const english = row.english;
     if (spanish && english) {
       classesMap[title].content.push({ spanish, english });
     }
   }
 
-  const imported = [];
-  for (const cls of Object.values(classesMap)) {
-    const result = await query(
-      'INSERT INTO classes (title, category, level, content) VALUES ($1, $2, $3, $4) RETURNING *',
-      [cls.title, cls.category, cls.level, JSON.stringify(cls.content)]
-    );
-    imported.push(result.rows[0]);
+  const validClasses = Object.values(classesMap).filter((cls) => cls.content.length > 0);
+  if (validClasses.length === 0) {
+    return res.status(400).json({ message: 'El CSV no contiene términos válidos para importar' });
   }
+
+  const imported = [];
+  await withTransaction(async (client) => {
+    for (const cls of validClasses) {
+      const result = await client.query(
+        'INSERT INTO classes (title, category, level, content) VALUES ($1, $2, $3, $4) RETURNING *',
+        [cls.title, cls.category, cls.level, JSON.stringify(cls.content)]
+      );
+      imported.push(result.rows[0]);
+    }
+  });
 
   return res.status(201).json({ message: `${imported.length} clase(s) importadas`, classes: imported });
 }
@@ -248,58 +236,69 @@ async function submitQuiz(req, res) {
     return res.status(400).json({ message: 'classId y answers son requeridos' });
   }
 
-  // Get the class to validate answers
-  const classResult = await query('SELECT * FROM classes WHERE id = $1', [classId]);
-  if (classResult.rows.length === 0) {
-    return res.status(404).json({ message: 'Clase no encontrada' });
-  }
+  const outcome = await withTransaction(async (client) => {
+    const classResult = await client.query('SELECT * FROM classes WHERE id = $1', [classId]);
+    if (classResult.rows.length === 0) {
+      return { status: 404, body: { message: 'Clase no encontrada' } };
+    }
 
-  const classContent = classResult.rows[0].content;
-  let score = 0;
-  const total = answers.length;
+    const classContent = Array.isArray(classResult.rows[0].content) ? classResult.rows[0].content : [];
+    let score = 0;
+    const total = answers.length;
 
-  const graded = answers.map((a) => {
-    const term = classContent.find((t) => t.spanish === a.spanish);
-    const correct = Boolean(term) && matchesTranslation(term.english, a.answer);
-    if (correct) score++;
-    return { spanish: a.spanish, answer: a.answer, correct, expected: term?.english || '' };
-  });
+    const graded = answers.map((a) => {
+      const term = classContent.find((t) => t.spanish === a.spanish);
+      const correct = Boolean(term) && matchesTranslation(term.english, a.answer);
+      if (correct) {
+        score += 1;
+      }
+      return { spanish: a.spanish, answer: a.answer, correct, expected: term?.english || '' };
+    });
 
-  // Save quiz result
-  const result = await query(
-    'INSERT INTO quizzes (class_id, user_id, score, total, answers) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-    [classId, userId, score, total, JSON.stringify(graded)]
-  );
+    const result = await client.query(
+      'INSERT INTO quizzes (class_id, user_id, score, total, answers) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [classId, userId, score, total, JSON.stringify(graded)]
+    );
 
-  // Auto-update progress: mark class as completed if score >= 70%
-  if (total > 0 && (score / total) >= 0.7) {
-    const progressResult = await query('SELECT * FROM progress WHERE user_id = $1', [userId]);
-    if (progressResult.rows.length === 0) {
-      await query(
-        'INSERT INTO progress (user_id, completed_classes, current_level, score) VALUES ($1, $2, $3, $4)',
-        [userId, JSON.stringify([classId]), 'Beginner', score]
-      );
-    } else {
-      const current = progressResult.rows[0];
-      const completed = Array.isArray(current.completed_classes) ? current.completed_classes : [];
-      if (!completed.includes(classId)) {
-        completed.push(classId);
-        await query(
-          'UPDATE progress SET completed_classes = $1, score = score + $2 WHERE user_id = $3',
-          [JSON.stringify(completed), score, userId]
+    const passed = total > 0 && (score / total) >= 0.7;
+    if (passed) {
+      const progressResult = await client.query('SELECT * FROM progress WHERE user_id = $1 FOR UPDATE', [userId]);
+      if (progressResult.rows.length === 0) {
+        await client.query(
+          'INSERT INTO progress (user_id, completed_classes, current_level, score) VALUES ($1, $2, $3, $4)',
+          [userId, JSON.stringify([classId]), 'Beginner', score]
         );
+      } else {
+        const current = progressResult.rows[0];
+        const completed = Array.isArray(current.completed_classes) ? current.completed_classes : [];
+        if (!completed.includes(classId)) {
+          completed.push(classId);
+          await client.query(
+            'UPDATE progress SET completed_classes = $1, score = score + $2 WHERE user_id = $3',
+            [JSON.stringify(completed), score, userId]
+          );
+        }
       }
     }
+
+    return {
+      status: 200,
+      body: {
+        quizId: result.rows[0].id,
+        score,
+        total,
+        percentage: total > 0 ? Math.round((score / total) * 100) : 0,
+        passed,
+        answers: graded,
+      },
+    };
+  });
+
+  if (outcome.status !== 200) {
+    return res.status(outcome.status).json(outcome.body);
   }
 
-  return res.json({
-    quizId: result.rows[0].id,
-    score,
-    total,
-    percentage: total > 0 ? Math.round((score / total) * 100) : 0,
-    passed: total > 0 && (score / total) >= 0.7,
-    answers: graded,
-  });
+  return res.json(outcome.body);
 }
 
 async function getQuizHistory(req, res) {

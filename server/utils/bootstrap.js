@@ -38,13 +38,27 @@ async function ensureUsers() {
   const count = parseInt(result.rows[0].count, 10);
 
   if (count === 0) {
-    const hashedPassword = await hashPassword('Admin1234');
+    const isProduction = process.env.NODE_ENV === 'production';
+    const username = process.env.DEFAULT_ADMIN_USERNAME || (isProduction ? '' : 'admin');
+    const password = process.env.DEFAULT_ADMIN_PASSWORD || (isProduction ? '' : 'Admin1234');
+    const name = process.env.DEFAULT_ADMIN_NAME || 'Admin';
+    const forcePasswordChange = String(process.env.DEFAULT_ADMIN_FORCE_PASSWORD_CHANGE || 'true') !== 'false';
+
+    if (!username || !password) {
+      log.warn('Skipping default admin seed because credentials were not configured');
+      return;
+    }
+
+    const hashedPassword = await hashPassword(password);
     await query(
       `INSERT INTO users (name, username, password, role, active, must_change_password)
        VALUES ($1, $2, $3, $4, $5, $6)`,
-      ['Admin', 'admin', hashedPassword, 'admin', true, true]
+      [name, username.toLowerCase(), hashedPassword, 'admin', true, forcePasswordChange]
     );
-    console.log('Default admin user created (admin / Admin1234)');
+    log.info('Default admin user created', {
+      username: username.toLowerCase(),
+      mustChangePassword: forcePasswordChange,
+    });
   }
 }
 

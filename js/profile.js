@@ -22,7 +22,7 @@ async function loadProfile() {
     const date = new Date(q.completedAt).toLocaleDateString(getCurrentLang() === 'en' ? 'en-US' : 'es-CR');
     return `
       <div class="quiz-result ${status}" style="margin-bottom:0.6rem;text-align:left;padding:0.6rem 0.8rem;">
-        <strong>${translateClassTitle(q.classTitle)}</strong>
+        <strong>${escapeHtml(translateClassTitle(q.classTitle))}</strong>
         <span style="float:right;">${q.score}/${q.total} (${pct}%) — ${date}</span>
       </div>`;
   }).join('');

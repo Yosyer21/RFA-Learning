@@ -4,6 +4,7 @@ const {
   registerSchema,
   createUserSchema,
   createClassSchema,
+  progressSchema,
   validate,
 } = require('../server/utils/validators');
 
@@ -55,6 +56,21 @@ describe('validators', () => {
       expect(result.data.active).toBe(true);
     });
 
+    test('coerces boolean-like string inputs', () => {
+      const result = createUserSchema.safeParse({
+        name: 'Test',
+        username: 'TESTUSER',
+        password: 'Test1234',
+        active: 'false',
+        mustChangePassword: 'true',
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.data.username).toBe('testuser');
+      expect(result.data.active).toBe(false);
+      expect(result.data.mustChangePassword).toBe(true);
+    });
+
     test('rejects invalid role', () => {
       const result = createUserSchema.safeParse({ name: 'Test', username: 'test', password: 'Test1234', role: 'superadmin' });
       expect(result.success).toBe(false);
@@ -78,6 +94,22 @@ describe('validators', () => {
     test('rejects empty title', () => {
       const result = createClassSchema.safeParse({ title: '', content: 'test' });
       expect(result.success).toBe(false);
+    });
+  });
+
+  describe('progressSchema', () => {
+    test('coerces numeric strings', () => {
+      const result = progressSchema.safeParse({
+        userId: '12',
+        completedClasses: ['1', '2'],
+        currentLevel: 'Beginner',
+        score: '7',
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.data.userId).toBe(12);
+      expect(result.data.completedClasses).toEqual([1, 2]);
+      expect(result.data.score).toBe(7);
     });
   });
 

@@ -13,8 +13,25 @@ async function getClient() {
   return pool.connect();
 }
 
+async function withTransaction(work) {
+  const client = await getClient();
+
+  try {
+    await client.query('BEGIN');
+    const result = await work(client);
+    await client.query('COMMIT');
+    return result;
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 module.exports = {
   pool,
   query,
   getClient,
+  withTransaction,
 };

@@ -1,6 +1,20 @@
 const { query } = require('../utils/db');
 const { comparePassword, hashPassword } = require('../utils/hash');
-const { normalizeText, publicUser } = require('../utils/helpers');
+const { normalizeText } = require('../utils/helpers');
+
+function regenerateSession(req, payload) {
+  return new Promise((resolve, reject) => {
+    req.session.regenerate((error) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+
+      req.session.user = payload;
+      resolve();
+    });
+  });
+}
 
 async function login(req, res) {
   const { username, password } = req.body;
@@ -20,7 +34,7 @@ async function login(req, res) {
     return res.status(401).json({ message: 'Credenciales inválidas' });
   }
 
-  req.session.user = {
+  const sessionUser = {
     id: user.id,
     name: user.name,
     username: user.username,
@@ -28,9 +42,11 @@ async function login(req, res) {
     mustChangePassword: Boolean(user.must_change_password),
   };
 
+  await regenerateSession(req, sessionUser);
+
   return res.json({
     message: 'Login exitoso',
-    user: req.session.user,
+    user: sessionUser,
   });
 }
 
@@ -57,7 +73,7 @@ async function register(req, res) {
 
   const newUser = result.rows[0];
 
-  req.session.user = {
+  const sessionUser = {
     id: newUser.id,
     name: newUser.name,
     username: newUser.username,
@@ -65,9 +81,11 @@ async function register(req, res) {
     mustChangePassword: false,
   };
 
+  await regenerateSession(req, sessionUser);
+
   return res.status(201).json({
     message: 'Registro exitoso',
-    user: req.session.user,
+    user: sessionUser,
   });
 }
 
@@ -114,8 +132,14 @@ async function updateProfile(req, res) {
 }
 
 function logout(req, res) {
-  req.session.destroy(() => {
+  req.session.destroy((error) => {
     res.clearCookie('rfa.sid');
+
+    if (error) {
+      res.status(500).json({ message: 'No se pudo cerrar la sesión' });
+      return;
+    }
+
     res.json({ message: 'Logout exitoso' });
   });
 }
@@ -129,14 +153,22 @@ function me(req, res) {
 }
 
 async function seedStatus(_req, res) {
-  const result = await query('SELECT id, name, username, role, active, must_change_password FROM users');
-  const users = result.rows.map((row) => ({
-    ...row,
-    mustChangePassword: row.must_change_password,
-  }));
+  const result = await query(`
+    SELECT
+      COUNT(*)::int AS total_users,
+      COUNT(*) FILTER (WHERE role = 'admin')::int AS total_admins,
+      COUNT(*) FILTER (WHERE role = 'student')::int AS total_students,
+      COUNT(*) FILTER (WHERE active = true)::int AS active_users
+    FROM users
+  `);
+  const summary = result.rows[0];
+
   res.json({
-    users: users.map(publicUser),
-    hasAdmin: users.some((user) => user.role === 'admin'),
+    totalUsers: summary.total_users,
+    totalAdmins: summary.total_admins,
+    totalStudents: summary.total_students,
+    activeUsers: summary.active_users,
+    hasAdmin: summary.total_admins > 0,
   });
 }
 

@@ -26,6 +26,7 @@
     },
     "devDependencies": {
         "@railway/cli": "^4.35.0",
-        "jest": "^30.3.0"
+        "jest": "^30.3.0",
+        "supertest": "^7.2.2"
     }
 }

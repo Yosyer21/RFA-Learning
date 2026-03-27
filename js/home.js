@@ -53,7 +53,7 @@ function renderCompletedList(classes, completedIds) {
   list.innerHTML = done.map(c => `
     <li>
       <span class="check-icon"></span>
-      <span class="class-name">${translateClassTitle(c.title)}</span>
+      <span class="class-name">${escapeHtml(translateClassTitle(c.title))}</span>
       <span class="class-badge">${translateClassLevel(c.level)}</span>
     </li>`).join('');
 }
