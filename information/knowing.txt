@@ -1,0 +1,231 @@
+==================================================
+LENGUAJE DEL FÚTBOL (ESPAÑOL - INGLÉS) [VERSIÓN AVANZADA]
+==================================================
+
+DESCRIPCIÓN:
+Este documento contiene vocabulario técnico, táctico y expresiones utilizadas
+en el fútbol profesional en español e inglés. Incluye términos de juego,
+posiciones, análisis táctico, scouting y lenguaje de comentaristas.
+
+Uso recomendado:
+- Aplicaciones deportivas
+- Sistemas de análisis de partidos
+- Proyectos de IA (comentarios automáticos)
+- Academias de fútbol (ej: RFA)
+- Interfaces educativas
+
+==================================================
+1. POSICIONES EN EL CAMPO
+==================================================
+
+Portero / Arquero = Goalkeeper (GK)
+Defensa = Defender
+Defensa central = Center Back (CB)
+Defensa central derecho = Right Center Back (RCB)
+Defensa central izquierdo = Left Center Back (LCB)
+Lateral derecho = Right Back (RB)
+Lateral izquierdo = Left Back (LB)
+Carrilero = Wing Back (RWB / LWB)
+
+Mediocampista = Midfielder
+Mediocentro = Central Midfielder (CM)
+Volante defensivo = Defensive Midfielder (CDM)
+Volante ofensivo = Attacking Midfielder (CAM)
+Interior derecho = Right Midfielder (RM)
+Interior izquierdo = Left Midfielder (LM)
+
+Extremo derecho = Right Winger (RW)
+Extremo izquierdo = Left Winger (LW)
+Delantero = Forward
+Delantero centro = Striker (ST)
+Segundo delantero = Second Striker (SS)
+Falso 9 = False Nine
+
+==================================================
+2. ACCIONES DEL JUEGO
+==================================================
+
+Pase corto = Short pass
+Pase largo = Long pass
+Pase filtrado = Through ball
+Centro = Cross
+Disparo = Shot
+Disparo a puerta = Shot on target
+Disparo fuera = Shot off target
+Gol = Goal
+Asistencia = Assist
+
+Regate = Dribble
+Entrada = Tackle
+Entrada limpia = Clean tackle
+Entrada fuerte = Hard tackle
+Intercepción = Interception
+Despeje = Clearance
+Bloqueo = Block
+
+Control del balón = Ball control
+Primer toque = First touch
+Conducción = Ball carrying
+Recuperación = Ball recovery
+Pérdida de balón = Turnover
+
+==================================================
+3. REGLAS Y ARBITRAJE
+==================================================
+
+Penal = Penalty kick
+Fuera de juego = Offside
+Falta = Foul
+Mano = Handball
+Ventaja = Advantage
+
+Tiro libre directo = Direct free kick
+Tiro libre indirecto = Indirect free kick
+Saque de esquina = Corner kick
+Saque de banda = Throw-in
+Saque de meta = Goal kick
+
+Tarjeta amarilla = Yellow card
+Tarjeta roja = Red card
+Expulsión = Sending off
+
+Árbitro = Referee
+Árbitro asistente = Assistant referee
+VAR = Video Assistant Referee
+
+==================================================
+4. TÁCTICA Y ESTRATEGIA
+==================================================
+
+Formación = Formation
+Ejemplo:
+4-3-3, 4-4-2, 3-5-2
+
+Posesión = Possession
+Dominio del juego = Game control
+Ritmo del partido = Match tempo
+
+Presión alta = High press
+Presión media = Mid press
+Presión baja = Low press
+
+Bloque bajo = Low block
+Bloque medio = Mid block
+Bloque alto = High block
+
+Contraataque = Counterattack
+Transición ofensiva = Offensive transition
+Transición defensiva = Defensive transition
+
+Salida de balón = Build-up play
+Juego directo = Direct play
+Juego posicional = Positional play
+
+Cambio de juego = Switch of play
+Amplitud = Width
+Profundidad = Depth
+
+==================================================
+5. ANÁLISIS Y ESTADÍSTICAS
+==================================================
+
+Posesión (%) = Possession (%)
+Tiros = Shots
+Tiros a puerta = Shots on target
+Pases completados = Completed passes
+Precisión de pase = Pass accuracy
+
+Expected goals = xG
+Expected assists = xA
+Duelos ganados = Duels won
+Recuperaciones = Recoveries
+Intercepciones = Interceptions
+
+Minutos jugados = Minutes played
+Goles por partido = Goals per match
+Asistencias por partido = Assists per match
+
+==================================================
+6. LENGUAJE DE COMENTARISTAS
+==================================================
+
+¡Qué golazo! = What a goal!
+¡Increíble parada! = What a save!
+Partido muy disputado = Very competitive match
+Está dominando el partido = He is dominating the game
+Gran jugada colectiva = Great team play
+
+Se la pierde increíblemente = He misses it unbelievably
+Está en fuera de juego = He is offside
+Gran definición = Great finish
+
+==================================================
+7. SCOUTING Y EVALUACIÓN DE JUGADORES
+==================================================
+
+Técnico = Technical
+Control del balón = Ball control
+Pase = Passing
+Regate = Dribbling
+Finalización = Finishing
+
+Táctico = Tactical
+Posicionamiento = Positioning
+Toma de decisiones = Decision making
+Lectura del juego = Game reading
+
+Físico = Physical
+Velocidad = Speed
+Resistencia = Endurance
+Fuerza = Strength
+Agilidad = Agility
+
+Psicológico = Psychological
+Confianza = Confidence
+Mentalidad = Mentality
+Concentración = Focus
+
+Social = Social
+Trabajo en equipo = Teamwork
+Comunicación = Communication
+Liderazgo = Leadership
+
+==================================================
+8. TIPOS DE JUGADAS
+==================================================
+
+Contraataque rápido = Fast counterattack
+Ataque posicional = Positional attack
+Centro al área = Cross into the box
+Balón parado = Set piece
+
+Tiro de esquina corto = Short corner
+Tiro libre directo = Direct free kick
+Tiro libre indirecto = Indirect free kick
+
+==================================================
+9. DIFERENCIAS CLAVE (INGLÉS)
+==================================================
+
+Football (Europa) = Fútbol
+Soccer (USA) = Fútbol
+
+Pitch = Cancha
+Field = Campo
+Cleats = Botines
+Boots = Botas de fútbol
+
+==================================================
+10. IDEAS PARA IMPLEMENTACIÓN
+==================================================
+
+- API de traducción fútbol ES ↔ EN
+- Sistema de comentarios automáticos (IA)
+- Dashboard de estadísticas
+- Simulador de partidos
+- Sistema de scouting digital
+- Plataforma educativa interactiva
+
+==================================================
+FIN DEL DOCUMENTO
+==================================================

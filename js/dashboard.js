@@ -5,6 +5,8 @@ const classesList = document.getElementById('classes-list');
 const createUserForm = document.getElementById('create-user-form');
 const createClassForm = document.getElementById('create-class-form');
 const csvImportForm = document.getElementById('csv-import-form');
+let currentUsersPage = 1;
+let currentClassesPage = 1;
 
 function smoothSectionNav() {
   document.querySelectorAll('.dashboard-nav a').forEach((link) => {
@@ -56,6 +58,22 @@ function escapeHtml(text) {
 function userRow(user) {
   const roleBadge = user.role === 'admin' ? 'badge-admin' : 'badge-student';
   const stateBadge = user.active ? 'badge-active' : 'badge-inactive';
+  const translatedRole = translateUserRole(user.role);
+  const roleOptions = ['student', 'admin']
+    .map((role) => `<option value="${role}" ${user.role === role ? 'selected' : ''}>${escapeHtml(translateUserRole(role))}</option>`)
+    .join('');
+  const activeOptions = [
+    { value: 'true', label: t('dashboard.active'), selected: user.active },
+    { value: 'false', label: t('dashboard.inactive'), selected: !user.active },
+  ]
+    .map((item) => `<option value="${item.value}" ${item.selected ? 'selected' : ''}>${escapeHtml(item.label)}</option>`)
+    .join('');
+  const passwordOptions = [
+    { value: 'false', label: t('dashboard.normalPassword'), selected: !user.mustChangePassword },
+    { value: 'true', label: t('dashboard.forcePassword'), selected: user.mustChangePassword },
+  ]
+    .map((item) => `<option value="${item.value}" ${item.selected ? 'selected' : ''}>${escapeHtml(item.label)}</option>`)
+    .join('');
 
   return `
     <article class="entity-card">
@@ -64,25 +82,16 @@ function userRow(user) {
         <span>${escapeHtml(user.username)}</span>
       </div>
       <div class="entity-meta">
-        <span class="badge ${roleBadge}">${user.role}</span>
+        <span class="badge ${roleBadge}">${escapeHtml(translatedRole)}</span>
         <span class="badge ${stateBadge}">${user.active ? t('dashboard.active') : t('dashboard.inactive')}</span>
         <span class="badge">${user.mustChangePassword ? t('dashboard.forcePassword') : t('dashboard.normalPassword')}</span>
       </div>
       <form class="form-inline user-edit-form" data-id="${user.id}">
         <input name="name" value="${escapeHtml(user.name)}" required>
         <input name="username" value="${escapeHtml(user.username)}" required>
-        <select name="role">
-          <option value="student" ${user.role === 'student' ? 'selected' : ''}>student</option>
-          <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>admin</option>
-        </select>
-        <select name="active">
-          <option value="true" ${user.active ? 'selected' : ''}>activo</option>
-          <option value="false" ${!user.active ? 'selected' : ''}>inactivo</option>
-        </select>
-        <select name="mustChangePassword">
-          <option value="false" ${!user.mustChangePassword ? 'selected' : ''}>normal</option>
-          <option value="true" ${user.mustChangePassword ? 'selected' : ''}>forzar password</option>
-        </select>
+        <select name="role">${roleOptions}</select>
+        <select name="active">${activeOptions}</select>
+        <select name="mustChangePassword">${passwordOptions}</select>
         <input name="password" placeholder="${t('dashboard.newPasswordPlaceholder')}">
         <button class="btn btn-small" type="submit">${t('dashboard.save')}</button>
         <button class="btn btn-small btn-danger" type="button" data-delete-id="${user.id}">${t('ui.delete')}</button>
@@ -95,12 +104,15 @@ function classRow(lesson) {
   const contentText = (lesson.content || [])
     .map((item) => `${item.spanish}|${item.english}`)
     .join('\n');
+  const translatedTitle = translateClassTitle(lesson.title);
+  const translatedCategory = translateClassCategory(lesson.category);
+  const translatedLevel = translateClassLevel(lesson.level);
 
   return `
     <article class="entity-card">
       <div class="entity-header">
-        <strong>${escapeHtml(lesson.title)}</strong>
-        <span>${escapeHtml(lesson.category)} - ${escapeHtml(lesson.level)}</span>
+        <strong>${escapeHtml(translatedTitle)}</strong>
+        <span>${escapeHtml(translatedCategory)} - ${escapeHtml(translatedLevel)}</span>
       </div>
       <form class="form-stack class-edit-form" data-id="${lesson.id}">
         <input name="title" value="${escapeHtml(lesson.title)}" required>
@@ -117,6 +129,7 @@ function classRow(lesson) {
 }
 
 async function loadUsers(page = 1) {
+  currentUsersPage = page;
   const result = await apiJson(`/api/users?page=${page}&limit=20`);
   if (!result) return;
 
@@ -174,6 +187,7 @@ async function loadUsers(page = 1) {
 }
 
 async function loadClasses(page = 1) {
+  currentClassesPage = page;
   const result = await apiJson(`/api/classes?page=${page}&limit=20`);
   if (!result) return;
 
@@ -292,6 +306,10 @@ csvImportForm?.addEventListener('submit', async (event) => {
 document.getElementById('logout-btn')?.addEventListener('click', async () => {
   await fetch('/api/auth/logout', { method: 'POST' });
   window.location.href = '/login';
+});
+
+window.addEventListener('languagechange', () => {
+  Promise.all([loadStats(), loadUsers(currentUsersPage), loadClasses(currentClassesPage)]);
 });
 
 smoothSectionNav();

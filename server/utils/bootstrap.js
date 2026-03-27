@@ -3,6 +3,7 @@ const { initDatabase } = require('./init-db');
 const { hashPassword } = require('./hash');
 const { runMigrations } = require('./migrator');
 const { log } = require('./logger');
+const { footballSeedClasses } = require('./football-classes');
 
 async function ensureConfig() {
   const defaults = {
@@ -52,18 +53,13 @@ async function ensureClasses() {
   const count = parseInt(result.rows[0].count, 10);
 
   if (count === 0) {
-    const content = JSON.stringify([
-      { spanish: 'portero', english: 'goalkeeper' },
-      { spanish: 'defensa', english: 'defender' },
-      { spanish: 'mediocampista', english: 'midfielder' },
-      { spanish: 'delantero', english: 'striker' },
-    ]);
-
-    await query(
-      `INSERT INTO classes (title, category, level, content)
-       VALUES ($1, $2, $3, $4)`,
-      ['Basic Football Vocabulary', 'Vocabulary', 'Beginner', content]
-    );
+    for (const lesson of footballSeedClasses) {
+      await query(
+        `INSERT INTO classes (title, category, level, content)
+         VALUES ($1, $2, $3, $4)`,
+        [lesson.title, lesson.category, lesson.level, JSON.stringify(lesson.content)]
+      );
+    }
   }
 }
 

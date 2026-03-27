@@ -98,7 +98,19 @@ const translations = {
     'classes.searchPlaceholder': 'Buscar clase...',
     'classes.allCategories': 'Todas las categorías',
     'classes.allLevels': 'Todos los niveles',
+    'classes.levelBeginner': 'Principiante',
+    'classes.levelIntermediate': 'Intermedio',
+    'classes.levelAdvanced': 'Avanzado',
     'classes.modulesAvailable': '{0} módulo(s) disponible(s)',
+    'classes.pageHint': 'Explora cada módulo, revisa una vista previa y abre el quiz cuando quieras practicar.',
+    'classes.previewLabel': 'Vista previa',
+    'classes.termsLabel': '{0} términos',
+    'classes.availableModules': 'Módulos disponibles',
+    'classes.visibleTerms': 'Términos visibles',
+    'classes.visibleCategories': 'Categorías visibles',
+    'classes.showTerms': 'Ver términos completos',
+    'classes.hideTerms': 'Ocultar términos',
+    'classes.visibleStats': '{0} visibles',
     'classes.takeQuiz': 'Tomar Quiz',
     'classes.noQuizContent': 'Esta clase no tiene contenido para quiz',
     'classes.quizTitle': 'Quiz: {0}',
@@ -142,18 +154,20 @@ const translations = {
     'dashboard.classUpdated': 'Clase actualizada',
     'dashboard.classDeleted': 'Clase eliminada',
     'dashboard.classCreated': 'Clase creada',
+    'dashboard.roleStudent': 'Estudiante',
+    'dashboard.roleAdmin': 'Administrador',
     'dashboard.deleteUserConfirm': '¿Eliminar este usuario?',
     'dashboard.deleteClassConfirm': '¿Eliminar esta clase?',
     'dashboard.statUsers': 'Usuarios',
     'dashboard.statAdmins': 'Admins',
-    'dashboard.statStudents': 'Students',
+    'dashboard.statStudents': 'Estudiantes',
     'dashboard.statActive': 'Activos',
     'dashboard.statClasses': 'Clases',
     'dashboard.statProgress': 'Registros progreso',
-    'dashboard.active': 'activo',
-    'dashboard.inactive': 'inactivo',
-    'dashboard.forcePassword': 'forzar password',
-    'dashboard.normalPassword': 'password normal',
+    'dashboard.active': 'Activo',
+    'dashboard.inactive': 'Inactivo',
+    'dashboard.forcePassword': 'Forzar contraseña',
+    'dashboard.normalPassword': 'Contraseña normal',
     'dashboard.save': 'Guardar',
 
     // Profile
@@ -186,7 +200,7 @@ const translations = {
 
     // Landing / Index
     'landing.heroKicker': 'Football Language System',
-    'landing.heroTitle': 'Lenguaje profesional de fútbol en una sola plataforma',
+    'landing.heroTitle': 'Lenguaje profesional de fútbol en',
     'landing.heroTitleHighlight': 'una sola plataforma',
     'landing.heroLead': 'RFA.Learning integra traducción, análisis y educación deportiva para mejorar la comunicación entre jugadores, entrenadores y analistas.',
     'landing.tag1': 'ES-EN',
@@ -199,6 +213,9 @@ const translations = {
     'landing.bilingualDesc': 'Terminología técnica y comunicación aplicada.',
     'landing.formativeTitle': 'Uso formativo',
     'landing.formativeDesc': 'Enfoque para academias, staff técnico y jugadores.',
+    'landing.heroImage1Alt': 'Entrenamiento de fútbol en campo',
+    'landing.heroImage2Alt': 'Entrenador guiando práctica en cancha',
+    'landing.heroImage3Alt': 'Jugador en conducción de balón',
     'landing.stat1': '500+',
     'landing.stat1Label': 'Términos técnicos',
     'landing.stat2': '2',
@@ -250,6 +267,9 @@ const translations = {
     'landing.audience5Desc': 'Soporte para productos deportivos, IA y sistemas de scouting.',
     'landing.galleryLabel': 'Visual',
     'landing.galleryTitle': 'Experiencia En Campo',
+    'landing.galleryImage1Alt': 'Entrenador explicando ejercicio de fútbol',
+    'landing.galleryImage2Alt': 'Jugador conduciendo balón en entrenamiento',
+    'landing.galleryImage3Alt': 'Niños realizando ejercicio de control de balón',
     'landing.gallery1': 'Contexto real de formación',
     'landing.gallery2': 'Aplicación individual',
     'landing.gallery3': 'Desarrollo técnico',
@@ -369,7 +389,19 @@ const translations = {
     'classes.searchPlaceholder': 'Search class...',
     'classes.allCategories': 'All categories',
     'classes.allLevels': 'All levels',
+    'classes.levelBeginner': 'Beginner',
+    'classes.levelIntermediate': 'Intermediate',
+    'classes.levelAdvanced': 'Advanced',
     'classes.modulesAvailable': '{0} module(s) available',
+    'classes.pageHint': 'Browse each module, review a preview and open the quiz whenever you want to practice.',
+    'classes.previewLabel': 'Preview',
+    'classes.termsLabel': '{0} terms',
+    'classes.availableModules': 'Available modules',
+    'classes.visibleTerms': 'Visible terms',
+    'classes.visibleCategories': 'Visible categories',
+    'classes.showTerms': 'Show full terms',
+    'classes.hideTerms': 'Hide terms',
+    'classes.visibleStats': '{0} visible',
     'classes.takeQuiz': 'Take Quiz',
     'classes.noQuizContent': 'This class has no quiz content',
     'classes.quizTitle': 'Quiz: {0}',
@@ -413,6 +445,8 @@ const translations = {
     'dashboard.classUpdated': 'Class updated',
     'dashboard.classDeleted': 'Class deleted',
     'dashboard.classCreated': 'Class created',
+    'dashboard.roleStudent': 'Student',
+    'dashboard.roleAdmin': 'Administrator',
     'dashboard.deleteUserConfirm': 'Delete this user?',
     'dashboard.deleteClassConfirm': 'Delete this class?',
     'dashboard.statUsers': 'Users',
@@ -421,10 +455,10 @@ const translations = {
     'dashboard.statActive': 'Active',
     'dashboard.statClasses': 'Classes',
     'dashboard.statProgress': 'Progress records',
-    'dashboard.active': 'active',
-    'dashboard.inactive': 'inactive',
-    'dashboard.forcePassword': 'force password',
-    'dashboard.normalPassword': 'normal password',
+    'dashboard.active': 'Active',
+    'dashboard.inactive': 'Inactive',
+    'dashboard.forcePassword': 'Force password',
+    'dashboard.normalPassword': 'Normal password',
     'dashboard.save': 'Save',
 
     // Profile
@@ -457,7 +491,7 @@ const translations = {
 
     // Landing / Index
     'landing.heroKicker': 'Football Language System',
-    'landing.heroTitle': 'Professional football language in one platform',
+    'landing.heroTitle': 'Professional football language in',
     'landing.heroTitleHighlight': 'one platform',
     'landing.heroLead': 'RFA.Learning integrates translation, analysis and sports education to improve communication between players, coaches and analysts.',
     'landing.tag1': 'ES-EN',
@@ -470,6 +504,9 @@ const translations = {
     'landing.bilingualDesc': 'Technical terminology and applied communication.',
     'landing.formativeTitle': 'Formative use',
     'landing.formativeDesc': 'Designed for academies, technical staff and players.',
+    'landing.heroImage1Alt': 'Football training on the field',
+    'landing.heroImage2Alt': 'Coach guiding practice on the pitch',
+    'landing.heroImage3Alt': 'Player dribbling the ball',
     'landing.stat1': '500+',
     'landing.stat1Label': 'Technical terms',
     'landing.stat2': '2',
@@ -521,6 +558,9 @@ const translations = {
     'landing.audience5Desc': 'Support for sports products, AI and scouting systems.',
     'landing.galleryLabel': 'Gallery',
     'landing.galleryTitle': 'Field Experience',
+    'landing.galleryImage1Alt': 'Coach explaining a football drill',
+    'landing.galleryImage2Alt': 'Player dribbling the ball in training',
+    'landing.galleryImage3Alt': 'Children doing ball control exercise',
     'landing.gallery1': 'Real training context',
     'landing.gallery2': 'Individual application',
     'landing.gallery3': 'Technical development',
@@ -546,6 +586,86 @@ const translations = {
 };
 
 // ── Core functions ──
+const classTitleVariants = [
+  { es: 'Posiciones y Roles en el Campo', en: 'Positions and Roles on the Field' },
+  { es: 'Acciones del Juego', en: 'Game Actions' },
+  { es: 'Reglas y Arbitraje', en: 'Rules and Officiating' },
+  { es: 'Táctica y Estrategia', en: 'Tactics and Strategy' },
+  { es: 'Análisis y Scouting', en: 'Analysis and Scouting' },
+  { es: 'Lenguaje del Comentarista y Diferencias Clave', en: 'Commentator Language and Key Differences' },
+  { es: 'Lenguaje del Comentarista y Jugadas Clave', en: 'Commentator Language and Key Plays' },
+];
+
+const classCategoryVariants = [
+  { es: 'Posiciones', en: 'Positions' },
+  { es: 'Acciones', en: 'Actions' },
+  { es: 'Arbitraje', en: 'Officiating' },
+  { es: 'Táctica', en: 'Tactics' },
+  { es: 'Análisis', en: 'Analysis' },
+  { es: 'Comunicación', en: 'Communication' },
+];
+
+const classLevelVariants = [
+  { es: 'Principiante', en: 'Beginner' },
+  { es: 'Intermedio', en: 'Intermediate' },
+  { es: 'Avanzado', en: 'Advanced' },
+  { es: 'Beginner', en: 'Beginner' },
+  { es: 'Intermediate', en: 'Intermediate' },
+  { es: 'Advanced', en: 'Advanced' },
+];
+
+const roleVariants = [
+  { es: 'student', en: 'student' },
+  { es: 'admin', en: 'admin' },
+  { es: 'Estudiante', en: 'Student' },
+  { es: 'Administrador', en: 'Administrator' },
+  { es: 'Student', en: 'Student' },
+  { es: 'Administrator', en: 'Administrator' },
+];
+
+function normalizeDisplayText(value) {
+  return String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function translateClassTitle(title) {
+  return translateKnownClassValue(title, classTitleVariants);
+}
+
+function translateClassCategory(category) {
+  return translateKnownClassValue(category, classCategoryVariants);
+}
+
+function translateClassLevel(level) {
+  return translateKnownClassValue(level, classLevelVariants);
+}
+
+function translateUserRole(role) {
+  const normalized = normalizeDisplayText(role);
+  const match = roleVariants.find((item) => {
+    return normalizeDisplayText(item.es) === normalized || normalizeDisplayText(item.en) === normalized;
+  });
+
+  if (!match) return role || '';
+  return currentLang === 'en' ? match.en : match.es;
+}
+
+function translateKnownClassValue(value, variants) {
+  const normalized = normalizeDisplayText(value);
+  const match = variants.find((item) => {
+    return normalizeDisplayText(item.es) === normalized || normalizeDisplayText(item.en) === normalized;
+  });
+
+  if (!match) return value || '';
+  return currentLang === 'en' ? match.en : match.es;
+}
+
 function detectLanguage() {
   const saved = localStorage.getItem(LANG_KEY);
   if (saved && translations[saved]) return saved;
@@ -574,6 +694,7 @@ function setLanguage(lang) {
   document.documentElement.setAttribute('lang', lang);
   translatePage();
   updateLangToggle();
+  window.dispatchEvent(new CustomEvent('languagechange', { detail: { lang: currentLang } }));
 }
 
 function translatePage() {
@@ -592,6 +713,10 @@ function translatePage() {
   // data-i18n-aria → aria-label
   document.querySelectorAll('[data-i18n-aria]').forEach((el) => {
     el.setAttribute('aria-label', t(el.dataset.i18nAria));
+  });
+  // data-i18n-alt → alt
+  document.querySelectorAll('[data-i18n-alt]').forEach((el) => {
+    el.setAttribute('alt', t(el.dataset.i18nAlt));
   });
 }
 
@@ -616,6 +741,12 @@ function updateLangToggle() {
   btn.textContent = currentLang === 'es' ? 'EN' : 'ES';
   btn.title = currentLang === 'es' ? 'Switch to English' : 'Cambiar a español';
 }
+
+window.translateClassTitle = translateClassTitle;
+window.translateClassCategory = translateClassCategory;
+window.translateClassLevel = translateClassLevel;
+window.translateUserRole = translateUserRole;
+window.getCurrentLang = getCurrentLang;
 
 // ── Initialize on DOM ready ──
 document.documentElement.setAttribute('lang', currentLang);

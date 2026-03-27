@@ -19,10 +19,10 @@ async function loadProfile() {
   container.innerHTML = historyResult.data.map((q) => {
     const pct = q.total > 0 ? Math.round((q.score / q.total) * 100) : 0;
     const status = pct >= 70 ? 'passed' : 'failed';
-    const date = new Date(q.completedAt).toLocaleDateString('es');
+    const date = new Date(q.completedAt).toLocaleDateString(getCurrentLang() === 'en' ? 'en-US' : 'es-CR');
     return `
       <div class="quiz-result ${status}" style="margin-bottom:0.6rem;text-align:left;padding:0.6rem 0.8rem;">
-        <strong>${q.classTitle}</strong>
+        <strong>${translateClassTitle(q.classTitle)}</strong>
         <span style="float:right;">${q.score}/${q.total} (${pct}%) — ${date}</span>
       </div>`;
   }).join('');
@@ -55,6 +55,10 @@ document.getElementById('profile-form')?.addEventListener('submit', async (event
 document.getElementById('logout-btn')?.addEventListener('click', async () => {
   await fetch('/api/auth/logout', { method: 'POST' });
   window.location.href = '/login';
+});
+
+window.addEventListener('languagechange', () => {
+  loadProfile();
 });
 
 loadProfile();

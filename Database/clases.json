@@ -1,26 +1,143 @@
 [
   {
-    "id": 1,
-    "title": "Basic Football Vocabulary",
-    "category": "Vocabulary",
+    "title": "Posiciones y Roles en el Campo",
+    "category": "Posiciones",
     "level": "Beginner",
     "content": [
-      {
-        "spanish": "portero",
-        "english": "goalkeeper"
-      },
-      {
-        "spanish": "defensa",
-        "english": "defender"
-      },
-      {
-        "spanish": "mediocampista",
-        "english": "midfielder"
-      },
-      {
-        "spanish": "delantero",
-        "english": "striker"
-      }
+      { "spanish": "portero / arquero", "english": "goalkeeper (GK)" },
+      { "spanish": "defensa", "english": "defender" },
+      { "spanish": "defensa central", "english": "center back (CB)" },
+      { "spanish": "defensa central derecho", "english": "right center back (RCB)" },
+      { "spanish": "defensa central izquierdo", "english": "left center back (LCB)" },
+      { "spanish": "lateral derecho", "english": "right back (RB)" },
+      { "spanish": "lateral izquierdo", "english": "left back (LB)" },
+      { "spanish": "carrilero", "english": "wing back (RWB / LWB)" },
+      { "spanish": "mediocampista", "english": "midfielder" },
+      { "spanish": "mediocentro", "english": "central midfielder (CM)" },
+      { "spanish": "volante defensivo", "english": "defensive midfielder (CDM)" },
+      { "spanish": "extremo derecho", "english": "right winger (RW)" },
+      { "spanish": "extremo izquierdo", "english": "left winger (LW)" },
+      { "spanish": "delantero centro", "english": "striker (ST)" },
+      { "spanish": "falso 9", "english": "false nine" }
+    ]
+  },
+  {
+    "title": "Acciones del Juego",
+    "category": "Acciones",
+    "level": "Beginner",
+    "content": [
+      { "spanish": "pase corto", "english": "short pass" },
+      { "spanish": "pase largo", "english": "long pass" },
+      { "spanish": "pase filtrado", "english": "through ball" },
+      { "spanish": "centro", "english": "cross" },
+      { "spanish": "disparo", "english": "shot" },
+      { "spanish": "disparo a puerta", "english": "shot on target" },
+      { "spanish": "disparo fuera", "english": "shot off target" },
+      { "spanish": "gol", "english": "goal" },
+      { "spanish": "asistencia", "english": "assist" },
+      { "spanish": "regate", "english": "dribble" },
+      { "spanish": "entrada limpia", "english": "clean tackle" },
+      { "spanish": "control del balón", "english": "ball control" },
+      { "spanish": "primer toque", "english": "first touch" },
+      { "spanish": "recuperación", "english": "ball recovery" },
+      { "spanish": "pérdida de balón", "english": "turnover" }
+    ]
+  },
+  {
+    "title": "Reglas y Arbitraje",
+    "category": "Arbitraje",
+    "level": "Intermediate",
+    "content": [
+      { "spanish": "penal", "english": "penalty kick" },
+      { "spanish": "fuera de juego", "english": "offside" },
+      { "spanish": "falta", "english": "foul" },
+      { "spanish": "mano", "english": "handball" },
+      { "spanish": "ventaja", "english": "advantage" },
+      { "spanish": "tiro libre directo", "english": "direct free kick" },
+      { "spanish": "tiro libre indirecto", "english": "indirect free kick" },
+      { "spanish": "saque de esquina", "english": "corner kick" },
+      { "spanish": "saque de banda", "english": "throw-in" },
+      { "spanish": "saque de meta", "english": "goal kick" },
+      { "spanish": "tarjeta amarilla", "english": "yellow card" },
+      { "spanish": "tarjeta roja", "english": "red card" },
+      { "spanish": "expulsión", "english": "sending off" },
+      { "spanish": "árbitro", "english": "referee" },
+      { "spanish": "VAR", "english": "video assistant referee" }
+    ]
+  },
+  {
+    "title": "Táctica y Estrategia",
+    "category": "Táctica",
+    "level": "Intermediate",
+    "content": [
+      { "spanish": "formación", "english": "formation" },
+      { "spanish": "posesión", "english": "possession" },
+      { "spanish": "dominio del juego", "english": "game control" },
+      { "spanish": "ritmo del partido", "english": "match tempo" },
+      { "spanish": "presión alta", "english": "high press" },
+      { "spanish": "presión media", "english": "mid press" },
+      { "spanish": "bloque bajo", "english": "low block" },
+      { "spanish": "bloque alto", "english": "high block" },
+      { "spanish": "contraataque", "english": "counterattack" },
+      { "spanish": "transición ofensiva", "english": "offensive transition" },
+      { "spanish": "transición defensiva", "english": "defensive transition" },
+      { "spanish": "salida de balón", "english": "build-up play" },
+      { "spanish": "juego directo", "english": "direct play" },
+      { "spanish": "juego posicional", "english": "positional play" },
+      { "spanish": "cambio de juego", "english": "switch of play" },
+      { "spanish": "amplitud", "english": "width" },
+      { "spanish": "profundidad", "english": "depth" }
+    ]
+  },
+  {
+    "title": "Análisis y Scouting",
+    "category": "Análisis",
+    "level": "Advanced",
+    "content": [
+      { "spanish": "posesión (%)", "english": "possession (%)" },
+      { "spanish": "tiros", "english": "shots" },
+      { "spanish": "tiros a puerta", "english": "shots on target" },
+      { "spanish": "pases completados", "english": "completed passes" },
+      { "spanish": "precisión de pase", "english": "pass accuracy" },
+      { "spanish": "expected goals", "english": "xG" },
+      { "spanish": "expected assists", "english": "xA" },
+      { "spanish": "duelos ganados", "english": "duels won" },
+      { "spanish": "recuperaciones", "english": "recoveries" },
+      { "spanish": "intercepciones", "english": "interceptions" },
+      { "spanish": "minutos jugados", "english": "minutes played" },
+      { "spanish": "goles por partido", "english": "goals per match" },
+      { "spanish": "asistencias por partido", "english": "assists per match" },
+      { "spanish": "técnico", "english": "technical" },
+      { "spanish": "táctico", "english": "tactical" },
+      { "spanish": "físico", "english": "physical" },
+      { "spanish": "psicológico", "english": "psychological" },
+      { "spanish": "liderazgo", "english": "leadership" }
+    ]
+  },
+  {
+    "title": "Lenguaje del Comentarista y Diferencias Clave",
+    "category": "Comunicación",
+    "level": "Advanced",
+    "content": [
+      { "spanish": "¡Qué golazo!", "english": "What a goal!" },
+      { "spanish": "¡Increíble parada!", "english": "What a save!" },
+      { "spanish": "partido muy disputado", "english": "very competitive match" },
+      { "spanish": "está dominando el partido", "english": "he is dominating the game" },
+      { "spanish": "gran jugada colectiva", "english": "great team play" },
+      { "spanish": "se la pierde increíblemente", "english": "he misses it unbelievably" },
+      { "spanish": "está en fuera de juego", "english": "he is offside" },
+      { "spanish": "gran definición", "english": "great finish" },
+      { "spanish": "contraataque rápido", "english": "fast counterattack" },
+      { "spanish": "ataque posicional", "english": "positional attack" },
+      { "spanish": "centro al área", "english": "cross into the box" },
+      { "spanish": "balón parado", "english": "set piece" },
+      { "spanish": "tiro de esquina corto", "english": "short corner" },
+      { "spanish": "fútbol (Europa)", "english": "football" },
+      { "spanish": "fútbol (USA)", "english": "soccer" },
+      { "spanish": "cancha", "english": "pitch" },
+      { "spanish": "campo", "english": "field" },
+      { "spanish": "botines", "english": "cleats" },
+      { "spanish": "botas de fútbol", "english": "boots" }
     ]
   }
 ]

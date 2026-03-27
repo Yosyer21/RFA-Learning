@@ -1,7 +1,99 @@
 let currentUser = null;
 let allCategories = new Set();
+let currentClassesPage = 1;
+
+function getTermCount(lesson) {
+  return Array.isArray(lesson.content) ? lesson.content.length : 0;
+}
+
+function renderTermList(terms, className = 'term-list') {
+  return `
+    <ul class="${className}">
+      ${terms
+        .map((item) => `<li><span>${escapeHtml(item.spanish)}</span><strong>${escapeHtml(item.english)}</strong></li>`)
+        .join('')}
+    </ul>
+  `;
+}
+
+function renderClassFilters(selectedCategory, selectedLevel) {
+  const catSelect = document.getElementById('filter-category');
+  if (catSelect) {
+    const options = [`<option value="">${escapeHtml(t('classes.allCategories'))}</option>`];
+    Array.from(allCategories)
+      .sort((a, b) => translateClassCategory(a).localeCompare(translateClassCategory(b), getCurrentLang() === 'en' ? 'en' : 'es'))
+      .forEach((cat) => {
+        options.push(
+          `<option value="${escapeHtml(cat)}"${cat === selectedCategory ? ' selected' : ''}>${escapeHtml(translateClassCategory(cat))}</option>`
+        );
+      });
+    catSelect.innerHTML = options.join('');
+  }
+
+  const levelSelect = document.getElementById('filter-level');
+  if (levelSelect) {
+    const levels = ['', 'Beginner', 'Intermediate', 'Advanced'];
+    levelSelect.innerHTML = levels
+      .map((level) => {
+        if (!level) {
+          return `<option value="">${escapeHtml(t('classes.allLevels'))}</option>`;
+        }
+        return `<option value="${escapeHtml(level)}"${level === selectedLevel ? ' selected' : ''}>${escapeHtml(translateClassLevel(level))}</option>`;
+      })
+      .join('');
+  }
+}
+
+function renderClassCard(lesson) {
+  const terms = Array.isArray(lesson.content) ? lesson.content : [];
+  const previewTerms = terms.slice(0, 4);
+  const previewCount = previewTerms.length;
+  const totalTerms = terms.length;
+  const hasMoreTerms = totalTerms > previewCount;
+  const classTitle = translateClassTitle(lesson.title);
+  const classCategory = translateClassCategory(lesson.category);
+  const classLevel = translateClassLevel(lesson.level);
+  const toggleButton = hasMoreTerms
+    ? `<button class="btn btn-small btn-ghost class-toggle" type="button" data-toggle-terms="${lesson.id}" aria-expanded="false">${t('classes.showTerms')}</button>`
+    : `<span class="class-card-note">${t('classes.termsLabel', totalTerms)}</span>`;
+
+  return `
+    <article class="class-card" data-class-id="${lesson.id}">
+      <div class="class-card-header">
+        <div>
+          <h3>${escapeHtml(classTitle)}</h3>
+          <p class="class-card-meta">
+            <span class="badge">${escapeHtml(classCategory)}</span>
+            <span class="badge">${escapeHtml(classLevel)}</span>
+            <span class="badge badge-soft">${t('classes.termsLabel', totalTerms)}</span>
+          </p>
+        </div>
+        ${toggleButton}
+      </div>
+
+      <div class="class-preview">
+        <div class="class-preview-head">
+          <span class="kicker">${t('classes.previewLabel')}</span>
+          <span class="class-preview-count">${t('classes.visibleStats', previewCount)}</span>
+        </div>
+        ${renderTermList(previewTerms, 'term-list term-list-preview')}
+      </div>
+
+      <div class="class-details hidden" data-term-panel="${lesson.id}">
+        ${hasMoreTerms ? renderTermList(terms, 'term-list term-list-full') : ''}
+      </div>
+
+      <div class="class-actions">
+        <button class="btn btn-small btn-primary quiz-btn" data-class-id="${lesson.id}" type="button">
+          ${t('classes.takeQuiz')}
+        </button>
+      </div>
+    </article>
+  `;
+}
 
 async function loadClasses(page = 1) {
+  currentClassesPage = page;
   const meResult = await apiJson('/api/auth/me');
   if (!meResult) return;
   currentUser = meResult.data.user;
@@ -28,45 +120,47 @@ async function loadClasses(page = 1) {
   const { data: classes, pagination } = result.data;
   const container = document.getElementById('classes-container');
   const summary = document.getElementById('classes-summary');
-  summary.textContent = t('classes.modulesAvailable', pagination.total);
+  const pageTerms = classes.reduce((total, lesson) => total + getTermCount(lesson), 0);
+  const categories = new Set(classes.map((lesson) => lesson.category).filter(Boolean));
+
+  summary.innerHTML = `
+    <div class="classes-summary-grid">
+      <div class="summary-chip">
+        <span>${t('classes.availableModules')}</span>
+        <strong>${pagination.total}</strong>
+      </div>
+      <div class="summary-chip">
+        <span>${t('classes.visibleTerms')}</span>
+        <strong>${pageTerms}</strong>
+      </div>
+      <div class="summary-chip">
+        <span>${t('classes.visibleCategories')}</span>
+        <strong>${categories.size}</strong>
+      </div>
+    </div>
+  `;
 
   // Populate category filter
   classes.forEach((c) => allCategories.add(c.category));
-  const catSelect = document.getElementById('filter-category');
-  if (catSelect && catSelect.options.length <= 1) {
-    allCategories.forEach((cat) => {
-      const opt = document.createElement('option');
-      opt.value = cat;
-      opt.textContent = cat;
-      catSelect.appendChild(opt);
-    });
-  }
+  renderClassFilters(category, level);
 
-  container.innerHTML = classes
-    .map(
-      (lesson) => `
-      <article class="class-card">
-        <h3>${escapeHtml(lesson.title)}</h3>
-        <p class="entity-meta">
-          <span class="badge">${escapeHtml(lesson.category)}</span>
-          <span class="badge">${escapeHtml(lesson.level)}</span>
-        </p>
-        <ul class="term-list">
-          ${(lesson.content || [])
-            .map((item) => `<li><span>${escapeHtml(item.spanish)}</span><strong>${escapeHtml(item.english)}</strong></li>`)
-            .join('')}
-        </ul>
-        <button class="btn btn-small btn-primary quiz-btn" data-class-id="${lesson.id}" style="margin-top:0.8rem;">
-          ${t('classes.takeQuiz')}
-        </button>
-      </article>
-    `
-    )
-    .join('');
+  container.innerHTML = classes.map(renderClassCard).join('');
 
   // Quiz buttons
   container.querySelectorAll('.quiz-btn').forEach((btn) => {
     btn.addEventListener('click', () => startQuiz(parseInt(btn.dataset.classId), classes));
+  });
+
+  container.querySelectorAll('.class-toggle').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const classId = btn.dataset.toggleTerms;
+      const panel = container.querySelector(`[data-term-panel="${classId}"]`);
+      if (!panel) return;
+
+      const isHidden = panel.classList.toggle('hidden');
+      btn.setAttribute('aria-expanded', String(!isHidden));
+      btn.textContent = isHidden ? t('classes.showTerms') : t('classes.hideTerms');
+    });
   });
 
   renderPagination('classes-pagination', pagination, loadClasses);
@@ -87,12 +181,13 @@ function startQuiz(classId, classes) {
 
   // Shuffle and pick up to 10 questions
   const questions = [...lesson.content].sort(() => Math.random() - 0.5).slice(0, 10);
+  const classTitle = translateClassTitle(lesson.title);
 
   const overlay = document.createElement('div');
   overlay.className = 'quiz-overlay';
   overlay.innerHTML = `
-    <div class="quiz-modal" role="dialog" aria-label="${t('classes.quizTitle', escapeHtml(lesson.title))}">
-      <h2>${t('classes.quizTitle', escapeHtml(lesson.title))}</h2>
+    <div class="quiz-modal" role="dialog" aria-label="${t('classes.quizTitle', escapeHtml(classTitle))}">
+      <h2>${t('classes.quizTitle', escapeHtml(classTitle))}</h2>
       <p class="hint">${t('classes.quizHint')}</p>
       <form id="quiz-form">
         ${questions
@@ -182,6 +277,10 @@ document.getElementById('search-input')?.addEventListener('input', () => {
 
 document.getElementById('filter-category')?.addEventListener('change', () => loadClasses(1));
 document.getElementById('filter-level')?.addEventListener('change', () => loadClasses(1));
+
+window.addEventListener('languagechange', () => {
+  loadClasses(currentClassesPage);
+});
 
 document.getElementById('logout-btn')?.addEventListener('click', async () => {
   await fetch('/api/auth/logout', { method: 'POST' });

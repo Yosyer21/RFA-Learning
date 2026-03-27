@@ -14,15 +14,126 @@
   margin-bottom: 0.6rem;
 }
 
+#classes-summary {
+  margin: 0.9rem 0 1rem;
+}
+
+.classes-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.summary-chip {
+  padding: 0.85rem 0.95rem;
+  border: 1px solid color-mix(in srgb, var(--border) 35%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface-2) 16%, transparent);
+  display: grid;
+  gap: 0.2rem;
+}
+
+.summary-chip span {
+  color: var(--muted);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.summary-chip strong {
+  font-family: 'Archivo', sans-serif;
+  font-size: 1.18rem;
+}
+
+#classes-container {
+  display: grid;
+  gap: 1rem;
+}
+
 #classes-container .class-card {
-  margin-bottom: 1rem;
+  padding: 1rem;
+  display: grid;
+  gap: 0.95rem;
 }
 
 #classes-container .class-card h3 {
-  font-size: 0.95rem;
-  margin-bottom: 0.4rem;
+  font-size: 1rem;
+  margin: 0;
 }
 
-#classes-container .class-card .term-list {
-  margin-top: 0.5rem;
+.class-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.8rem;
+}
+
+.class-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.55rem 0 0;
+}
+
+.badge-soft {
+  color: color-mix(in srgb, var(--text) 88%, var(--muted));
+}
+
+.class-preview,
+.class-details {
+  border: 1px solid color-mix(in srgb, var(--border) 26%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface-2) 16%, transparent);
+  padding: 0.9rem;
+}
+
+.class-preview-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.7rem;
+}
+
+.class-preview-count,
+.class-card-note {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.term-list-preview {
+  margin: 0;
+}
+
+.term-list-full {
+  margin: 0;
+}
+
+.class-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: flex-end;
+}
+
+.class-toggle {
+  white-space: nowrap;
+}
+
+@media (max-width: 780px) {
+  .classes-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .class-card-header {
+    flex-direction: column;
+  }
+
+  .class-actions {
+    justify-content: stretch;
+  }
+
+  .class-actions .btn {
+    width: 100%;
+  }
 }

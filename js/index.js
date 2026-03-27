@@ -23,7 +23,7 @@ function setupHeroSlider() {
     const dot = document.createElement('button');
     dot.type = 'button';
     dot.className = 'slider-dot';
-    dot.setAttribute('aria-label', `Ir a imagen ${index + 1}`);
+    dot.setAttribute('aria-label', t('landing.dotAria', index + 1));
     dot.addEventListener('click', () => {
       goTo(index);
       resetAutoplay();
@@ -130,6 +130,12 @@ function setupHeroSlider() {
 
   render();
   startAutoplay();
+
+  window.addEventListener('languagechange', () => {
+    dots.forEach((_dot, index) => {
+      dots[index].setAttribute('aria-label', t('landing.dotAria', index + 1));
+    });
+  });
 }
 
 function setupRevealAnimations() {

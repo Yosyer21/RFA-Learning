@@ -1,5 +1,5 @@
 const { query } = require('../utils/db');
-const { normalizeText } = require('../utils/helpers');
+const { normalizeText, matchesTranslation } = require('../utils/helpers');
 
 function parseContent(rawContent) {
   if (Array.isArray(rawContent)) {
@@ -260,7 +260,7 @@ async function submitQuiz(req, res) {
 
   const graded = answers.map((a) => {
     const term = classContent.find((t) => t.spanish === a.spanish);
-    const correct = term && term.english.toLowerCase() === (a.answer || '').toLowerCase();
+    const correct = Boolean(term) && matchesTranslation(term.english, a.answer);
     if (correct) score++;
     return { spanish: a.spanish, answer: a.answer, correct, expected: term?.english || '' };
   });

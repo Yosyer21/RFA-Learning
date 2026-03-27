@@ -30,7 +30,7 @@ function renderLevelBars(classes, completed) {
     return `
       <div class="level-bar">
         <div class="level-bar-head">
-          <span>${level}</span>
+          <span>${translateClassLevel(level)}</span>
           <small>${done}/${total}</small>
         </div>
         <div class="level-bar-track">
@@ -53,8 +53,8 @@ function renderCompletedList(classes, completedIds) {
   list.innerHTML = done.map(c => `
     <li>
       <span class="check-icon"></span>
-      <span class="class-name">${c.title}</span>
-      <span class="class-badge">${c.level}</span>
+      <span class="class-name">${translateClassTitle(c.title)}</span>
+      <span class="class-badge">${translateClassLevel(c.level)}</span>
     </li>`).join('');
 }
 
@@ -83,7 +83,7 @@ async function loadHome() {
   const pct = Math.round((completedIds.length / totalClasses) * 100);
 
   // Stat cards
-  document.getElementById('stat-level').textContent = progress.currentLevel || 'Beginner';
+  document.getElementById('stat-level').textContent = translateClassLevel(progress.currentLevel || 'Beginner');
   document.getElementById('stat-completed').textContent = completedIds.length;
   document.getElementById('stat-score').textContent = progress.score ?? 0;
   document.getElementById('stat-streak').textContent = progress.streak ?? 0;
@@ -101,6 +101,10 @@ async function loadHome() {
 document.getElementById('logout-btn')?.addEventListener('click', async () => {
   await fetch('/api/auth/logout', { method: 'POST' });
   window.location.href = '/login';
+});
+
+window.addEventListener('languagechange', () => {
+  loadHome();
 });
 
 loadHome();

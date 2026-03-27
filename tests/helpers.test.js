@@ -1,4 +1,9 @@
-const { normalizeText, publicUser } = require('../server/utils/helpers');
+const {
+  normalizeText,
+  normalizeComparableText,
+  matchesTranslation,
+  publicUser,
+} = require('../server/utils/helpers');
 
 describe('helpers', () => {
   describe('normalizeText', () => {
@@ -12,6 +17,34 @@ describe('helpers', () => {
 
     test('converts numbers to string', () => {
       expect(normalizeText(123)).toBe('123');
+    });
+  });
+
+  describe('normalizeComparableText', () => {
+    test('removes accents and punctuation', () => {
+      expect(normalizeComparableText('¡Qué golazo!')).toBe('que golazo');
+    });
+
+    test('normalizes parenthetical abbreviations', () => {
+      expect(normalizeComparableText('goalkeeper (GK)')).toBe('goalkeeper gk');
+    });
+  });
+
+  describe('matchesTranslation', () => {
+    test('accepts exact normalized match', () => {
+      expect(matchesTranslation('What a goal!', 'what a goal')).toBe(true);
+    });
+
+    test('accepts accent-insensitive match', () => {
+      expect(matchesTranslation('fútbol', 'Futbol')).toBe(true);
+    });
+
+    test('accepts match without parenthetical notes', () => {
+      expect(matchesTranslation('goalkeeper (GK)', 'goalkeeper')).toBe(true);
+    });
+
+    test('rejects different translations', () => {
+      expect(matchesTranslation('goalkeeper', 'defender')).toBe(false);
     });
   });
 
