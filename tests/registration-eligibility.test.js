@@ -1,5 +1,26 @@
 const { extractEligibleIdentifiersFromSheet } = require('../server/utils/registration-eligibility');
 
+describe('google sheets configuration', () => {
+  const originalEnv = { ...process.env };
+
+  afterEach(() => {
+    process.env = { ...originalEnv };
+    jest.resetModules();
+  });
+
+  test('accepts inline service account JSON', () => {
+    process.env.GOOGLE_SHEETS_SPREADSHEET_ID = 'spreadsheet-id';
+    process.env.GOOGLE_SERVICE_ACCOUNT_JSON = JSON.stringify({
+      client_email: 'service@example.com',
+      private_key: '-----BEGIN PRIVATE KEY-----\\nabc\\n-----END PRIVATE KEY-----\\n',
+    });
+
+    const { hasGoogleSheetsConfig } = require('../server/utils/registration-eligibility');
+
+    expect(hasGoogleSheetsConfig()).toBe(true);
+  });
+});
+
 describe('registration eligibility parser', () => {
   test('extracts paid Football Language System accounts from a header-based sheet', () => {
     const values = [

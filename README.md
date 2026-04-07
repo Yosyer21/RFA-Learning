@@ -43,8 +43,11 @@ En Railway debes definir `DATABASE_URL` y `SESSION_SECRET`; no se recomienda dep
 - `GOOGLE_SERVICE_ACCOUNT_EMAIL`: correo de la cuenta de servicio
 - `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY`: clave privada de la cuenta de servicio, con saltos de línea escapados como `\n`
 - `GOOGLE_APPLICATION_CREDENTIALS`: ruta al JSON de la cuenta de servicio
+- `GOOGLE_SERVICE_ACCOUNT_JSON`: JSON completo de la cuenta de servicio, útil para Railway o secretos en una sola variable
 - `GOOGLE_SHEETS_RANGE`: rango a leer, por defecto `Sheet1!A:Z`
 - `REGISTRATION_ALLOWED_ACCOUNTS`: lista opcional separada por comas para pruebas o fallback local
+
+En Railway es más simple definir `GOOGLE_SERVICE_ACCOUNT_JSON` con el contenido completo del archivo de credenciales, además de `GOOGLE_SHEETS_SPREADSHEET_ID` y `GOOGLE_SHEETS_RANGE`. Si prefieres usar variables separadas, también funcionan `GOOGLE_SERVICE_ACCOUNT_EMAIL` y `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY`.
 
 Si no defines credenciales iniciales de admin en producciÃ³n, el bootstrap omite ese usuario por seguridad.
 

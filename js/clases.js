@@ -62,13 +62,36 @@ function toggleFavoriteClass(classId) {
 }
 
 function getCompletedClassIds(progress) {
-  if (!progress || Array.isArray(progress)) {
+  if (!progress) {
     return [];
   }
 
-  return Array.isArray(progress.completedClasses)
-    ? progress.completedClasses.map((id) => Number(id)).filter(Number.isFinite)
-    : [];
+  if (Array.isArray(progress)) {
+    return progress
+      .flatMap((entry) => {
+        if (!entry) return [];
+
+        if (Array.isArray(entry.completedClasses)) {
+          return entry.completedClasses;
+        }
+
+        if (Array.isArray(entry.completed_classes)) {
+          return entry.completed_classes;
+        }
+
+        return [];
+      })
+      .map((id) => Number(id))
+      .filter(Number.isFinite);
+  }
+
+  const completedClasses = Array.isArray(progress.completedClasses)
+    ? progress.completedClasses
+    : Array.isArray(progress.completed_classes)
+      ? progress.completed_classes
+      : [];
+
+  return completedClasses.map((id) => Number(id)).filter(Number.isFinite);
 }
 
 function compareClasses(a, b) {
@@ -597,88 +620,6 @@ function startQuiz(classId, classes, options = {}) {
 
     showToast(passed ? t('classes.quizPassedToast') : t('classes.quizFailedToast'), passed ? 'success' : 'warning');
   });
-}
-
-function scoreVoiceForMode(voice, mode) {
-  const normalizedMode = mode === 'es' ? 'es' : 'en';
-  const lang = String(voice?.lang || '').toLowerCase();
-  const name = String(voice?.name || '').toLowerCase();
-  let score = 0;
-
-  if (normalizedMode === 'es') {
-    if (lang.startsWith('es-419')) score += 120;
-    if (lang.startsWith('es-mx')) score += 115;
-    if (lang.startsWith('es-us')) score += 112;
-    if (lang.startsWith('es-es')) score += 108;
-    if (lang.startsWith('es-')) score += 100;
-    if (lang === 'es') score += 95;
-    if (name.includes('spanish')) score += 20;
-    if (name.includes('espanol') || name.includes('español')) score += 20;
-    if (name.includes('latam') || name.includes('latin')) score += 18;
-    if (name.includes('google')) score += 14;
-    if (name.includes('microsoft')) score += 12;
-    if (name.includes('natural')) score += 12;
-    if (name.includes('enhanced')) score += 10;
-    if (name.includes('neural')) score += 10;
-    if (name.includes('premium')) score += 10;
-  } else {
-    if (lang.startsWith('en-us')) score += 115;
-    if (lang.startsWith('en-gb')) score += 110;
-    if (lang.startsWith('en-au')) score += 105;
-    if (lang.startsWith('en-')) score += 100;
-    if (lang === 'en') score += 95;
-    if (name.includes('english')) score += 20;
-    if (name.includes('google')) score += 14;
-    if (name.includes('microsoft')) score += 12;
-    if (name.includes('natural')) score += 12;
-    if (name.includes('enhanced')) score += 10;
-    if (name.includes('neural')) score += 10;
-    if (name.includes('premium')) score += 10;
-  }
-
-  if (voice?.default) score += 6;
-  if (voice?.localService) score += 4;
-
-  return score;
-}
-
-function pickVoiceForMode(mode) {
-  if (!window.speechSynthesis || typeof window.speechSynthesis.getVoices !== 'function') {
-    return null;
-  }
-
-  const voices = window.speechSynthesis.getVoices();
-  if (!voices.length) return null;
-
-  const normalizedMode = mode === 'es' ? 'es' : 'en';
-  return voices
-    .slice()
-    .sort((a, b) => scoreVoiceForMode(b, normalizedMode) - scoreVoiceForMode(a, normalizedMode))[0] || null;
-}
-
-function speakText(text, mode = 'en') {
-  if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
-    return false;
-  }
-
-  const cleaned = stripSpeechText(text);
-  if (!cleaned) return false;
-
-  const normalizedMode = mode === 'es' ? 'es' : 'en';
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(cleaned);
-  utterance.lang = normalizedMode === 'es' ? 'es-419' : 'en-US';
-  utterance.rate = normalizedMode === 'es' ? 0.88 : 0.92;
-  utterance.pitch = normalizedMode === 'es' ? 1.02 : 1;
-  const voice = pickVoiceForMode(normalizedMode);
-  if (voice) {
-    utterance.voice = voice;
-    if (voice.lang) {
-      utterance.lang = voice.lang;
-    }
-  }
-  window.speechSynthesis.speak(utterance);
-  return true;
 }
 
 let searchTimeout;

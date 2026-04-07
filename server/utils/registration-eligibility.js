@@ -38,6 +38,7 @@ function getServiceAccountConfig() {
   const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || '';
   const privateKey = (process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY || process.env.GOOGLE_PRIVATE_KEY || '').replace(/\\n/g, '\n');
   const sheetRange = process.env.GOOGLE_SHEETS_RANGE || process.env.REGISTRATION_SHEETS_RANGE || 'Sheet1!A:Z';
+  const serviceAccountJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON || process.env.RAILWAY_GOOGLE_SERVICE_ACCOUNT_JSON || '';
   const credentialFilePath = process.env.GOOGLE_APPLICATION_CREDENTIALS || process.env.GOOGLE_SERVICE_ACCOUNT_FILE || '';
 
   return {
@@ -45,8 +46,25 @@ function getServiceAccountConfig() {
     clientEmail: clientEmail.trim(),
     privateKey,
     sheetRange: sheetRange.trim(),
+    serviceAccountJson: serviceAccountJson.trim(),
     credentialFilePath: credentialFilePath.trim(),
   };
+}
+
+function loadCredentialsFromJson(jsonText) {
+  if (!jsonText) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(String(jsonText));
+    return {
+      clientEmail: String(parsed.client_email || '').trim(),
+      privateKey: String(parsed.private_key || '').replace(/\\n/g, '\n'),
+    };
+  } catch (_error) {
+    return null;
+  }
 }
 
 function loadCredentialsFromFile(filePath) {
@@ -72,8 +90,14 @@ function loadCredentialsFromFile(filePath) {
 
 function hasGoogleSheetsConfig() {
   const config = getServiceAccountConfig();
+  const inlineCredentials = loadCredentialsFromJson(config.serviceAccountJson);
   const fileCredentials = loadCredentialsFromFile(config.credentialFilePath);
-  return Boolean(config.spreadsheetId && ((config.clientEmail && config.privateKey) || (fileCredentials && fileCredentials.clientEmail && fileCredentials.privateKey)));
+  const effectiveCredentials = inlineCredentials || fileCredentials;
+
+  return Boolean(
+    config.spreadsheetId
+    && ((config.clientEmail && config.privateKey) || (effectiveCredentials && effectiveCredentials.clientEmail && effectiveCredentials.privateKey))
+  );
 }
 
 function isEmailLike(value) {
@@ -91,6 +115,19 @@ function isProductValue(value) {
 
 function findHeaderIndex(headers, keywords) {
   return headers.findIndex((header) => keywords.some((keyword) => header.includes(keyword)));
+}
+
+function findExactHeaderIndex(headers, keywords) {
+  return headers.findIndex((header) => keywords.includes(header));
+}
+
+function findHeaderIndexWithFallback(headers, exactKeywords, fallbackKeywords) {
+  const exactIndex = findExactHeaderIndex(headers, exactKeywords);
+  if (exactIndex >= 0) {
+    return exactIndex;
+  }
+
+  return findHeaderIndex(headers, fallbackKeywords);
 }
 
 function normalizeOrderNumber(value) {
@@ -124,8 +161,16 @@ function parseMoneyValue(value) {
 
 function extractRecordFromRow(row, headers) {
   const normalizedCells = row.map((cell) => normalizeValue(cell));
-  const productIndex = findHeaderIndex(headers, ['line item name', 'product', 'item', 'service', 'plan', 'course']);
-  const statusIndex = findHeaderIndex(headers, ['financial status', 'status', 'payment', 'paid', 'estado', 'pago']);
+  const productIndex = findHeaderIndexWithFallback(
+    headers,
+    ['line item name', 'product', 'service', 'plan', 'course', 'item'],
+    ['line item name', 'product', 'service', 'plan', 'course']
+  );
+  const statusIndex = findHeaderIndexWithFallback(
+    headers,
+    ['financial status', 'payment status', 'order status', 'status', 'paid'],
+    ['financial status', 'payment status', 'order status', 'status']
+  );
   const emailIndex = findHeaderIndex(headers, ['email', 'correo', 'customer email']);
   const orderIndex = findHeaderIndex(headers, ['order number', 'order', 'order id', 'id']);
   const paidAtIndex = findHeaderIndex(headers, ['paid at', 'payment date', 'date paid']);
@@ -224,8 +269,16 @@ function extractEligibleIdentifiersFromSheet(values) {
   }
 
   const headers = rows[0].map((cell) => normalizeValue(cell));
-  const productIndex = findHeaderIndex(headers, ['product', 'item', 'service', 'plan', 'course', 'line item name']);
-  const statusIndex = findHeaderIndex(headers, ['status', 'payment', 'paid', 'estado', 'pago']);
+  const productIndex = findHeaderIndexWithFallback(
+    headers,
+    ['line item name', 'product', 'service', 'plan', 'course', 'item'],
+    ['line item name', 'product', 'service', 'plan', 'course']
+  );
+  const statusIndex = findHeaderIndexWithFallback(
+    headers,
+    ['financial status', 'payment status', 'order status', 'status', 'paid'],
+    ['financial status', 'payment status', 'order status', 'status']
+  );
   const identifierIndex = findHeaderIndex(headers, ['email', 'correo', 'username', 'usuario', 'account', 'cuenta', 'client']);
 
   const eligibleIdentifiers = new Set();
@@ -365,10 +418,11 @@ async function getAccessToken() {
     return cachedAccessToken;
   }
 
-  const { clientEmail, privateKey, credentialFilePath } = getServiceAccountConfig();
+  const { clientEmail, privateKey, serviceAccountJson, credentialFilePath } = getServiceAccountConfig();
+  const inlineCredentials = loadCredentialsFromJson(serviceAccountJson);
   const fileCredentials = loadCredentialsFromFile(credentialFilePath);
-  const effectiveClientEmail = clientEmail || fileCredentials?.clientEmail || '';
-  const effectivePrivateKey = privateKey || fileCredentials?.privateKey || '';
+  const effectiveClientEmail = clientEmail || inlineCredentials?.clientEmail || fileCredentials?.clientEmail || '';
+  const effectivePrivateKey = privateKey || inlineCredentials?.privateKey || fileCredentials?.privateKey || '';
 
   if (!effectiveClientEmail || !effectivePrivateKey) {
     throw new Error('Google service account credentials are missing');
