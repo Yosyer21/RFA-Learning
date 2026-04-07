@@ -1,4 +1,5 @@
 const { query } = require('../utils/db');
+const { hasGoogleSheetsConfig, loadPaidRegistrationAccounts } = require('../utils/registration-eligibility');
 
 async function dashboardStats(_req, res) {
   const usersResult = await query(`
@@ -23,6 +24,25 @@ async function dashboardStats(_req, res) {
   });
 }
 
+async function paidAccounts(_req, res) {
+  if (!hasGoogleSheetsConfig()) {
+    return res.status(503).json({ message: 'La hoja de pagos no está configurada' });
+  }
+
+  const accounts = await loadPaidRegistrationAccounts();
+  const totalOrders = accounts.length;
+  const totalPeople = accounts.length;
+  const lastPaidAt = accounts.find((account) => account.paidAt || account.createdAt)?.paidAt || accounts.find((account) => account.createdAt)?.createdAt || '';
+
+  return res.json({
+    totalOrders,
+    totalPeople,
+    lastPaidAt,
+    accounts,
+  });
+}
+
 module.exports = {
   dashboardStats,
+  paidAccounts,
 };

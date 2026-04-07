@@ -2,6 +2,9 @@ const statsData = document.getElementById('stats-data');
 const statsCards = document.getElementById('stats-cards');
 const usersList = document.getElementById('users-list');
 const classesList = document.getElementById('classes-list');
+const paidSummary = document.getElementById('paid-summary');
+const paidAccountsList = document.getElementById('paid-accounts-list');
+const paidSyncStatus = document.getElementById('paid-sync-status');
 const createUserForm = document.getElementById('create-user-form');
 const createClassForm = document.getElementById('create-class-form');
 const csvImportForm = document.getElementById('csv-import-form');
@@ -47,6 +50,124 @@ async function loadStats() {
     .join('');
 
   statsData.textContent = JSON.stringify(data, null, 2);
+}
+
+function formatDashboardDate(value) {
+  if (!value) return '';
+
+  const parsed = new Date(String(value).replace(' ', 'T'));
+  if (Number.isNaN(parsed.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat(currentLang === 'en' ? 'en-US' : 'es-ES', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(parsed);
+}
+
+function formatCurrency(value, currency) {
+  if (value === null || value === undefined || value === '') {
+    return '';
+  }
+
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) {
+    return String(value);
+  }
+
+  if (!currency) {
+    return numericValue.toFixed(2);
+  }
+
+  try {
+    return new Intl.NumberFormat(currentLang === 'en' ? 'en-US' : 'es-ES', {
+      style: 'currency',
+      currency,
+    }).format(numericValue);
+  } catch (_error) {
+    return `${currency} ${numericValue.toFixed(2)}`;
+  }
+}
+
+function renderPaidAccount(account) {
+  const personName = account.customerName || account.billingName || account.email;
+  const orderLabel = account.orderNumber ? `#${escapeHtml(account.orderNumber)}` : t('dashboard.paidOrderUnknown');
+  const amountLabel = formatCurrency(account.total, account.currency);
+  const paidLabel = account.paidAt || account.createdAt ? formatDashboardDate(account.paidAt || account.createdAt) : '';
+
+  return `
+    <article class="paid-account-card">
+      <div class="paid-account-card__top">
+        <div class="paid-account-card__name">
+          <strong>${escapeHtml(personName)}</strong>
+          <span>${escapeHtml(account.email)}</span>
+        </div>
+        <div class="paid-account-card__meta">
+          <span>${escapeHtml(orderLabel)}</span>
+        </div>
+      </div>
+      <div class="paid-account-card__chips">
+        <span class="badge badge-active">${escapeHtml(t('dashboard.paidConfirmed'))}</span>
+        ${account.product ? `<span class="badge badge-student">${escapeHtml(account.product)}</span>` : ''}
+        ${account.fulfillmentStatus ? `<span class="badge">${escapeHtml(account.fulfillmentStatus)}</span>` : ''}
+        ${amountLabel ? `<span class="badge">${escapeHtml(amountLabel)}</span>` : ''}
+        ${paidLabel ? `<span class="badge">${escapeHtml(paidLabel)}</span>` : ''}
+      </div>
+    </article>
+  `;
+}
+
+async function loadPaidAccounts() {
+  const result = await apiJson('/api/admin/paid-accounts');
+  if (!result) return;
+
+  if (!result.ok) {
+    const message = result.status === 503
+      ? t('dashboard.paidAccountsUnavailable')
+      : (result.data.message || t('dashboard.paidAccountsError'));
+
+    if (paidSyncStatus) {
+      paidSyncStatus.textContent = t('dashboard.syncError');
+      paidSyncStatus.classList.add('badge-error');
+    }
+
+    paidSummary.innerHTML = `
+      <article class="stat-card"><span>${escapeHtml(t('dashboard.paidPeople'))}</span><strong>0</strong></article>
+      <article class="stat-card"><span>${escapeHtml(t('dashboard.paidOrders'))}</span><strong>0</strong></article>
+      <article class="stat-card"><span>${escapeHtml(t('dashboard.lastPayment'))}</span><strong>—</strong></article>
+    `;
+    paidAccountsList.innerHTML = `<div class="paid-account-empty">${escapeHtml(message)}</div>`;
+    return;
+  }
+
+  const data = result.data;
+  const accounts = Array.isArray(data.accounts) ? data.accounts : [];
+
+  if (paidSyncStatus) {
+    paidSyncStatus.textContent = t('dashboard.synced');
+    paidSyncStatus.classList.remove('badge-error');
+  }
+
+  paidSummary.innerHTML = [
+    [t('dashboard.paidPeople'), data.totalPeople ?? accounts.length ?? 0],
+    [t('dashboard.paidOrders'), data.totalOrders ?? accounts.length ?? 0],
+    [t('dashboard.lastPayment'), formatDashboardDate(data.lastPaidAt) || '—'],
+  ]
+    .map(([label, value]) => `
+      <article class="stat-card">
+        <span>${escapeHtml(label)}</span>
+        <strong>${escapeHtml(String(value))}</strong>
+      </article>
+    `)
+    .join('');
+
+  if (accounts.length === 0) {
+    paidAccountsList.innerHTML = `<div class="paid-account-empty">${escapeHtml(t('dashboard.paidAccountsEmpty'))}</div>`;
+    return;
+  }
+
+  paidAccountsList.innerHTML = accounts.map(renderPaidAccount).join('');
 }
 
 function escapeHtml(text) {
@@ -309,8 +430,8 @@ document.getElementById('logout-btn')?.addEventListener('click', async () => {
 });
 
 window.addEventListener('languagechange', () => {
-  Promise.all([loadStats(), loadUsers(currentUsersPage), loadClasses(currentClassesPage)]);
+  Promise.all([loadStats(), loadPaidAccounts(), loadUsers(currentUsersPage), loadClasses(currentClassesPage)]);
 });
 
 smoothSectionNav();
-Promise.all([loadStats(), loadUsers(), loadClasses()]);
+Promise.all([loadStats(), loadPaidAccounts(), loadUsers(), loadClasses()]);

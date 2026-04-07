@@ -18,7 +18,7 @@ const userRoutes = require('./routes/user.routes');
 const classRoutes = require('./routes/class.routes');
 const adminRoutes = require('./routes/admin.routes');
 const { bootstrapDatabase } = require('./utils/bootstrap');
-const { pool } = require('./utils/db');
+const { pool, isEmbeddedDatabase } = require('./utils/db');
 const { log } = require('./utils/logger');
 
 function getAllowedOrigins() {
@@ -31,6 +31,12 @@ function getAllowedOrigins() {
 function createApp({ sessionSecret } = {}) {
   const app = express();
   const allowedOrigins = getAllowedOrigins();
+  const sessionStore = isEmbeddedDatabase
+    ? new session.MemoryStore()
+    : new PgSession({
+        pool,
+        createTableIfMissing: true,
+      });
 
   app.disable('x-powered-by');
   app.set('trust proxy', Number(process.env.TRUST_PROXY || 1));
@@ -84,10 +90,7 @@ function createApp({ sessionSecret } = {}) {
       secret: sessionSecret || process.env.SESSION_SECRET || 'rfa-learning-dev-secret-change-this',
       resave: false,
       saveUninitialized: false,
-      store: new PgSession({
-        pool,
-        createTableIfMissing: true,
-      }),
+      store: sessionStore,
       cookie: {
         httpOnly: true,
         sameSite: 'lax',
@@ -149,7 +152,14 @@ function createApp({ sessionSecret } = {}) {
 
 async function startServer() {
   const config = await bootstrapDatabase();
-  const app = createApp({ sessionSecret: process.env.SESSION_SECRET || config.sessionSecret });
+  const isProduction = process.env.NODE_ENV === 'production';
+  const sessionSecret = process.env.SESSION_SECRET || (!isProduction ? config.sessionSecret : '');
+
+  if (isProduction && !sessionSecret) {
+    throw new Error('SESSION_SECRET is required in production');
+  }
+
+  const app = createApp({ sessionSecret });
   const PORT = Number(process.env.PORT || config.port || 3000);
   const HOST = '0.0.0.0';
 

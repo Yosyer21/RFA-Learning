@@ -32,3 +32,104 @@
   flex: 1;
   min-width: 120px;
 }
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.section-heading h2 {
+  margin-bottom: 0.2rem;
+}
+
+.section-badge {
+  align-self: flex-start;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--border) 35%, transparent);
+  background: color-mix(in srgb, var(--surface) 85%, transparent);
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.stats-grid-compact {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  margin-bottom: 1rem;
+}
+
+.paid-accounts-list {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.paid-account-card {
+  border: 1px solid color-mix(in srgb, var(--border) 34%, transparent);
+  border-radius: 16px;
+  padding: 0.95rem 1rem;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface-2) 72%, transparent));
+  box-shadow: var(--glow);
+}
+
+.paid-account-card__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 0.7rem;
+}
+
+.paid-account-card__name {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.paid-account-card__name strong {
+  font-size: 1rem;
+}
+
+.paid-account-card__name span,
+.paid-account-card__meta span {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.paid-account-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.paid-account-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.7rem;
+}
+
+.paid-account-card__chips .badge {
+  font-size: 0.72rem;
+}
+
+.paid-account-empty {
+  padding: 1rem;
+  border: 1px dashed color-mix(in srgb, var(--border) 40%, transparent);
+  border-radius: 14px;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+}
+
+@media (max-width: 720px) {
+  .section-heading {
+    flex-direction: column;
+  }
+
+  .paid-account-card__top {
+    flex-direction: column;
+  }
+}

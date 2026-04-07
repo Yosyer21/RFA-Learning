@@ -28,6 +28,7 @@ Abrir `http://localhost:3000`.
 
 Si no defines `DATABASE_URL`, la app usa una base embebida para desarrollo local. Eso permite iniciar el proyecto sin tener PostgreSQL instalado.
 Si quieres usar un archivo `.env`, copia `.env.example` a `.env` y ajusta los valores necesarios. En Railway, el proyecto está creado como `RFA-Learning`.
+En Railway debes definir `DATABASE_URL` y `SESSION_SECRET`; no se recomienda depender de los valores por defecto.
 
 ## Variables de entorno
 - `DATABASE_URL`: cadena de conexiÃ³n a PostgreSQL

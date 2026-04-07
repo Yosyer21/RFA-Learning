@@ -7,12 +7,13 @@ const { footballSeedClasses } = require('./football-classes');
 const { enrichLessonContent } = require('./content');
 
 async function ensureConfig() {
+  const isProduction = process.env.NODE_ENV === 'production';
   const defaults = {
     projectName: 'RFA.Learning',
     port: 3000,
     defaultLanguage: 'es',
     registrationEnabled: false,
-    sessionSecret: 'rfa-learning-dev-secret-change-this',
+    sessionSecret: isProduction ? '' : 'rfa-learning-dev-secret-change-this',
   };
 
   const result = await query('SELECT key, value FROM config');

@@ -1,4 +1,5 @@
 const { Pool: PgPool } = require('pg');
+const isEmbeddedDatabase = !process.env.DATABASE_URL && process.env.NODE_ENV !== 'production';
 
 function createPool() {
   if (process.env.DATABASE_URL) {
@@ -6,6 +7,10 @@ function createPool() {
       connectionString: process.env.DATABASE_URL,
       ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
     });
+  }
+
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('DATABASE_URL is required in production');
   }
 
   const { newDb } = require('pg-mem');
@@ -45,4 +50,5 @@ module.exports = {
   query,
   getClient,
   withTransaction,
+  isEmbeddedDatabase,
 };

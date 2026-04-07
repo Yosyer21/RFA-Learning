@@ -599,6 +599,12 @@ textarea {
   color: var(--success);
 }
 
+.badge-error {
+  border-color: color-mix(in srgb, var(--danger) 55%, transparent);
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+}
+
 .badge-inactive {
   border-color: color-mix(in srgb, var(--danger) 40%, transparent);
   color: var(--danger);

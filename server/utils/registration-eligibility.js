@@ -18,6 +18,7 @@ let cachedAt = 0;
 let cachedAccessToken = null;
 let accessTokenExpiresAt = 0;
 let refreshPromise = null;
+let cachedPaidAccounts = null;
 
 function normalizeValue(value) {
   return String(value ?? '').trim().toLowerCase();
@@ -92,6 +93,84 @@ function findHeaderIndex(headers, keywords) {
   return headers.findIndex((header) => keywords.some((keyword) => header.includes(keyword)));
 }
 
+function normalizeOrderNumber(value) {
+  const normalized = normalizeValue(value);
+  if (!normalized) {
+    return '';
+  }
+
+  const numeric = Number(normalized.replace(/[^0-9.]/g, ''));
+  return Number.isFinite(numeric) && numeric > 0 ? String(Math.trunc(numeric)) : normalized;
+}
+
+function parseCurrencyValue(value) {
+  const normalized = normalizeValue(value);
+  if (!normalized) {
+    return '';
+  }
+
+  return normalized.toUpperCase();
+}
+
+function parseMoneyValue(value) {
+  const normalized = String(value ?? '').trim().replace(/,/g, '');
+  if (!normalized) {
+    return null;
+  }
+
+  const numeric = Number(normalized.replace(/[^0-9.-]/g, ''));
+  return Number.isFinite(numeric) ? numeric : null;
+}
+
+function extractRecordFromRow(row, headers) {
+  const normalizedCells = row.map((cell) => normalizeValue(cell));
+  const productIndex = findHeaderIndex(headers, ['line item name', 'product', 'item', 'service', 'plan', 'course']);
+  const statusIndex = findHeaderIndex(headers, ['financial status', 'status', 'payment', 'paid', 'estado', 'pago']);
+  const emailIndex = findHeaderIndex(headers, ['email', 'correo', 'customer email']);
+  const orderIndex = findHeaderIndex(headers, ['order number', 'order', 'order id', 'id']);
+  const paidAtIndex = findHeaderIndex(headers, ['paid at', 'payment date', 'date paid']);
+  const createdAtIndex = findHeaderIndex(headers, ['created at', 'created']);
+  const billingNameIndex = findHeaderIndex(headers, ['billing name', 'customer name', 'full name']);
+  const totalIndex = findHeaderIndex(headers, ['total', 'amount']);
+  const currencyIndex = findHeaderIndex(headers, ['currency']);
+  const fulfillmentIndex = findHeaderIndex(headers, ['fulfillment status', 'fulfilled status']);
+
+  const hasProduct = productIndex >= 0
+    ? isProductValue(row[productIndex])
+    : normalizedCells.some((cell) => isProductValue(cell));
+
+  const hasPaid = statusIndex >= 0
+    ? isPaidValue(row[statusIndex])
+    : normalizedCells.some((cell) => isPaidValue(cell));
+
+  if (!hasProduct || !hasPaid) {
+    return null;
+  }
+
+  const email = emailIndex >= 0 && row[emailIndex]
+    ? normalizeValue(row[emailIndex])
+    : row.find((cell) => isEmailLike(cell))
+      ? normalizeValue(row.find((cell) => isEmailLike(cell)))
+      : '';
+
+  if (!email) {
+    return null;
+  }
+
+  return {
+    orderNumber: orderIndex >= 0 ? normalizeOrderNumber(row[orderIndex]) : '',
+    email,
+    customerName: billingNameIndex >= 0 ? String(row[billingNameIndex] ?? '').trim() : '',
+    product: productIndex >= 0 ? String(row[productIndex] ?? '').trim() : '',
+    financialStatus: statusIndex >= 0 ? String(row[statusIndex] ?? '').trim() : '',
+    paidAt: paidAtIndex >= 0 ? String(row[paidAtIndex] ?? '').trim() : '',
+    createdAt: createdAtIndex >= 0 ? String(row[createdAtIndex] ?? '').trim() : '',
+    currency: currencyIndex >= 0 ? parseCurrencyValue(row[currencyIndex]) : '',
+    total: totalIndex >= 0 ? parseMoneyValue(row[totalIndex]) : null,
+    fulfillmentStatus: fulfillmentIndex >= 0 ? String(row[fulfillmentIndex] ?? '').trim() : '',
+  };
+}
+
 function extractIdentifierFromRow(row, identifierIndex) {
   if (identifierIndex >= 0 && row[identifierIndex]) {
     return normalizeValue(row[identifierIndex]);
@@ -145,7 +224,7 @@ function extractEligibleIdentifiersFromSheet(values) {
   }
 
   const headers = rows[0].map((cell) => normalizeValue(cell));
-  const productIndex = findHeaderIndex(headers, ['product', 'item', 'service', 'plan', 'course', 'order', 'orden']);
+  const productIndex = findHeaderIndex(headers, ['product', 'item', 'service', 'plan', 'course', 'line item name']);
   const statusIndex = findHeaderIndex(headers, ['status', 'payment', 'paid', 'estado', 'pago']);
   const identifierIndex = findHeaderIndex(headers, ['email', 'correo', 'username', 'usuario', 'account', 'cuenta', 'client']);
 
@@ -178,6 +257,32 @@ function extractEligibleIdentifiersFromSheet(values) {
   }
 
   return Array.from(eligibleIdentifiers);
+}
+
+function extractPaidRegistrationAccountsFromSheet(values) {
+  const rows = Array.isArray(values)
+    ? values.filter((row) => Array.isArray(row) && row.some((cell) => normalizeValue(cell)))
+    : [];
+
+  if (rows.length === 0) {
+    return [];
+  }
+
+  const headers = rows[0].map((cell) => normalizeValue(cell));
+  const records = [];
+  const seenEmails = new Set();
+
+  for (let rowIndex = 1; rowIndex < rows.length; rowIndex += 1) {
+    const record = extractRecordFromRow(rows[rowIndex], headers);
+    if (!record || seenEmails.has(record.email)) {
+      continue;
+    }
+
+    seenEmails.add(record.email);
+    records.push(record);
+  }
+
+  return records;
 }
 
 function postForm(url, body) {
@@ -315,6 +420,34 @@ async function fetchEligibleIdentifiers() {
   return extractEligibleIdentifiersFromSheet(result.values || []);
 }
 
+async function loadPaidRegistrationAccounts({ forceRefresh = false } = {}) {
+  const cacheLifetimeMs = Number(process.env.REGISTRATION_ELIGIBILITY_CACHE_MS || 5 * 60 * 1000);
+
+  if (!forceRefresh && cachedPaidAccounts && Date.now() - cachedAt < cacheLifetimeMs) {
+    return cachedPaidAccounts;
+  }
+
+  const { spreadsheetId, sheetRange } = getServiceAccountConfig();
+
+  if (!spreadsheetId) {
+    throw new Error('Google Sheets spreadsheet ID is missing');
+  }
+
+  const accessToken = await getAccessToken();
+  const url = new URL(`https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(spreadsheetId)}/values/${encodeURIComponent(sheetRange)}`);
+  url.searchParams.set('majorDimension', 'ROWS');
+
+  const result = await getJson(url, {
+    Authorization: `Bearer ${accessToken}`,
+  });
+
+  const paidAccounts = extractPaidRegistrationAccountsFromSheet(result.values || []);
+  cachedIdentifiers = Array.from(new Set(paidAccounts.map((account) => account.email).filter(Boolean)));
+  cachedPaidAccounts = paidAccounts;
+  cachedAt = Date.now();
+  return paidAccounts;
+}
+
 async function loadEligibleIdentifiers({ forceRefresh = false } = {}) {
   const cacheLifetimeMs = Number(process.env.REGISTRATION_ELIGIBILITY_CACHE_MS || 5 * 60 * 1000);
 
@@ -368,6 +501,8 @@ async function isEligibleRegistrationAccount(identifier) {
 module.exports = {
   hasGoogleSheetsConfig,
   extractEligibleIdentifiersFromSheet,
+  extractPaidRegistrationAccountsFromSheet,
   loadEligibleIdentifiers,
+  loadPaidRegistrationAccounts,
   isEligibleRegistrationAccount,
 };
