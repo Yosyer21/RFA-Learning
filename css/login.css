@@ -8,6 +8,41 @@
   padding: 2rem 1.8rem;
 }
 
+.register-intro {
+  margin: 0.45rem auto 0;
+  max-width: 34ch;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--text) 78%, var(--muted));
+}
+
+.register-note {
+  margin: 1rem 0 1.1rem;
+  padding: 0.95rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--border) 42%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+}
+
+.register-note h2 {
+  margin: 0 0 0.45rem;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.register-note ul {
+  margin: 0;
+  padding-left: 1rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.register-note li {
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
 .login-header {
   text-align: center;
   margin-bottom: 0.6rem;
@@ -33,6 +68,34 @@
   width: 100%;
   padding: 0.62rem;
   font-size: 0.82rem;
+}
+
+.checkbox-row {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  align-items: start;
+  column-gap: 0.65rem;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 0.2rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--border) 35%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  cursor: pointer;
+}
+
+.checkbox-row input {
+  margin-top: 0.18rem;
+  width: 18px;
+  height: 18px;
+}
+
+.checkbox-row span {
+  display: block;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  white-space: normal;
 }
 
 .login-card .hint {

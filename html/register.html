@@ -25,19 +25,43 @@
       <div class="login-header">
         <span class="kicker" data-i18n="register.kicker">Cuenta nueva</span>
         <h1 data-i18n="register.title">Crear cuenta</h1>
+        <p class="register-intro" data-i18n="register.intro">Completa tus datos para crear tu acceso y verificar que tu compra esté registrada.</p>
       </div>
 
+      <section class="register-note" aria-label="Información de registro">
+        <h2 data-i18n="register.noteTitle">Antes de empezar</h2>
+        <ul>
+          <li data-i18n="register.noteEligibility">Solo puedes registrarte con el correo usado en tu compra.</li>
+          <li data-i18n="register.noteProduct">La compra debe incluir Football Language System.</li>
+          <li data-i18n="register.notePassword">Usa una contraseña fuerte y confírmala antes de enviar.</li>
+        </ul>
+      </section>
+
       <label for="name" data-i18n="register.name">Nombre completo</label>
-      <input id="name" name="name" placeholder="Tu nombre" data-i18n-placeholder="register.namePlaceholder" required aria-required="true">
+      <input id="name" name="name" type="text" autocomplete="name" placeholder="Tu nombre" data-i18n-placeholder="register.namePlaceholder" required aria-required="true">
       <div class="field-error" aria-live="polite"></div>
 
-      <label for="username" data-i18n="register.username">Usuario</label>
-      <input id="username" name="username" placeholder="Tu nombre de usuario" data-i18n-placeholder="register.usernamePlaceholder" minlength="3" required aria-required="true">
+      <label for="username" data-i18n="register.username">Correo autorizado</label>
+      <input id="username" name="username" type="email" inputmode="email" autocomplete="email" placeholder="Correo asociado a la compra" data-i18n-placeholder="register.usernamePlaceholder" minlength="3" required aria-required="true">
       <div class="field-error" aria-live="polite"></div>
+
+      <p class="hint" data-i18n="register.eligibilityHint" style="margin-top:-0.25rem; margin-bottom:0.75rem;">
+        Solo podrán registrarse los correos pagados del Football Language System.
+      </p>
 
       <label for="password" data-i18n="register.password">Contraseña</label>
-      <input id="password" name="password" type="password" placeholder="Mín. 8 caracteres, mayúscula, minúscula y número" data-i18n-placeholder="register.passwordPlaceholder" minlength="8" required aria-required="true">
+      <input id="password" name="password" type="password" autocomplete="new-password" placeholder="Mín. 8 caracteres, mayúscula, minúscula y número" data-i18n-placeholder="register.passwordPlaceholder" minlength="8" required aria-required="true">
       <div id="password-strength-container"></div>
+      <div class="field-error" aria-live="polite"></div>
+
+      <label for="password-confirm" data-i18n="register.passwordConfirm">Confirmar contraseña</label>
+      <input id="password-confirm" name="passwordConfirm" type="password" autocomplete="new-password" placeholder="Repite tu contraseña" data-i18n-placeholder="register.passwordConfirmPlaceholder" minlength="8" required aria-required="true">
+      <div class="field-error" aria-live="polite"></div>
+
+      <label class="checkbox-row">
+        <input id="accept-terms" name="acceptTerms" type="checkbox" required aria-required="true">
+        <span data-i18n="register.acceptTerms">Acepto usar el servicio solo con mi cuenta autorizada y mantener mis credenciales seguras.</span>
+      </label>
       <div class="field-error" aria-live="polite"></div>
 
       <button type="submit" class="btn btn-primary" data-i18n="register.submit">Registrarse</button>

@@ -151,7 +151,8 @@ async function apiJson(url, options = {}) {
 
 // ── Form Validation ──
 function validateField(input, rules = {}) {
-  const value = input.value.trim();
+  const isCheckbox = input.type === 'checkbox';
+  const value = isCheckbox ? input.checked : input.value.trim();
   let error = '';
 
   if (rules.required && !value) {
@@ -160,14 +161,29 @@ function validateField(input, rules = {}) {
     error = t('validation.minChars', rules.minLength);
   } else if (rules.pattern && !rules.pattern.test(value)) {
     error = rules.patternMessage || t('validation.invalidFormat');
+  } else if (typeof rules.customValidator === 'function' && !rules.customValidator(value, input)) {
+    error = rules.customMessage || t('validation.invalidFormat');
   }
 
-  const errorEl = input.parentElement?.querySelector('.field-error');
+  const errorEl = input.parentElement?.classList?.contains('checkbox-row')
+    ? input.parentElement.nextElementSibling?.classList?.contains('field-error')
+      ? input.parentElement.nextElementSibling
+      : null
+    : input.nextElementSibling?.classList?.contains('field-error')
+      ? input.nextElementSibling
+      : input.parentElement?.querySelector('.field-error');
+
   if (error) {
     input.classList.add('input-error');
+    if (isCheckbox) {
+      input.setCustomValidity(error);
+    }
     if (errorEl) errorEl.textContent = error;
   } else {
     input.classList.remove('input-error');
+    if (isCheckbox) {
+      input.setCustomValidity('');
+    }
     if (errorEl) errorEl.textContent = '';
   }
 

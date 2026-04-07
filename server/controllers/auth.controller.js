@@ -1,6 +1,7 @@
 const { query } = require('../utils/db');
 const { comparePassword, hashPassword } = require('../utils/hash');
 const { normalizeText } = require('../utils/helpers');
+const { isEligibleRegistrationAccount, hasGoogleSheetsConfig } = require('../utils/registration-eligibility');
 
 function regenerateSession(req, payload) {
   return new Promise((resolve, reject) => {
@@ -56,8 +57,19 @@ async function register(req, res) {
   // Check if registration is enabled
   const configResult = await query("SELECT value FROM config WHERE key = 'registrationEnabled'");
   const registrationEnabled = configResult.rows[0]?.value === true;
-  if (!registrationEnabled) {
+  const hasRegistrationSource = hasGoogleSheetsConfig() || String(process.env.REGISTRATION_ALLOWED_ACCOUNTS || '').trim().length > 0;
+
+  if (!registrationEnabled && !hasRegistrationSource) {
     return res.status(403).json({ message: 'El registro no está habilitado' });
+  }
+
+  if (!hasRegistrationSource) {
+    return res.status(503).json({ message: 'La validación de registro no está configurada' });
+  }
+
+  const isAllowed = await isEligibleRegistrationAccount(username);
+  if (!isAllowed) {
+    return res.status(403).json({ message: 'Esta cuenta no está habilitada para registrarse' });
   }
 
   const existing = await query('SELECT id FROM users WHERE LOWER(username) = $1', [username.toLowerCase()]);
@@ -156,9 +168,9 @@ async function seedStatus(_req, res) {
   const result = await query(`
     SELECT
       COUNT(*)::int AS total_users,
-      COUNT(*) FILTER (WHERE role = 'admin')::int AS total_admins,
-      COUNT(*) FILTER (WHERE role = 'student')::int AS total_students,
-      COUNT(*) FILTER (WHERE active = true)::int AS active_users
+      SUM(CASE WHEN role = 'admin' THEN 1 ELSE 0 END)::int AS total_admins,
+      SUM(CASE WHEN role = 'student' THEN 1 ELSE 0 END)::int AS total_students,
+      SUM(CASE WHEN active = true THEN 1 ELSE 0 END)::int AS active_users
     FROM users
   `);
   const summary = result.rows[0];

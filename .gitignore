@@ -4,6 +4,9 @@ node_modules/
 # Environment
 .env
 
+# Google service account file used locally
+ruizacademy-a9923609ca7a.json
+
 # Database (local JSON - contains sensitive data)
 Database/users.json
 Database/progress.json

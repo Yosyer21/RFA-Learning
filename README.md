@@ -26,6 +26,9 @@ npm run start
 
 Abrir `http://localhost:3000`.
 
+Si no defines `DATABASE_URL`, la app usa una base embebida para desarrollo local. Eso permite iniciar el proyecto sin tener PostgreSQL instalado.
+Si quieres usar un archivo `.env`, copia `.env.example` a `.env` y ajusta los valores necesarios. En Railway, el proyecto está creado como `RFA-Learning`.
+
 ## Variables de entorno
 - `DATABASE_URL`: cadena de conexiÃ³n a PostgreSQL
 - `SESSION_SECRET`: secreto para cookies de sesiÃ³n
@@ -35,8 +38,18 @@ Abrir `http://localhost:3000`.
 - `DEFAULT_ADMIN_PASSWORD`: contraseÃ±a inicial de administrador
 - `DEFAULT_ADMIN_NAME`: nombre del administrador inicial
 - `DEFAULT_ADMIN_FORCE_PASSWORD_CHANGE`: `true` o `false`
+- `GOOGLE_SHEETS_SPREADSHEET_ID`: ID de la hoja de Google con las órdenes
+- `GOOGLE_SERVICE_ACCOUNT_EMAIL`: correo de la cuenta de servicio
+- `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY`: clave privada de la cuenta de servicio, con saltos de línea escapados como `\n`
+- `GOOGLE_APPLICATION_CREDENTIALS`: ruta al JSON de la cuenta de servicio
+- `GOOGLE_SHEETS_RANGE`: rango a leer, por defecto `Sheet1!A:Z`
+- `REGISTRATION_ALLOWED_ACCOUNTS`: lista opcional separada por comas para pruebas o fallback local
 
 Si no defines credenciales iniciales de admin en producciÃ³n, el bootstrap omite ese usuario por seguridad.
+
+## Registro basado en órdenes
+El alta de usuarios ahora depende de una lista de correos pagados. El sistema busca el producto `Football Language System` en la hoja de Google Sheets y solo permite registrarse a los correos que aparezcan como pagados.
+La hoja debe estar compartida con `crm-service-account@ruizacademy.iam.gserviceaccount.com` o con la cuenta de servicio que configures.
 
 ## Usuario inicial
 - En desarrollo, si no configuras `DEFAULT_ADMIN_USERNAME` y `DEFAULT_ADMIN_PASSWORD`, se crea un admin temporal con:

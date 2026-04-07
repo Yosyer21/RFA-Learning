@@ -16,12 +16,14 @@
         "bcrypt": "^6.0.0",
         "connect-pg-simple": "^10.0.0",
         "cors": "^2.8.6",
+        "dotenv": "^17.4.1",
         "express": "^5.2.1",
         "express-rate-limit": "^8.3.1",
         "express-session": "^1.19.0",
         "helmet": "^8.1.0",
         "multer": "^2.1.1",
         "pg": "^8.20.0",
+        "pg-mem": "^3.0.14",
         "zod": "^4.3.6"
     },
     "devDependencies": {

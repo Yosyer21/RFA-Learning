@@ -1,9 +1,20 @@
-const { Pool } = require('pg');
+const { Pool: PgPool } = require('pg');
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-});
+function createPool() {
+  if (process.env.DATABASE_URL) {
+    return new PgPool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    });
+  }
+
+  const { newDb } = require('pg-mem');
+  const db = newDb({ autoCreateForeignKeyIndices: true });
+  const { Pool } = db.adapters.createPg();
+  return new Pool();
+}
+
+const pool = createPool();
 
 async function query(text, params) {
   return pool.query(text, params);
