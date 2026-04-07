@@ -26,7 +26,13 @@ async function dashboardStats(_req, res) {
 
 async function paidAccounts(_req, res) {
   if (!hasGoogleSheetsConfig()) {
-    return res.status(503).json({ message: 'La hoja de pagos no está configurada' });
+    return res.json({
+      configured: false,
+      totalOrders: 0,
+      totalPeople: 0,
+      lastPaidAt: '',
+      accounts: []
+    });
   }
 
   const accounts = await loadPaidRegistrationAccounts();
@@ -35,6 +41,7 @@ async function paidAccounts(_req, res) {
   const lastPaidAt = accounts.find((account) => account.paidAt || account.createdAt)?.paidAt || accounts.find((account) => account.createdAt)?.createdAt || '';
 
   return res.json({
+    configured: true,
     totalOrders,
     totalPeople,
     lastPaidAt,

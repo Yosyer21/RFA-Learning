@@ -143,10 +143,18 @@ async function loadPaidAccounts() {
 
   const data = result.data;
   const accounts = Array.isArray(data.accounts) ? data.accounts : [];
+  const isLocalMode = data.configured === false;
 
   if (paidSyncStatus) {
-    paidSyncStatus.textContent = t('dashboard.synced');
-    paidSyncStatus.classList.remove('badge-error');
+    if (isLocalMode) {
+      paidSyncStatus.textContent = t('dashboard.localMode');
+      paidSyncStatus.classList.remove('badge-error');
+      paidSyncStatus.classList.add('badge-inactive');
+    } else {
+      paidSyncStatus.textContent = t('dashboard.synced');
+      paidSyncStatus.classList.remove('badge-error');
+      paidSyncStatus.classList.remove('badge-inactive');
+    }
   }
 
   paidSummary.innerHTML = [
@@ -163,7 +171,7 @@ async function loadPaidAccounts() {
     .join('');
 
   if (accounts.length === 0) {
-    paidAccountsList.innerHTML = `<div class="paid-account-empty">${escapeHtml(t('dashboard.paidAccountsEmpty'))}</div>`;
+    paidAccountsList.innerHTML = `<div class="paid-account-empty">${escapeHtml(isLocalMode ? t('dashboard.paidAccountsLocalHint') : t('dashboard.paidAccountsEmpty'))}</div>`;
     return;
   }
 
