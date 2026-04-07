@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const {
   getClasses,
+  getClassesMeta,
   createClass,
   updateClass,
   deleteClass,
@@ -19,6 +20,7 @@ const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 2 * 1024 * 1024 } });
 
 router.get('/', asyncHandler(getClasses));
+router.get('/meta', asyncHandler(getClassesMeta));
 router.get('/progress', asyncHandler(getProgress));
 router.post('/progress', validate(progressSchema), asyncHandler(updateProgress));
 

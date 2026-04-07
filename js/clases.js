@@ -1,9 +1,11 @@
 let currentUser = null;
 let allCategories = new Set();
 let currentClassesPage = 1;
+let classMeta = { totalClasses: 0, totalTerms: 0, categories: [], levels: [] };
 
 const FAVORITES_KEY = 'rfa-class-favorites';
 const SPEECH_MODE_KEY = 'rfa-speech-mode';
+const CLASS_FILTERS_KEY = 'rfa-class-filters';
 const LEVEL_ORDER = {
   Beginner: 0,
   Intermediate: 1,
@@ -29,6 +31,36 @@ function getSpeechMode() {
   return saved === 'es' ? 'es' : 'en';
 }
 
+function getSavedClassFilters() {
+  try {
+    const raw = localStorage.getItem(CLASS_FILTERS_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return {
+      search: typeof parsed.search === 'string' ? parsed.search : '',
+      category: typeof parsed.category === 'string' ? parsed.category : '',
+      level: typeof parsed.level === 'string' ? parsed.level : '',
+    };
+  } catch {
+    return { search: '', category: '', level: '' };
+  }
+}
+
+function saveClassFilters(filters) {
+  localStorage.setItem(CLASS_FILTERS_KEY, JSON.stringify({
+    search: String(filters.search || '').trim(),
+    category: String(filters.category || '').trim(),
+    level: String(filters.level || '').trim(),
+  }));
+}
+
+function getCurrentClassFilters() {
+  return {
+    search: document.getElementById('search-input')?.value || '',
+    category: document.getElementById('filter-category')?.value || '',
+    level: document.getElementById('filter-level')?.value || '',
+  };
+}
+
 function setSpeechMode(mode) {
   const normalized = mode === 'es' ? 'es' : 'en';
   localStorage.setItem(SPEECH_MODE_KEY, normalized);
@@ -39,6 +71,25 @@ function syncSpeechModeSelector() {
   const selector = document.getElementById('speech-language');
   if (selector) {
     selector.value = getSpeechMode();
+  }
+}
+
+function syncClassFilterInputs() {
+  const saved = getSavedClassFilters();
+  const searchInput = document.getElementById('search-input');
+  const categorySelect = document.getElementById('filter-category');
+  const levelSelect = document.getElementById('filter-level');
+
+  if (searchInput) {
+    searchInput.value = saved.search;
+  }
+
+  if (categorySelect) {
+    categorySelect.value = saved.category;
+  }
+
+  if (levelSelect) {
+    levelSelect.value = saved.level;
   }
 }
 
@@ -312,7 +363,8 @@ function renderClassFilters(selectedCategory, selectedLevel) {
   const catSelect = document.getElementById('filter-category');
   if (catSelect) {
     const options = [`<option value="">${escapeHtml(t('classes.allCategories'))}</option>`];
-    Array.from(allCategories)
+    const categories = classMeta.categories.length > 0 ? classMeta.categories : Array.from(allCategories);
+    categories
       .sort((a, b) => translateClassCategory(a).localeCompare(translateClassCategory(b), getCurrentLang() === 'en' ? 'en' : 'es'))
       .forEach((cat) => {
         options.push(
@@ -324,7 +376,7 @@ function renderClassFilters(selectedCategory, selectedLevel) {
 
   const levelSelect = document.getElementById('filter-level');
   if (levelSelect) {
-    const levels = ['', 'Beginner', 'Intermediate', 'Advanced'];
+    const levels = ['', ...(classMeta.levels.length > 0 ? classMeta.levels : ['Beginner', 'Intermediate', 'Advanced'])];
     levelSelect.innerHTML = levels
       .map((level) => {
         if (!level) {
@@ -391,6 +443,10 @@ function renderClassCard(lesson) {
 
 async function loadClasses(page = 1) {
   currentClassesPage = page;
+  if (!classMeta.categories.length || !classMeta.levels.length) {
+    await loadClassesMeta();
+  }
+
   const meResult = await apiJson('/api/auth/me');
   if (!meResult) return;
   currentUser = meResult.data.user;
@@ -399,9 +455,8 @@ async function loadClasses(page = 1) {
     document.getElementById('dashboard-link').classList.remove('hidden');
   }
 
-  const search = document.getElementById('search-input')?.value || '';
-  const category = document.getElementById('filter-category')?.value || '';
-  const level = document.getElementById('filter-level')?.value || '';
+  const { search, category, level } = getCurrentClassFilters();
+  saveClassFilters({ search, category, level });
 
   const params = new URLSearchParams({ page, limit: 10 });
   if (search) params.set('search', search);
@@ -422,24 +477,28 @@ async function loadClasses(page = 1) {
   const container = document.getElementById('classes-container');
   const summary = document.getElementById('classes-summary');
   const pageTerms = classes.reduce((total, lesson) => total + getTermCount(lesson), 0);
-  const categories = new Set(classes.map((lesson) => lesson.category).filter(Boolean));
   const favoriteIds = getFavoriteIds();
   const completedIds = getCompletedClassIds(progress);
   const completedOnPage = classes.filter((lesson) => completedIds.includes(lesson.id)).length;
+  const availableCategories = classMeta.categories.length > 0 ? classMeta.categories.length : new Set(classes.map((lesson) => lesson.category).filter(Boolean)).size;
 
   summary.innerHTML = `
     <div class="classes-summary-grid">
       <div class="summary-chip">
         <span>${t('classes.availableModules')}</span>
-        <strong>${pagination.total}</strong>
+        <strong>${classMeta.totalClasses || pagination.total}</strong>
       </div>
       <div class="summary-chip">
         <span>${t('classes.visibleTerms')}</span>
         <strong>${pageTerms}</strong>
       </div>
       <div class="summary-chip">
-        <span>${t('classes.visibleCategories')}</span>
-        <strong>${categories.size}</strong>
+        <span>${t('classes.availableCategories')}</span>
+        <strong>${availableCategories}</strong>
+      </div>
+      <div class="summary-chip">
+        <span>${t('classes.catalogTerms')}</span>
+        <strong>${classMeta.totalTerms || pageTerms}</strong>
       </div>
       <div class="summary-chip">
         <span>${t('classes.favoriteModules')}</span>
@@ -452,7 +511,6 @@ async function loadClasses(page = 1) {
     </div>
   `;
 
-  classes.forEach((c) => allCategories.add(c.category));
   renderClassFilters(category, level);
 
   container.innerHTML = classes.map(renderClassCard).join('');
@@ -498,6 +556,23 @@ async function loadClasses(page = 1) {
   });
 
   renderPagination('classes-pagination', pagination, loadClasses);
+}
+
+async function loadClassesMeta() {
+  const result = await apiJson('/api/classes/meta');
+  if (!result || !result.ok) {
+    return null;
+  }
+
+  classMeta = {
+    totalClasses: Number(result.data.totalClasses) || 0,
+    totalTerms: Number(result.data.totalTerms) || 0,
+    categories: Array.isArray(result.data.categories) ? result.data.categories : [],
+    levels: Array.isArray(result.data.levels) ? result.data.levels : [],
+  };
+
+  allCategories = new Set(classMeta.categories);
+  return classMeta;
 }
 
 function escapeHtml(text) {
@@ -625,11 +700,18 @@ function startQuiz(classId, classes, options = {}) {
 let searchTimeout;
 document.getElementById('search-input')?.addEventListener('input', () => {
   clearTimeout(searchTimeout);
+  saveClassFilters(getCurrentClassFilters());
   searchTimeout = setTimeout(() => loadClasses(1), 400);
 });
 
-document.getElementById('filter-category')?.addEventListener('change', () => loadClasses(1));
-document.getElementById('filter-level')?.addEventListener('change', () => loadClasses(1));
+document.getElementById('filter-category')?.addEventListener('change', () => {
+  saveClassFilters(getCurrentClassFilters());
+  loadClasses(1);
+});
+document.getElementById('filter-level')?.addEventListener('change', () => {
+  saveClassFilters(getCurrentClassFilters());
+  loadClasses(1);
+});
 document.getElementById('speech-language')?.addEventListener('change', (event) => {
   setSpeechMode(event.target.value);
   showToast(t('classes.voiceSaved'), 'success');
@@ -644,4 +726,5 @@ document.getElementById('logout-btn')?.addEventListener('click', async () => {
   window.location.href = '/login';
 });
 
+syncClassFilterInputs();
 loadClasses();

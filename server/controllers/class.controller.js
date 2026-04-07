@@ -60,6 +60,34 @@ async function getClasses(req, res) {
   });
 }
 
+async function getClassesMeta(_req, res) {
+  const result = await query('SELECT id, category, level, content FROM classes ORDER BY id');
+  const categories = new Set();
+  const levels = new Set();
+  let totalTerms = 0;
+
+  for (const row of result.rows) {
+    if (row.category) {
+      categories.add(String(row.category).trim());
+    }
+
+    if (row.level) {
+      levels.add(String(row.level).trim());
+    }
+
+    if (Array.isArray(row.content)) {
+      totalTerms += row.content.length;
+    }
+  }
+
+  return res.json({
+    totalClasses: result.rows.length,
+    totalTerms,
+    categories: Array.from(categories).sort((a, b) => a.localeCompare(b)),
+    levels: Array.from(levels).sort((a, b) => a.localeCompare(b)),
+  });
+}
+
 async function createClass(req, res) {
   const { title, category, level } = req.body;
   const content = parseClassContent(req.body.content);
@@ -314,6 +342,7 @@ async function getQuizHistory(req, res) {
 
 module.exports = {
   getClasses,
+  getClassesMeta,
   createClass,
   updateClass,
   deleteClass,
