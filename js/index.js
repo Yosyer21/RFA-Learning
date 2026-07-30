@@ -5,6 +5,48 @@ function goLogin() {
 document.getElementById('go-login')?.addEventListener('click', goLogin);
 document.getElementById('go-login-bottom')?.addEventListener('click', goLogin);
 
+/* ── Floating Particles ── */
+function createParticles() {
+  const container = document.getElementById('particles-bg');
+  if (!container) return;
+
+  const count = 30;
+  for (let i = 0; i < count; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    const size = Math.random() * 3 + 1;
+    particle.style.width = size + 'px';
+    particle.style.height = size + 'px';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.animationDuration = (Math.random() * 20 + 15) + 's';
+    particle.style.animationDelay = (Math.random() * 20) + 's';
+    particle.style.opacity = Math.random() * 0.4 + 0.1;
+    container.appendChild(particle);
+  }
+}
+
+/* ── Scroll Effect for Topbar ── */
+function setupScrollEffect() {
+  const topbar = document.getElementById('topbar');
+  if (!topbar) return;
+
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        if (window.scrollY > 20) {
+          topbar.classList.add('scrolled');
+        } else {
+          topbar.classList.remove('scrolled');
+        }
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+}
+
+/* ── Hero Slider ── */
 function setupHeroSlider() {
   const root = document.querySelector('[data-hero-slider]');
   if (!root) return;
@@ -138,6 +180,7 @@ function setupHeroSlider() {
   });
 }
 
+/* ── Reveal Animations ── */
 function setupRevealAnimations() {
   const selectors = ['.reveal', '.reveal-modern', '.reveal-left', '.reveal-right', '.reveal-scale'];
   const items = Array.from(document.querySelectorAll(selectors.join(',')));
@@ -158,5 +201,24 @@ function setupRevealAnimations() {
   items.forEach((item) => observer.observe(item));
 }
 
+/* ── Smooth Scroll for Anchor Links ── */
+function setupSmoothScroll() {
+  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+    anchor.addEventListener('click', (e) => {
+      const targetId = anchor.getAttribute('href');
+      if (targetId === '#') return;
+      const target = document.querySelector(targetId);
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+}
+
+/* ── Init ── */
+createParticles();
+setupScrollEffect();
 setupHeroSlider();
 setupRevealAnimations();
+setupSmoothScroll();
