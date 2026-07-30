@@ -6,6 +6,7 @@
   <title>Dashboard | RFA.Learning</title>
   <link rel="stylesheet" href="../css/dashboard.css">
   <link rel="stylesheet" href="../css/shared.css">
+  <link rel="stylesheet" href="../css/modern.css">
 </head>
 <body>
   <a href="#stats-section" class="skip-link" data-i18n="skip.dashboard">Ir al dashboard</a>
@@ -22,7 +23,7 @@
   </header>
 
   <main class="container dashboard-layout">
-    <aside class="card dashboard-sidebar">
+    <aside class="glass-card dashboard-sidebar">
       <span class="kicker" data-i18n="dashboard.kicker">Panel admin</span>
       <h2 data-i18n="dashboard.subtitle">Control central</h2>
       <p class="hint" data-i18n="dashboard.hint">Gestiona usuarios, clases y seguimiento desde una sola vista.</p>
@@ -34,13 +35,13 @@
     </aside>
 
     <section class="dashboard-main">
-      <section id="stats-section" class="card">
+      <section id="stats-section" class="glass-card">
         <h2 data-i18n="dashboard.stats">Estadisticas</h2>
         <div id="stats-cards" class="stats-grid"></div>
         <pre id="stats-data" class="pre-box" data-i18n="ui.loading">Cargando...</pre>
       </section>
 
-      <section id="payments-section" class="card">
+      <section id="payments-section" class="glass-card">
         <div class="section-heading">
           <div>
             <h2 data-i18n="dashboard.paidAccounts">Pagos confirmados</h2>
@@ -52,7 +53,7 @@
         <div id="paid-accounts-list" class="paid-accounts-list"></div>
       </section>
 
-      <section id="users-section" class="card">
+      <section id="users-section" class="glass-card">
         <h2 data-i18n="dashboard.users">Usuarios</h2>
         <form id="create-user-form" class="form-inline">
           <input name="name" placeholder="Nombre" data-i18n-placeholder="dashboard.namePlaceholder" required>
@@ -62,13 +63,13 @@
             <option value="student" data-i18n="dashboard.roleStudent">student</option>
             <option value="admin" data-i18n="dashboard.roleAdmin">admin</option>
           </select>
-          <button class="btn btn-primary" type="submit" data-i18n="dashboard.createUser">Crear</button>
+          <button class="btn btn-modern btn-modern-primary" type="submit" data-i18n="dashboard.createUser">Crear</button>
         </form>
         <p id="user-message" class="hint"></p>
         <div id="users-list"></div>
       </section>
 
-      <section id="classes-section" class="card">
+      <section id="classes-section" class="glass-card">
         <h2 data-i18n="dashboard.classes">Clases</h2>
         <form id="create-class-form" class="form-stack">
           <input name="title" placeholder="Titulo" data-i18n-placeholder="dashboard.titlePlaceholder" required>
@@ -81,7 +82,7 @@
             rows="5"
             required
           ></textarea>
-          <button class="btn btn-primary" type="submit" data-i18n="dashboard.createClass">Crear clase</button>
+          <button class="btn btn-modern btn-modern-primary" type="submit" data-i18n="dashboard.createClass">Crear clase</button>
         </form>
         <p id="class-message" class="hint"></p>
         <div id="classes-list"></div>
@@ -90,7 +91,7 @@
         <h3 style="margin-top:1.5rem;" data-i18n="dashboard.importCsv">Importar clases desde CSV</h3>
         <form id="csv-import-form" class="csv-upload">
           <input type="file" name="file" accept=".csv" required>
-          <button class="btn btn-small btn-primary" type="submit" data-i18n="dashboard.import">Importar</button>
+          <button class="btn btn-small btn-modern btn-modern-primary" type="submit" data-i18n="dashboard.import">Importar</button>
         </form>
         <p id="csv-message" class="hint"></p>
       </section>

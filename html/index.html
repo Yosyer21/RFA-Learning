@@ -6,6 +6,7 @@
   <title>RFA.Learning</title>
   <link rel="stylesheet" href="../css/index.css">
   <link rel="stylesheet" href="../css/shared.css">
+  <link rel="stylesheet" href="../css/modern.css">
 </head>
 <body>
   <a href="#resumen" class="skip-link" data-i18n="skip.content">Ir al contenido</a>
@@ -23,8 +24,9 @@
   </header>
 
   <main class="landing">
-    <section class="hero-shell">
-      <div class="hero-copy-panel reveal">
+    <!-- Hero Section - Full Width Slider -->
+    <section class="hero-shell reveal-modern">
+      <div class="hero-copy-panel">
         <p class="kicker"><span class="kicker-line"></span><span data-i18n="landing.heroKicker">Football Language System</span></p>
         <h1><span data-i18n="landing.heroTitle">Lenguaje profesional de futbol en</span> <span class="gradient-text" data-i18n="landing.heroTitleHighlight">una sola plataforma</span></h1>
         <p class="hero-lead" data-i18n="landing.heroLead">RFA.Learning integra traduccion, analisis y educacion deportiva para mejorar la comunicacion entre jugadores, entrenadores y analistas.</p>
@@ -50,7 +52,7 @@
         </div>
       </div>
 
-      <div class="hero-stage reveal" data-hero-slider>
+      <div class="hero-stage" data-hero-slider>
         <div class="hero-stage-frame">
           <div class="hero-viewport">
             <div class="hero-track" data-slide-track>
@@ -66,6 +68,10 @@
                 <img src="../assets/14.jpeg" alt="Jugador en conduccion de balon" data-i18n-alt="landing.heroImage3Alt" loading="lazy">
                 <figcaption data-i18n="landing.sliderCaption3">Aplicacion de conceptos en contexto real.</figcaption>
               </figure>
+              <figure class="hero-slide">
+                <img src="../assets/10.jpeg" alt="Ninos entrenando futbol" data-i18n-alt="landing.heroImage4Alt" loading="lazy">
+                <figcaption data-i18n="landing.sliderCaption4">Desarrollo formativo desde las bases.</figcaption>
+              </figure>
             </div>
             <div class="slider-progress"><span data-slide-progress></span></div>
           </div>
@@ -78,7 +84,8 @@
       </div>
     </section>
 
-    <section class="stats-strip reveal">
+    <!-- Stats Strip -->
+    <section class="stats-strip reveal-modern">
       <article>
         <strong data-i18n="landing.stat1">500+</strong>
         <span data-i18n="landing.stat1Label">Terminos tecnicos</span>
@@ -97,7 +104,8 @@
       </article>
     </section>
 
-    <section class="signal-strip reveal">
+    <!-- Signal Strip - Features Preview -->
+    <section class="signal-strip reveal-modern">
       <article>
         <div class="signal-icon" data-icon="01"></div>
         <strong data-i18n="landing.signal1Title">Comprension bilingue</strong>
@@ -115,7 +123,8 @@
       </article>
     </section>
 
-    <section id="resumen" class="landing-section split-section reveal">
+    <!-- Summary Section -->
+    <section id="resumen" class="landing-section split-section reveal-modern">
       <div class="section-label">
         <span data-i18n="landing.summaryLabel">Resumen</span>
         <h2 data-i18n="landing.summaryTitle">Descripcion</h2>
@@ -126,7 +135,8 @@
       </div>
     </section>
 
-    <section class="landing-section split-section reveal">
+    <!-- Purpose Section -->
+    <section class="landing-section split-section reveal-modern">
       <div class="section-label">
         <span data-i18n="landing.purposeLabel">Proposito</span>
         <h2 data-i18n="landing.purposeTitle">Objetivo Del Sistema</h2>
@@ -142,7 +152,8 @@
       </div>
     </section>
 
-    <section id="funcionalidades" class="landing-section reveal">
+    <!-- Features Section -->
+    <section id="funcionalidades" class="landing-section reveal-modern">
       <div class="section-heading">
         <span data-i18n="landing.featuresLabel">Capacidades</span>
         <h2 data-i18n="landing.featuresTitle">Funcionalidades Principales</h2>
@@ -166,7 +177,8 @@
       </div>
     </section>
 
-    <section class="landing-section reveal">
+    <!-- Audience Section -->
+    <section class="landing-section reveal-modern">
       <div class="section-heading">
         <span data-i18n="landing.audienceLabel">Usuarios</span>
         <h2 data-i18n="landing.audienceTitle">Para Quien Es Esta Plataforma</h2>
@@ -190,13 +202,14 @@
       </div>
     </section>
 
-    <section id="galeria" class="landing-section reveal">
+    <!-- Gallery Section - Modern Grid -->
+    <section id="galeria" class="landing-section reveal-modern">
       <div class="section-heading">
         <span data-i18n="landing.galleryLabel">Visual</span>
         <h2 data-i18n="landing.galleryTitle">Experiencia En Campo</h2>
       </div>
-      <div class="index-gallery">
-        <article class="gallery-item gallery-wide">
+      <div class="gallery-grid-modern">
+        <article class="gallery-item gallery-item-wide">
           <img src="../assets/8.jpeg" alt="Entrenador explicando ejercicio de futbol" data-i18n-alt="landing.galleryImage1Alt" loading="lazy">
           <div class="gallery-overlay">
             <span data-i18n="landing.gallery1">Contexto real de formacion</span>
@@ -208,16 +221,29 @@
             <span data-i18n="landing.gallery2">Aplicacion individual</span>
           </div>
         </article>
-        <article class="gallery-item gallery-tall">
+        <article class="gallery-item gallery-item-tall">
           <img src="../assets/10.jpeg" alt="Ninos realizando ejercicio de control de balon" data-i18n-alt="landing.galleryImage3Alt" loading="lazy">
           <div class="gallery-overlay">
             <span data-i18n="landing.gallery3">Desarrollo tecnico</span>
           </div>
         </article>
+        <article class="gallery-item">
+          <img src="../assets/4.jpeg" alt="Equipo de futbol en entrenamiento" data-i18n-alt="landing.galleryImage4Alt" loading="lazy">
+          <div class="gallery-overlay">
+            <span data-i18n="landing.gallery4">Trabajo en equipo</span>
+          </div>
+        </article>
+        <article class="gallery-item">
+          <img src="../assets/6.jpeg" alt="Ejercicio de precision con balon" data-i18n-alt="landing.galleryImage5Alt" loading="lazy">
+          <div class="gallery-overlay">
+            <span data-i18n="landing.gallery5">Precision y tecnica</span>
+          </div>
+        </article>
       </div>
     </section>
 
-    <section class="landing-section cta-strip reveal">
+    <!-- CTA Strip -->
+    <section class="landing-section cta-strip reveal-modern">
       <div class="cta-glow"></div>
       <div class="section-heading">
         <span data-i18n="landing.ctaLabel">Acceso</span>
@@ -231,7 +257,7 @@
     </section>
   </main>
 
-  <footer class="landing-footer reveal">
+  <footer class="landing-footer reveal-modern">
     <div class="footer-inner">
       <p class="footer-brand">RFA<span class="brand-dot">.</span>Learning</p>
       <p class="footer-copy" data-i18n="landing.footerDesc">Football Language System &mdash; Plataforma de lenguaje deportivo.</p>

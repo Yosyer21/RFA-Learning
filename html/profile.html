@@ -6,6 +6,7 @@
   <title>Perfil | RFA.Learning</title>
   <link rel="stylesheet" href="../css/home.css">
   <link rel="stylesheet" href="../css/shared.css">
+  <link rel="stylesheet" href="../css/modern.css">
 </head>
 <body>
   <a href="#profile-main" class="skip-link" data-i18n="skip.content">Ir al contenido</a>
@@ -22,36 +23,208 @@
   </header>
 
   <main id="profile-main" class="container">
-    <section class="card" style="max-width:600px;margin:0 auto;">
-      <span class="kicker" data-i18n="profile.kicker">Mi cuenta</span>
-      <h2 data-i18n="profile.title">Perfil</h2>
+    <!-- Profile Header -->
+    <section class="profile-header glass-card">
+      <div class="profile-avatar" id="profile-avatar-container">
+        <span id="profile-initials">RF</span>
+      </div>
+      <div class="profile-info">
+        <h2 id="profile-display-name">Cargando...</h2>
+        <span id="profile-role-badge" class="badge">Estudiante</span>
+        <p id="profile-username-display" class="profile-username">@usuario</p>
+        <p id="profile-bio-display" class="profile-bio"></p>
+      </div>
+      <div class="profile-stats-mini">
+        <div class="mini-stat">
+          <strong id="mini-classes">0</strong>
+          <span data-i18n="profile.miniClasses">Clases</span>
+        </div>
+        <div class="mini-stat">
+          <strong id="mini-quizzes">0</strong>
+          <span data-i18n="profile.miniQuizzes">Quizzes</span>
+        </div>
+        <div class="mini-stat">
+          <strong id="mini-score">0</strong>
+          <span data-i18n="profile.miniScore">Puntos</span>
+        </div>
+      </div>
+    </section>
 
-      <form id="profile-form" style="margin-top:1rem;">
-        <label for="profile-name" data-i18n="profile.name">Nombre</label>
-        <input id="profile-name" name="name" required aria-required="true" style="width:100%;padding:0.55rem 0.8rem;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);margin-bottom:0.5rem;">
-        <div class="field-error" aria-live="polite"></div>
-
-        <label data-i18n="profile.username">Usuario</label>
-        <input id="profile-username" disabled style="width:100%;padding:0.55rem 0.8rem;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--muted);margin-bottom:0.5rem;opacity:0.6;">
-
-        <label data-i18n="profile.role">Rol</label>
-        <input id="profile-role" disabled style="width:100%;padding:0.55rem 0.8rem;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--muted);margin-bottom:1rem;opacity:0.6;">
-
-        <button type="submit" class="btn btn-primary" data-i18n="profile.save">Guardar cambios</button>
-      </form>
-
-      <hr style="border-color:var(--border);margin:1.5rem 0;">
-
-      <h3 data-i18n="profile.quizHistory">Historial de quizzes</h3>
-      <div id="quiz-history">
-        <p class="hint" data-i18n="ui.loading">Cargando...</p>
+    <!-- Edit Profile Form -->
+    <section class="glass-card profile-section">
+      <div class="section-head">
+        <span class="kicker" data-i18n="profile.kicker">Mi cuenta</span>
+        <h3 data-i18n="profile.title">Perfil</h3>
       </div>
 
-      <hr style="border-color:var(--border);margin:1.5rem 0;">
+      <form id="profile-form" class="profile-form">
+        <div class="form-group">
+          <label for="profile-name" data-i18n="profile.name">Nombre</label>
+          <input id="profile-name" name="name" required aria-required="true" placeholder="Tu nombre">
+          <div class="field-error" aria-live="polite"></div>
+        </div>
 
-      <a href="/change-password" class="btn btn-ghost" data-i18n="profile.changePassword">Cambiar contraseña</a>
+        <div class="form-group">
+          <label data-i18n="profile.username">Usuario</label>
+          <input id="profile-username" disabled>
+        </div>
+
+        <div class="form-group">
+          <label data-i18n="profile.role">Rol</label>
+          <input id="profile-role" disabled>
+        </div>
+
+        <div class="form-group">
+          <label data-i18n="profile.email">Correo</label>
+          <input id="profile-email" disabled>
+        </div>
+
+        <button type="submit" class="btn btn-modern btn-modern-primary" data-i18n="profile.save">Guardar cambios</button>
+      </form>
+    </section>
+
+    <!-- Personalización: Avatar Color -->
+    <section class="glass-card profile-section">
+      <div class="section-head">
+        <span class="kicker" data-i18n="profile.customizeKicker">Personalizar</span>
+        <h3 data-i18n="profile.customizeTitle">Apariencia</h3>
+      </div>
+      <div class="preferences-grid">
+        <div class="form-group">
+          <label data-i18n="profile.avatarColor">Color de avatar</label>
+          <div class="avatar-color-picker">
+            <input type="color" id="avatar-color-input" value="#6c5ce7">
+            <div class="color-presets">
+              <button class="color-preset" data-color="#6c5ce7" style="background:#6c5ce7" aria-label="Púrpura"></button>
+              <button class="color-preset" data-color="#e17055" style="background:#e17055" aria-label="Naranja"></button>
+              <button class="color-preset" data-color="#00b894" style="background:#00b894" aria-label="Verde"></button>
+              <button class="color-preset" data-color="#0984e3" style="background:#0984e3" aria-label="Azul"></button>
+              <button class="color-preset" data-color="#e84393" style="background:#e84393" aria-label="Rosa"></button>
+              <button class="color-preset" data-color="#fdcb6e" style="background:#fdcb6e" aria-label="Amarillo"></button>
+              <button class="color-preset" data-color="#a29bfe" style="background:#a29bfe" aria-label="Lavanda"></button>
+              <button class="color-preset" data-color="#fd79a8" style="background:#fd79a8" aria-label="Salmon"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Personalización: Biografía -->
+    <section class="glass-card profile-section">
+      <div class="section-head">
+        <span class="kicker" data-i18n="profile.bioKicker">Sobre ti</span>
+        <h3 data-i18n="profile.bioTitle">Biografía</h3>
+      </div>
+      <div class="preferences-grid">
+        <div class="form-group">
+          <label for="profile-bio" data-i18n="profile.bioLabel">Descripción breve</label>
+          <textarea id="profile-bio" rows="3" maxlength="500" placeholder="Ej: Apasionado del fútbol y el análisis táctico"></textarea>
+          <small class="bio-counter"><span id="bio-char-count">0</span>/500</small>
+        </div>
+      </div>
+      <button id="save-bio-btn" class="btn btn-modern btn-modern-primary" data-i18n="profile.saveBio">Guardar biografía</button>
+    </section>
+
+    <!-- Preferencias de aprendizaje -->
+    <section class="glass-card profile-section">
+      <div class="section-head">
+        <span class="kicker" data-i18n="profile.preferencesKicker">Preferencias</span>
+        <h3 data-i18n="profile.preferencesTitle">Aprendizaje</h3>
+      </div>
+      <div class="preferences-grid">
+        <div class="form-group">
+          <label data-i18n="profile.preferredVoice">Voz de pronunciación</label>
+          <select id="preferred-voice">
+            <option value="english" data-i18n="classes.voiceEnglish">Inglés</option>
+            <option value="spanish" data-i18n="classes.voiceSpanish">Español</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label data-i18n="profile.preferredTheme">Tema visual</label>
+          <select id="preferred-theme">
+            <option value="dark" data-i18n="theme.dark">Modo oscuro</option>
+            <option value="light" data-i18n="theme.light">Modo claro</option>
+          </select>
+        </div>
+      </div>
+      <button id="save-preferences-btn" class="btn btn-modern btn-modern-primary" data-i18n="profile.savePreferences">Guardar preferencias</button>
+    </section>
+
+    <!-- Estadísticas detalladas -->
+    <section class="glass-card profile-section">
+      <div class="section-head">
+        <span class="kicker" data-i18n="profile.statsKicker">Estadísticas</span>
+        <h3 data-i18n="profile.statsTitle">Rendimiento</h3>
+      </div>
+      <div id="profile-stats-grid" class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-icon">AC</span>
+          <strong id="stat-accuracy">0%</strong>
+          <small data-i18n="profile.statAccuracy">Precisión</small>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">RC</span>
+          <strong id="stat-streak">0</strong>
+          <small data-i18n="profile.statStreak">Racha (días)</small>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">QZ</span>
+          <strong id="stat-total-quizzes">0</strong>
+          <small data-i18n="profile.statTotalQuizzes">Quizzes totales</small>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">OK</span>
+          <strong id="stat-passed">0</strong>
+          <small data-i18n="profile.statPassed">Aprobados</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- Progreso por nivel -->
+    <section class="glass-card profile-section">
+      <div class="section-head">
+        <span class="kicker" data-i18n="profile.levelProgressKicker">Niveles</span>
+        <h3 data-i18n="profile.levelProgressTitle">Progreso por nivel</h3>
+      </div>
+      <div id="level-progress-container" class="level-progress-list">
+        <p class="hint" data-i18n="ui.loading">Cargando...</p>
+      </div>
+    </section>
+
+    <!-- Logros -->
+    <section class="glass-card profile-section">
+      <div class="section-head">
+        <span class="kicker" data-i18n="profile.achievementsKicker">Logros</span>
+        <h3 data-i18n="profile.achievementsTitle">Insignias</h3>
+      </div>
+      <div id="profile-achievements" class="achievements-grid">
+        <p class="hint" data-i18n="ui.loading">Cargando...</p>
+      </div>
+    </section>
+
+    <!-- Quiz History -->
+    <section class="glass-card profile-section">
+      <div class="section-head">
+        <span class="kicker" data-i18n="profile.quizHistoryKicker">Historial</span>
+        <h3 data-i18n="profile.quizHistory">Historial de quizzes</h3>
+      </div>
+      <div id="quiz-history" class="profile-quiz-list">
+        <p class="hint" data-i18n="ui.loading">Cargando...</p>
+      </div>
+    </section>
+
+    <!-- Account Actions -->
+    <section class="glass-card profile-section profile-actions">
+      <div class="section-head">
+        <span class="kicker" data-i18n="profile.actionsKicker">Acciones</span>
+        <h3 data-i18n="profile.actionsTitle">Cuenta</h3>
+      </div>
+      <div class="action-buttons">
+        <a href="/change-password" class="btn btn-modern btn-modern-ghost" data-i18n="profile.changePassword">Cambiar contraseña</a>
+      </div>
     </section>
   </main>
+
   <script src="../js/i18n.js"></script>
   <script src="../js/theme.js"></script>
   <script src="../js/shared.js"></script>

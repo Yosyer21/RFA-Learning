@@ -222,4 +222,33 @@ function renderPagination(containerId, pagination, onPageChange) {
   });
 }
 
+// ── Reveal Animations (shared) ──
+function setupRevealAnimations() {
+  const selectors = ['.reveal', '.reveal-modern', '.reveal-left', '.reveal-right', '.reveal-scale'];
+  const items = Array.from(document.querySelectorAll(selectors.join(',')));
+  if (!items.length) return;
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.12 }
+  );
+
+  items.forEach((item) => observer.observe(item));
+}
+
+// Auto-init reveal animations on DOM ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupRevealAnimations);
+} else {
+  setupRevealAnimations();
+}
+
 window.escapeHtml = escapeHtml;
+window.setupRevealAnimations = setupRevealAnimations;

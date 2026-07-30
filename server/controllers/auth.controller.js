@@ -156,12 +156,78 @@ function logout(req, res) {
   });
 }
 
-function me(req, res) {
+async function me(req, res) {
   if (!req.session.user) {
     return res.status(401).json({ message: 'No autorizado' });
   }
 
-  return res.json({ user: req.session.user });
+  // Fetch fresh user data from DB to include email and other fields
+  const result = await query(
+    'SELECT id, name, username, role, active, must_change_password, bio, avatar_color, preferred_voice, preferred_theme FROM users WHERE id = $1',
+    [req.session.user.id]
+  );
+  const user = result.rows[0];
+
+  if (!user) {
+    return res.status(404).json({ message: 'Usuario no encontrado' });
+  }
+
+  const userData = {
+    id: user.id,
+    name: user.name,
+    username: user.username,
+    email: user.username, // username is the email
+    role: user.role,
+    active: user.active,
+    mustChangePassword: Boolean(user.must_change_password),
+    bio: user.bio || '',
+    avatarColor: user.avatar_color || '#6c5ce7',
+    preferredVoice: user.preferred_voice || 'english',
+    preferredTheme: user.preferred_theme || 'dark',
+  };
+
+  return res.json({ user: userData });
+}
+
+async function updatePreferences(req, res) {
+  if (!req.session.user) {
+    return res.status(401).json({ message: 'No autorizado' });
+  }
+
+  const { bio, avatarColor, preferredVoice, preferredTheme } = req.body;
+
+  const updates = [];
+  const params = [];
+  let idx = 1;
+
+  if (bio !== undefined) {
+    updates.push(`bio = $${idx++}`);
+    params.push(String(bio).slice(0, 500));
+  }
+  if (avatarColor !== undefined) {
+    updates.push(`avatar_color = $${idx++}`);
+    params.push(String(avatarColor));
+  }
+  if (preferredVoice !== undefined) {
+    updates.push(`preferred_voice = $${idx++}`);
+    params.push(String(preferredVoice));
+  }
+  if (preferredTheme !== undefined) {
+    updates.push(`preferred_theme = $${idx++}`);
+    params.push(String(preferredTheme));
+  }
+
+  if (updates.length === 0) {
+    return res.status(400).json({ message: 'No hay campos para actualizar' });
+  }
+
+  params.push(req.session.user.id);
+  await query(
+    `UPDATE users SET ${updates.join(', ')} WHERE id = $${idx}`,
+    params
+  );
+
+  return res.json({ message: 'Preferencias actualizadas' });
 }
 
 async function seedStatus(_req, res) {
@@ -192,4 +258,5 @@ module.exports = {
   seedStatus,
   register,
   updateProfile,
+  updatePreferences,
 };

@@ -139,7 +139,8 @@ function setupHeroSlider() {
 }
 
 function setupRevealAnimations() {
-  const items = Array.from(document.querySelectorAll('.reveal'));
+  const selectors = ['.reveal', '.reveal-modern', '.reveal-left', '.reveal-right', '.reveal-scale'];
+  const items = Array.from(document.querySelectorAll(selectors.join(',')));
   if (!items.length) return;
 
   const observer = new IntersectionObserver(

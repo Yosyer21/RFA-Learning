@@ -41,26 +41,46 @@ async function ensureUsers() {
 
   if (count === 0) {
     const isProduction = process.env.NODE_ENV === 'production';
-    const username = process.env.DEFAULT_ADMIN_USERNAME || (isProduction ? '' : 'admin');
-    const password = process.env.DEFAULT_ADMIN_PASSWORD || (isProduction ? '' : 'Admin1234');
-    const name = process.env.DEFAULT_ADMIN_NAME || 'Admin';
+
+    // ── Admin user ──
+    const adminUsername = process.env.DEFAULT_ADMIN_USERNAME || (isProduction ? '' : 'admin');
+    const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD || (isProduction ? '' : 'Admin1234');
+    const adminName = process.env.DEFAULT_ADMIN_NAME || 'Admin';
     const forcePasswordChange = String(process.env.DEFAULT_ADMIN_FORCE_PASSWORD_CHANGE || 'true') !== 'false';
 
-    if (!username || !password) {
+    if (adminUsername && adminPassword) {
+      const hashedAdmin = await hashPassword(adminPassword);
+      await query(
+        `INSERT INTO users (name, username, password, role, active, must_change_password)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [adminName, adminUsername.toLowerCase(), hashedAdmin, 'admin', true, forcePasswordChange]
+      );
+      log.info('Default admin user created', {
+        username: adminUsername.toLowerCase(),
+        mustChangePassword: forcePasswordChange,
+      });
+    } else {
       log.warn('Skipping default admin seed because credentials were not configured');
-      return;
     }
 
-    const hashedPassword = await hashPassword(password);
-    await query(
-      `INSERT INTO users (name, username, password, role, active, must_change_password)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [name, username.toLowerCase(), hashedPassword, 'admin', true, forcePasswordChange]
-    );
-    log.info('Default admin user created', {
-      username: username.toLowerCase(),
-      mustChangePassword: forcePasswordChange,
-    });
+    // ── Standard test user ──
+    const userUsername = process.env.DEFAULT_USER_USERNAME || (isProduction ? '' : 'user');
+    const userPassword = process.env.DEFAULT_USER_PASSWORD || (isProduction ? '' : 'User1234');
+    const userName = process.env.DEFAULT_USER_NAME || 'Usuario';
+
+    if (userUsername && userPassword) {
+      const hashedUser = await hashPassword(userPassword);
+      await query(
+        `INSERT INTO users (name, username, password, role, active, must_change_password)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [userName, userUsername.toLowerCase(), hashedUser, 'user', true, false]
+      );
+      log.info('Default standard user created', {
+        username: userUsername.toLowerCase(),
+      });
+    } else {
+      log.warn('Skipping default user seed because credentials were not configured');
+    }
   }
 }
 

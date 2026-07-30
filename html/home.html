@@ -6,6 +6,7 @@
   <title>Home | RFA.Learning</title>
   <link rel="stylesheet" href="../css/home.css">
   <link rel="stylesheet" href="../css/shared.css">
+  <link rel="stylesheet" href="../css/modern.css">
 </head>
 <body>
   <a href="#welcome" class="skip-link" data-i18n="skip.content">Ir al contenido</a>
@@ -22,57 +23,127 @@
   </header>
 
   <main class="container">
-    <!-- Hero bienvenida -->
-    <section class="home-hero">
-      <div class="home-hero-copy">
-        <span class="kicker" data-i18n="home.kicker">Dashboard</span>
-        <h2 id="welcome" data-i18n="ui.loading">Cargando...</h2>
-        <p id="greeting-sub" class="hero-sub" data-i18n="home.subtitle">Continua tu aprendizaje del lenguaje del futbol.</p>
-        <a href="/clases" class="btn btn-primary hero-cta" data-i18n="home.goToClasses">Ir a clases</a>
-      </div>
-      <div class="home-hero-visual">
-        <div class="progress-ring-wrap">
-          <svg class="progress-ring" viewBox="0 0 120 120">
-            <defs>
-              <linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="var(--primary)"/>
-                <stop offset="100%" stop-color="var(--accent)"/>
-              </linearGradient>
-            </defs>
-            <circle class="progress-ring-bg" cx="60" cy="60" r="52"></circle>
-            <circle class="progress-ring-fill" cx="60" cy="60" r="52" stroke-dasharray="326.73" stroke-dashoffset="326.73"></circle>
-          </svg>
-          <div class="progress-ring-label">
-            <strong id="progress-pct">0%</strong>
-            <span data-i18n="home.completed">completado</span>
-          </div>
+    <!-- Hero con imagen de fondo -->
+    <section class="hero-image-bg home-hero" style="min-height:380px;padding:2.5rem 2rem;margin-bottom:1.5rem;">
+      <img src="../assets/1.jpeg" alt="Football training background">
+      <div style="position:relative;z-index:2;width:100%;">
+        <div class="home-hero-copy" style="max-width:600px;">
+          <span class="kicker" data-i18n="home.kicker">Dashboard</span>
+          <h2 id="welcome" style="color:white;font-size:clamp(1.6rem,3.5vw,2.2rem);" data-i18n="ui.loading">Cargando...</h2>
+          <p id="greeting-sub" class="hero-sub" style="color:rgba(255,255,255,0.8);max-width:40ch;" data-i18n="home.subtitle">Continua tu aprendizaje del lenguaje del futbol.</p>
+          <a href="/clases" class="btn btn-modern btn-modern-primary hero-cta" data-i18n="home.goToClasses">Ir a clases</a>
         </div>
       </div>
     </section>
 
-    <!-- Stats -->
+    <!-- Stats con diseño moderno -->
     <section class="home-stats">
-      <div class="stat-card">
-        <span data-i18n="home.statLevel">Nivel actual</span>
+      <div class="stat-card-modern">
+        <span class="stat-icon stat-icon-level">LV</span>
         <strong id="stat-level">--</strong>
+        <span data-i18n="home.statLevel">Nivel actual</span>
       </div>
-      <div class="stat-card">
-        <span data-i18n="home.statCompleted">Clases completadas</span>
+      <div class="stat-card-modern">
+        <span class="stat-icon stat-icon-completed">OK</span>
         <strong id="stat-completed">0</strong>
+        <span data-i18n="home.statCompleted">Clases completadas</span>
       </div>
-      <div class="stat-card">
-        <span data-i18n="home.statScore">Puntaje total</span>
+      <div class="stat-card-modern">
+        <span class="stat-icon stat-icon-score">PT</span>
         <strong id="stat-score">0</strong>
+        <span data-i18n="home.statScore">Puntaje total</span>
       </div>
-      <div class="stat-card">
-        <span data-i18n="home.statStreak">Racha activa</span>
+      <div class="stat-card-modern">
+        <span class="stat-icon stat-icon-streak">ST</span>
         <strong id="stat-streak">0</strong>
+        <span data-i18n="home.statStreak">Racha activa</span>
       </div>
     </section>
 
-    <!-- Progreso detallado -->
+    <!-- Barra de experiencia / Nivel -->
+    <section class="glass-card xp-section">
+      <div class="xp-header">
+        <div class="xp-info">
+          <span class="kicker" data-i18n="home.xpKicker">Progreso</span>
+          <h3 id="xp-level-label" data-i18n="home.xpTitle">Nivel: Principiante</h3>
+        </div>
+        <div class="xp-next">
+          <small id="xp-next-label" data-i18n="home.xpNext">Siguiente: Intermedio</small>
+        </div>
+      </div>
+      <div class="xp-bar-track">
+        <div id="xp-bar-fill" class="xp-bar-fill" style="width:0%"></div>
+      </div>
+      <div class="xp-bar-footer">
+        <span id="xp-progress-text">0%</span>
+        <span id="xp-classes-text" data-i18n="home.xpClasses">0 de 0 clases</span>
+      </div>
+    </section>
+
+    <!-- Clase recomendada del día -->
+    <section id="recommended-section" class="glass-card recommended-section" style="display:none;">
+      <div class="section-head">
+        <span class="kicker" data-i18n="home.recommendedKicker">Recomendado</span>
+        <h3 data-i18n="home.recommendedTitle">Clase del día</h3>
+      </div>
+      <div id="recommended-card" class="recommended-card">
+        <!-- JS -->
+      </div>
+    </section>
+
+    <!-- Grid principal: 2 columnas -->
     <div class="home-grid">
-      <section class="card home-section">
+      <!-- Continuar aprendizaje -->
+      <section class="glass-card home-section">
+        <div class="section-head">
+          <span class="kicker" data-i18n="home.continueKicker">Aprendizaje</span>
+          <h3 data-i18n="home.continueTitle">Continuar aprendiendo</h3>
+        </div>
+        <div id="continue-list" class="continue-list">
+          <!-- JS -->
+        </div>
+      </section>
+
+      <!-- Progreso semanal -->
+      <section class="glass-card home-section">
+        <div class="section-head">
+          <span class="kicker" data-i18n="home.weeklyKicker">Actividad</span>
+          <h3 data-i18n="home.weeklyTitle">Progreso semanal</h3>
+        </div>
+        <div id="weekly-chart" class="weekly-chart">
+          <!-- JS -->
+        </div>
+      </section>
+    </div>
+
+    <!-- Grid secundario: 2 columnas -->
+    <div class="home-grid" style="margin-top:1rem;">
+      <!-- Logros / Insignias -->
+      <section class="glass-card home-section">
+        <div class="section-head">
+          <span class="kicker" data-i18n="home.achievementsKicker">Logros</span>
+          <h3 data-i18n="home.achievementsTitle">Insignias</h3>
+        </div>
+        <div id="achievements-list" class="achievements-list">
+          <!-- JS -->
+        </div>
+      </section>
+
+      <!-- Últimos quizzes -->
+      <section class="glass-card home-section">
+        <div class="section-head">
+          <span class="kicker" data-i18n="home.quizHistoryKicker">Historial</span>
+          <h3 data-i18n="home.quizHistoryTitle">Últimos quizzes</h3>
+        </div>
+        <div id="quiz-history-list" class="quiz-history-list">
+          <!-- JS -->
+        </div>
+      </section>
+    </div>
+
+    <!-- Progreso detallado por nivel -->
+    <div class="home-grid" style="margin-top:1rem;">
+      <section class="glass-card home-section">
         <div class="section-head">
           <span class="kicker" data-i18n="home.progressKicker">Progreso</span>
           <h3 data-i18n="home.progressTitle">Avance por nivel</h3>
@@ -82,9 +153,9 @@
         </div>
       </section>
 
-      <section class="card home-section">
+      <section class="glass-card home-section">
         <div class="section-head">
-          <span class="kicker" data-i18n="home.activityKicker">Actividad</span>
+          <span class="kicker" data-i18n="home.activityKicker">Completadas</span>
           <h3 data-i18n="home.activityTitle">Clases completadas</h3>
         </div>
         <ul id="completed-list" class="completed-list">

@@ -6,9 +6,10 @@
   <title>Clases | RFA.Learning</title>
   <link rel="stylesheet" href="../css/clases.css">
   <link rel="stylesheet" href="../css/shared.css">
+  <link rel="stylesheet" href="../css/modern.css">
 </head>
 <body>
-  <a href="#classes-container" class="skip-link" data-i18n="skip.classes">Ir a las clases</a>
+  <a href="#classes-explore" class="skip-link" data-i18n="skip.classes">Ir a las clases</a>
   <header class="topbar">
     <div class="topbar-brand">
       <span class="brand-icon"></span>
@@ -22,40 +23,78 @@
     </nav>
   </header>
 
-  <main class="container">
-    <section class="card">
-      <span class="kicker" data-i18n="classes.kicker">Modulos</span>
-      <h2 data-i18n="classes.subtitle">Modulo disponible</h2>
-      <p class="hint" data-i18n="classes.pageHint">Explora cada módulo, revisa una vista previa y abre el quiz cuando quieras practicar.</p>
-      <div id="classes-summary" class="classes-summary" aria-live="polite"></div>
-      <div id="classes-highlights" class="classes-highlights" aria-live="polite"></div>
-
-      <div class="speech-control">
-        <div class="speech-control-copy">
-          <label for="speech-language" data-i18n="classes.voiceLabel">Voz de pronunciaciÃ³n</label>
-          <p class="hint" data-i18n="classes.voiceHelp">Elige si quieres escuchar el tÃ©rmino en espaÃ±ol o en inglÃ©s.</p>
+  <main class="container landing">
+    <!-- ── Hero ── -->
+    <section class="hero-image-bg classes-hero" style="min-height:320px;">
+      <img src="../assets/1.jpeg" alt="" aria-hidden="true">
+      <div class="classes-hero-content">
+        <span class="kicker" data-i18n="classes.kicker">Módulos</span>
+        <h1 data-i18n="classes.subtitle">Explora tu aprendizaje</h1>
+        <p class="hero-sub" id="classes-hero-sub" data-i18n="classes.pageHint">Domina el vocabulario del fútbol, módulo por módulo.</p>
+        <div class="classes-hero-stats" id="classes-hero-stats">
+          <div class="hero-stat">
+            <span class="hero-stat-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            </span>
+            <strong id="hero-total-classes">0</strong>
+            <span data-i18n="classes.availableModules">Módulos</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+            <strong id="hero-completed">0</strong>
+            <span data-i18n="classes.completedOnPageLabel">Completados</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </span>
+            <strong id="hero-favorites">0</strong>
+            <span data-i18n="classes.favoriteModules">Favoritos</span>
+          </div>
         </div>
-        <select id="speech-language" class="speech-language">
-          <option value="en" data-i18n="classes.voiceEnglish">InglÃ©s</option>
-          <option value="es" data-i18n="classes.voiceSpanish">EspaÃ±ol</option>
+      </div>
+    </section>
+
+    <!-- ── Level Tabs ── -->
+    <section class="classes-level-tabs" id="classes-level-tabs">
+      <button class="level-tab active" data-level="" data-i18n="classes.allLevels">Todos</button>
+      <button class="level-tab" data-level="Beginner" data-i18n="classes.levelBeginner">Beginner</button>
+      <button class="level-tab" data-level="Intermediate" data-i18n="classes.levelIntermediate">Intermediate</button>
+      <button class="level-tab" data-level="Advanced" data-i18n="classes.levelAdvanced">Advanced</button>
+    </section>
+
+    <!-- ── Filter Bar ── -->
+    <section class="filter-bar-modern" id="classes-filter-bar">
+      <div class="filter-search-wrap">
+        <span class="filter-search-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </span>
+        <input id="search-input" type="search" placeholder="Buscar clase..." data-i18n-placeholder="classes.searchPlaceholder" aria-label="Buscar clases">
+      </div>
+      <select id="filter-category" class="filter-select" data-i18n-aria="classes.allCategories" aria-label="Filtrar por categoría">
+        <option value="" data-i18n="classes.allCategories">Todas las categorías</option>
+      </select>
+      <div class="speech-control-compact">
+        <select id="speech-language" class="filter-select speech-select">
+          <option value="en">EN</option>
+          <option value="es">ES</option>
         </select>
       </div>
+    </section>
 
-      <div class="filter-bar">
-        <input id="search-input" type="search" placeholder="Buscar clase..." data-i18n-placeholder="classes.searchPlaceholder" data-i18n-aria="classes.searchPlaceholder" aria-label="Buscar clases">
-        <select id="filter-category" data-i18n-aria="classes.allCategories" aria-label="Filtrar por categoría">
-          <option value="" data-i18n="classes.allCategories">Todas las categorías</option>
-        </select>
-        <select id="filter-level" data-i18n-aria="classes.allLevels" aria-label="Filtrar por nivel">
-          <option value="" data-i18n="classes.allLevels">Todos los niveles</option>
-          <option value="Beginner" data-i18n="classes.levelBeginner">Beginner</option>
-          <option value="Intermediate" data-i18n="classes.levelIntermediate">Intermediate</option>
-          <option value="Advanced" data-i18n="classes.levelAdvanced">Advanced</option>
-        </select>
+    <!-- ── Highlights ── -->
+    <section id="classes-highlights" class="classes-highlights-modern"></section>
+
+    <!-- ── Class Grid ── -->
+    <section id="classes-explore" class="classes-explore-section">
+      <div class="section-head">
+        <span class="kicker">Biblioteca</span>
+        <h3>Tus módulos</h3>
       </div>
-
-      <div id="classes-container"></div>
-      <div id="classes-pagination"></div>
+      <div id="classes-container" class="classes-grid"></div>
+      <div id="classes-pagination" class="pagination-modern"></div>
     </section>
   </main>
 

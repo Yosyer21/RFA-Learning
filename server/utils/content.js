@@ -5,19 +5,31 @@ function normalizePair(item) {
 
   const spanish = String(item.spanish ?? '').trim();
   const english = String(item.english ?? '').trim();
+  const definition = String(item.definition ?? '').trim();
+  const definitionEn = String(item.definitionEn ?? '').trim();
   const example = String(item.example ?? '').trim();
   const exampleSpanish = String(item.exampleSpanish ?? item.exampleEs ?? '').trim();
+  const exampleEnglish = String(item.exampleEnglish ?? '').trim();
 
   if (!spanish || !english) {
     return null;
   }
 
   const normalized = { spanish, english };
+  if (definition) {
+    normalized.definition = definition;
+  }
+  if (definitionEn) {
+    normalized.definitionEn = definitionEn;
+  }
   if (example) {
     normalized.example = example;
   }
   if (exampleSpanish) {
     normalized.exampleSpanish = exampleSpanish;
+  }
+  if (exampleEnglish) {
+    normalized.exampleEnglish = exampleEnglish;
   }
 
   return normalized;
@@ -121,12 +133,19 @@ function enrichLessonContent(lesson = {}) {
         return null;
       }
 
-      const example = buildExamplePair(lesson, item);
-      if (example.example) {
-        normalized.example = example.example;
-      }
-      if (example.exampleSpanish) {
-        normalized.exampleSpanish = example.exampleSpanish;
+      // Only generate example if the item doesn't already have one
+      const hasExistingExample = String(item.example ?? '').trim() ||
+        String(item.exampleSpanish ?? item.exampleEs ?? '').trim() ||
+        String(item.exampleEnglish ?? '').trim();
+
+      if (!hasExistingExample) {
+        const example = buildExamplePair(lesson, item);
+        if (example.example) {
+          normalized.example = example.example;
+        }
+        if (example.exampleSpanish) {
+          normalized.exampleSpanish = example.exampleSpanish;
+        }
       }
 
       return normalized;

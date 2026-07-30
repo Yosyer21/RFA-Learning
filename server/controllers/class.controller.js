@@ -329,6 +329,86 @@ async function submitQuiz(req, res) {
   return res.json(outcome.body);
 }
 
+// ── Multiple Choice Quiz (definition-based, A/B/C/D) ──
+async function submitMultipleChoiceQuiz(req, res) {
+  const { classId, answers } = req.body;
+  const userId = req.user.id;
+
+  if (!classId || !Array.isArray(answers)) {
+    return res.status(400).json({ message: 'classId y answers son requeridos' });
+  }
+
+  const outcome = await withTransaction(async (client) => {
+    const classResult = await client.query('SELECT * FROM classes WHERE id = $1', [classId]);
+    if (classResult.rows.length === 0) {
+      return { status: 404, body: { message: 'Clase no encontrada' } };
+    }
+
+    const classContent = Array.isArray(classResult.rows[0].content) ? classResult.rows[0].content : [];
+    let score = 0;
+    const total = answers.length;
+
+    const graded = answers.map((a) => {
+      const term = classContent.find((t) => t.spanish === a.spanish);
+      const correct = Boolean(term) && String(a.selected).trim().toLowerCase() === String(term.english).trim().toLowerCase();
+      if (correct) {
+        score += 1;
+      }
+      return {
+        spanish: a.spanish,
+        selected: a.selected,
+        correct,
+        expected: term?.english || '',
+        options: a.options || [],
+      };
+    });
+
+    const result = await client.query(
+      'INSERT INTO quizzes (class_id, user_id, score, total, answers) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [classId, userId, score, total, JSON.stringify(graded)]
+    );
+
+    const passed = total > 0 && (score / total) >= 0.7;
+    if (passed) {
+      const progressResult = await client.query('SELECT * FROM progress WHERE user_id = $1 FOR UPDATE', [userId]);
+      if (progressResult.rows.length === 0) {
+        await client.query(
+          'INSERT INTO progress (user_id, completed_classes, current_level, score) VALUES ($1, $2, $3, $4)',
+          [userId, JSON.stringify([classId]), 'Beginner', score]
+        );
+      } else {
+        const current = progressResult.rows[0];
+        const completed = Array.isArray(current.completed_classes) ? current.completed_classes : [];
+        if (!completed.includes(classId)) {
+          completed.push(classId);
+          await client.query(
+            'UPDATE progress SET completed_classes = $1, score = score + $2 WHERE user_id = $3',
+            [JSON.stringify(completed), score, userId]
+          );
+        }
+      }
+    }
+
+    return {
+      status: 200,
+      body: {
+        quizId: result.rows[0].id,
+        score,
+        total,
+        percentage: total > 0 ? Math.round((score / total) * 100) : 0,
+        passed,
+        answers: graded,
+      },
+    };
+  });
+
+  if (outcome.status !== 200) {
+    return res.status(outcome.status).json(outcome.body);
+  }
+
+  return res.json(outcome.body);
+}
+
 async function getQuizHistory(req, res) {
   const userId = req.user.id;
   const result = await query(
@@ -338,6 +418,136 @@ async function getQuizHistory(req, res) {
     [userId]
   );
   return res.json(result.rows);
+}
+
+// ── Home Dashboard Data ──
+async function getHomeData(req, res) {
+  const userId = req.user.id;
+
+  // 1. Progress
+  const progressResult = await query(
+    'SELECT completed_classes AS "completedClasses", current_level AS "currentLevel", score FROM progress WHERE user_id = $1',
+    [userId]
+  );
+  const progress = progressResult.rows[0] || { completedClasses: [], currentLevel: 'Beginner', score: 0 };
+  const completedIds = Array.isArray(progress.completedClasses) ? progress.completedClasses : [];
+
+  // 2. All classes
+  const classesResult = await query('SELECT * FROM classes ORDER BY id');
+  const allClasses = classesResult.rows;
+
+  // 3. Weekly activity (last 7 days) - fetch all quizzes and filter in JS to avoid pg-mem timestamptz issues
+  const allQuizRows = await query(
+    `SELECT completed_at FROM quizzes WHERE user_id = $1`,
+    [userId]
+  );
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const weekRows = { rows: allQuizRows.rows.filter(r => new Date(r.completed_at) >= sevenDaysAgo) };
+  const weeklyMap = {};
+  weekRows.rows.forEach(r => {
+    const d = new Date(r.completed_at);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    weeklyMap[key] = (weeklyMap[key] || 0) + 1;
+  });
+  const weeklyActivity = Object.entries(weeklyMap).map(([day, count]) => ({ day, count })).sort((a,b) => a.day.localeCompare(b.day));
+
+  // 4. Quiz stats (average accuracy)
+  const quizStatsResult = await query(
+    `SELECT COUNT(*) AS total_quizzes, COALESCE(SUM(score), 0) AS total_score, COALESCE(SUM(total), 0) AS total_questions
+     FROM quizzes WHERE user_id = $1`,
+    [userId]
+  );
+  const quizStats = quizStatsResult.rows[0] || { total_quizzes: 0, total_score: 0, total_questions: 0 };
+
+  // 5. Last quizzes for history
+  const lastQuizzesResult = await query(
+    `SELECT q.id, q.class_id AS "classId", c.title AS "classTitle", q.score, q.total, q.completed_at AS "completedAt"
+     FROM quizzes q JOIN classes c ON q.class_id = c.id
+     WHERE q.user_id = $1 ORDER BY q.completed_at DESC LIMIT 5`,
+    [userId]
+  );
+
+  // 6. Uncompleted classes (for "continue learning")
+  const uncompletedClasses = allClasses.filter(c => !completedIds.includes(c.id)).slice(0, 4);
+
+  // 7. Recommended class (first uncompleted at user's level or next level)
+  const userLevel = progress.currentLevel || 'Beginner';
+  const levelOrder = ['Beginner', 'Intermediate', 'Advanced'];
+  const userLevelIdx = levelOrder.indexOf(userLevel);
+  let recommended = null;
+  for (let i = userLevelIdx; i < levelOrder.length; i++) {
+    recommended = uncompletedClasses.find(c => c.level === levelOrder[i]);
+    if (recommended) break;
+  }
+  if (!recommended && uncompletedClasses.length > 0) {
+    recommended = uncompletedClasses[0];
+  }
+
+  // 8. Achievements
+  const achievements = [];
+  const totalQuizzes = parseInt(quizStats.total_quizzes) || 0;
+  const totalScore = parseInt(quizStats.total_score) || 0;
+  const totalQuestions = parseInt(quizStats.total_questions) || 0;
+  const accuracy = totalQuestions > 0 ? Math.round((totalScore / totalQuestions) * 100) : 0;
+  const streak = 0;
+
+  if (completedIds.length >= 1) achievements.push({ id: 'first_class', icon: 'FC', titleEs: 'Primera clase', titleEn: 'First Class', descEs: 'Completaste tu primera clase', descEn: 'You completed your first class', unlocked: true });
+  if (completedIds.length >= 5) achievements.push({ id: 'five_classes', icon: '5C', titleEs: 'Estrella del aprendizaje', titleEn: 'Learning Star', descEs: 'Completaste 5 clases', descEn: 'You completed 5 classes', unlocked: true });
+  if (completedIds.length >= 10) achievements.push({ id: 'ten_classes', icon: '10', titleEs: 'Campeón', titleEn: 'Champion', descEs: 'Completaste 10 clases', descEn: 'You completed 10 classes', unlocked: true });
+  if (totalQuizzes >= 1) achievements.push({ id: 'first_quiz', icon: 'QZ', titleEs: 'Primer quiz', titleEn: 'First Quiz', descEs: 'Realizaste tu primer quiz', descEn: 'You took your first quiz', unlocked: true });
+  if (accuracy >= 90 && totalQuizzes >= 3) achievements.push({ id: 'accuracy_master', icon: 'AC', titleEs: 'Precisión letal', titleEn: 'Deadly Accuracy', descEs: `${accuracy}% de precisión en quizzes`, descEn: `${accuracy}% accuracy on quizzes`, unlocked: true });
+  if (streak >= 3) achievements.push({ id: 'streak_3', icon: 'S3', titleEs: 'Racha de 3', titleEn: 'Streak of 3', descEs: 'Mantén una racha de 3 días', descEn: 'Keep a 3-day streak', unlocked: true });
+  if (streak >= 7) achievements.push({ id: 'streak_7', icon: 'S7', titleEs: 'Racha semanal', titleEn: 'Weekly Streak', descEs: 'Mantén una racha de 7 días', descEn: 'Keep a 7-day streak', unlocked: true });
+
+  // Locked achievements (show next ones to unlock)
+  const lockedAchievements = [];
+  if (completedIds.length < 5) lockedAchievements.push({ id: 'five_classes', icon: '5C', titleEs: 'Estrella del aprendizaje', titleEn: 'Learning Star', descEs: 'Completa 5 clases', descEn: 'Complete 5 classes', unlocked: false, progress: completedIds.length, target: 5 });
+  if (completedIds.length < 10 && completedIds.length >= 5) lockedAchievements.push({ id: 'ten_classes', icon: '10', titleEs: 'Campeón', titleEn: 'Champion', descEs: 'Completa 10 clases', descEn: 'Complete 10 classes', unlocked: false, progress: completedIds.length, target: 10 });
+  if (streak < 3) lockedAchievements.push({ id: 'streak_3', icon: 'S3', titleEs: 'Racha de 3', titleEn: 'Streak of 3', descEs: 'Mantén racha de 3 días', descEn: 'Keep a 3-day streak', unlocked: false, progress: streak, target: 3 });
+  if (streak < 7 && streak >= 3) lockedAchievements.push({ id: 'streak_7', icon: 'S7', titleEs: 'Racha semanal', titleEn: 'Weekly Streak', descEs: 'Mantén racha de 7 días', descEn: 'Keep a 7-day streak', unlocked: false, progress: streak, target: 7 });
+
+  // 9. Level progress
+  const levelClasses = { Beginner: 0, Intermediate: 0, Advanced: 0 };
+  const levelCompleted = { Beginner: 0, Intermediate: 0, Advanced: 0 };
+  allClasses.forEach(c => {
+    if (levelClasses[c.level] !== undefined) levelClasses[c.level]++;
+    if (levelClasses[c.level] !== undefined && completedIds.includes(c.id)) levelCompleted[c.level]++;
+  });
+
+  // Calculate XP-like progress to next level
+  const currentLevelClasses = levelClasses[userLevel] || 1;
+  const currentLevelDone = levelCompleted[userLevel] || 0;
+  const levelProgress = Math.min(100, Math.round((currentLevelDone / currentLevelClasses) * 100));
+
+  // Next level
+  const nextLevelIdx = userLevelIdx + 1;
+  const nextLevel = nextLevelIdx < levelOrder.length ? levelOrder[nextLevelIdx] : null;
+
+  return res.json({
+    progress,
+    completedIds,
+    totalClasses: allClasses.length,
+    allClasses,
+    weeklyActivity,
+    quizStats: {
+      totalQuizzes: parseInt(quizStats.total_quizzes) || 0,
+      totalScore: parseInt(quizStats.total_score) || 0,
+      totalQuestions: parseInt(quizStats.total_questions) || 0,
+      accuracy,
+    },
+    lastQuizzes: lastQuizzesResult.rows,
+    uncompletedClasses,
+    recommendedClass: recommended,
+    achievements: achievements.slice(0, 6),
+    lockedAchievements: lockedAchievements.slice(0, 3),
+    levelProgress: {
+      currentLevel: userLevel,
+      nextLevel,
+      progress: levelProgress,
+      classesInLevel: currentLevelClasses,
+      completedInLevel: currentLevelDone,
+    },
+  });
 }
 
 module.exports = {
@@ -350,5 +560,7 @@ module.exports = {
   updateProgress,
   importClassesCsv,
   submitQuiz,
+  submitMultipleChoiceQuiz,
   getQuizHistory,
+  getHomeData,
 };
