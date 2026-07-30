@@ -39,53 +39,55 @@ async function ensureUsers() {
   const isProduction = process.env.NODE_ENV === 'production';
 
   // ── Admin user ──
-  const adminUsername = process.env.DEFAULT_ADMIN_USERNAME || (isProduction ? '' : 'admin');
+  const adminUsername = (process.env.DEFAULT_ADMIN_USERNAME || 'admin').toLowerCase();
   const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD || (isProduction ? '' : 'Admin1234');
   const adminName = process.env.DEFAULT_ADMIN_NAME || 'Admin';
   const forcePasswordChange = String(process.env.DEFAULT_ADMIN_FORCE_PASSWORD_CHANGE || 'true') !== 'false';
 
   if (adminUsername && adminPassword) {
-    const adminResult = await query('SELECT id FROM users WHERE role = $1 LIMIT 1', ['admin']);
+    const adminResult = await query('SELECT id FROM users WHERE LOWER(username) = $1 LIMIT 1', [adminUsername]);
     if (adminResult.rows.length === 0) {
       const hashedAdmin = await hashPassword(adminPassword);
       await query(
         `INSERT INTO users (name, username, password, role, active, must_change_password)
          VALUES ($1, $2, $3, $4, $5, $6)`,
-        [adminName, adminUsername.toLowerCase(), hashedAdmin, 'admin', true, forcePasswordChange]
+        [adminName, adminUsername, hashedAdmin, 'admin', true, forcePasswordChange]
       );
+      console.log(`[BOOTSTRAP] Admin user created: ${adminUsername} / ${adminPassword}`);
       log.info('Default admin user created', {
-        username: adminUsername.toLowerCase(),
+        username: adminUsername,
         mustChangePassword: forcePasswordChange,
       });
     } else {
-      log.debug('Admin user already exists, skipping');
+      console.log(`[BOOTSTRAP] Admin user already exists (username=${adminUsername}), skipping`);
     }
   } else {
     log.warn('Skipping default admin seed because credentials were not configured');
   }
 
   // ── Standard test user ──
-  const userUsername = process.env.DEFAULT_USER_USERNAME || (isProduction ? '' : 'user');
+  const userUsername = (process.env.DEFAULT_USER_USERNAME || 'user').toLowerCase();
   const userPassword = process.env.DEFAULT_USER_PASSWORD || (isProduction ? '' : 'User1234');
   const userName = process.env.DEFAULT_USER_NAME || 'Usuario';
 
   if (userUsername && userPassword) {
     const userResult = await query(
       'SELECT id FROM users WHERE LOWER(username) = $1 LIMIT 1',
-      [userUsername.toLowerCase()]
+      [userUsername]
     );
     if (userResult.rows.length === 0) {
       const hashedUser = await hashPassword(userPassword);
       await query(
         `INSERT INTO users (name, username, password, role, active, must_change_password)
          VALUES ($1, $2, $3, $4, $5, $6)`,
-        [userName, userUsername.toLowerCase(), hashedUser, 'user', true, false]
+        [userName, userUsername, hashedUser, 'user', true, false]
       );
+      console.log(`[BOOTSTRAP] Standard user created: ${userUsername} / ${userPassword}`);
       log.info('Default standard user created', {
-        username: userUsername.toLowerCase(),
+        username: userUsername,
       });
     } else {
-      log.debug('Standard user already exists, skipping');
+      console.log(`[BOOTSTRAP] Standard user already exists (username=${userUsername}), skipping`);
     }
   } else {
     log.warn('Skipping default user seed because credentials were not configured');
