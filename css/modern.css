@@ -492,3 +492,43 @@ html {
     height: 160px;
   }
 }
+
+@media (max-width: 480px) {
+  .glass-card {
+    padding: 1rem;
+  }
+
+  .btn-modern {
+    padding: 0.45rem 0.9rem;
+    font-size: 0.75rem;
+  }
+
+  .btn-modern-primary {
+    padding: 0.5rem 1rem;
+    font-size: 0.78rem;
+  }
+
+  .hero-image-bg {
+    min-height: 220px;
+  }
+
+  .gallery-grid-modern {
+    grid-auto-rows: 160px;
+  }
+
+  .course-card-image {
+    height: 140px;
+  }
+
+  .reveal-modern,
+  .reveal-left,
+  .reveal-right {
+    transform: translateY(15px);
+  }
+
+  .reveal-modern.is-visible,
+  .reveal-left.is-visible,
+  .reveal-right.is-visible {
+    transform: translateY(0);
+  }
+}

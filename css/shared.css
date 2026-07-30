@@ -326,3 +326,117 @@
 .csv-upload input[type="file"] {
   flex: 1;
 }
+
+/* ── Responsive ── */
+@media (max-width: 780px) {
+  .toast-container {
+    top: 0.8rem;
+    right: 0.8rem;
+    left: 0.8rem;
+  }
+
+  .toast {
+    min-width: unset;
+    max-width: 100%;
+    font-size: 0.82rem;
+    padding: 0.7rem 1rem;
+  }
+
+  .filter-bar {
+    flex-direction: column;
+  }
+
+  .filter-bar input,
+  .filter-bar select {
+    min-width: unset;
+    width: 100%;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  .pagination button {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.78rem;
+  }
+
+  .quiz-modal {
+    padding: 1.2rem;
+    width: 95vw;
+    max-height: 90vh;
+  }
+
+  .csv-upload {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .csv-upload input[type="file"] {
+    width: 100%;
+  }
+
+  .csv-upload .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .toast-container {
+    top: 0.5rem;
+    right: 0.5rem;
+    left: 0.5rem;
+  }
+
+  .toast {
+    font-size: 0.78rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
+  }
+
+  .spinner {
+    width: 36px;
+    height: 36px;
+    border-width: 3px;
+  }
+
+  .quiz-modal {
+    padding: 0.8rem;
+    width: 98vw;
+  }
+
+  .quiz-modal h2 {
+    font-size: 1rem;
+  }
+
+  .quiz-question label {
+    font-size: 0.82rem;
+  }
+
+  .quiz-question input {
+    font-size: 0.82rem;
+    padding: 0.45rem 0.6rem;
+  }
+
+  .pagination button {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.72rem;
+    min-width: 30px;
+  }
+
+  .pagination-info {
+    font-size: 0.72rem;
+  }
+
+  .filter-bar {
+    gap: 0.4rem;
+  }
+
+  .filter-bar input,
+  .filter-bar select {
+    font-size: 0.82rem;
+    padding: 0.45rem 0.65rem;
+  }
+}

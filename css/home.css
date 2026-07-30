@@ -639,6 +639,272 @@
   background:none !important;
 }
 
+/* ── Responsive ── */
+@media (max-width: 780px) {
+  .home-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+  }
+
+  .home-grid {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .home-hero {
+    padding: 1.5rem 1rem !important;
+    min-height: 280px !important;
+  }
+
+  .home-hero-copy {
+    max-width: 100%;
+  }
+
+  .home-hero-copy h2 {
+    font-size: clamp(1.2rem, 4vw, 1.6rem);
+  }
+
+  .xp-section {
+    padding: 1rem;
+  }
+
+  .xp-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+  }
+
+  .recommended-section {
+    padding: 1rem;
+  }
+
+  .recommended-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+
+  .recommended-card-action {
+    width: 100%;
+  }
+
+  .recommended-card-action .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .weekly-chart {
+    height: 90px;
+  }
+
+  .achievements-list {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.8rem;
+    padding: 1.2rem;
+  }
+
+  .profile-stats-mini {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .profile-info {
+    text-align: center;
+  }
+
+  .profile-section {
+    padding: 1rem;
+  }
+
+  .profile-form {
+    gap: 0.6rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .action-buttons .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .achievements-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .level-progress-item {
+    padding: 0.6rem 0.8rem;
+  }
+
+  .preferences-grid {
+    gap: 0.6rem;
+  }
+
+  .color-presets {
+    gap: 0.3rem;
+  }
+
+  .color-preset {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem;
+  }
+
+  .stat-card-modern {
+    padding: 0.8rem 0.5rem;
+  }
+
+  .stat-card-modern strong {
+    font-size: 1.1rem;
+  }
+
+  .stat-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 0.55rem;
+  }
+
+  .home-hero {
+    min-height: 240px !important;
+    padding: 1.2rem 0.8rem !important;
+  }
+
+  .hero-sub {
+    font-size: 0.85rem;
+  }
+
+  .xp-section {
+    padding: 0.8rem;
+  }
+
+  .xp-header h3 {
+    font-size: 0.85rem;
+  }
+
+  .xp-bar-track {
+    height: 6px;
+  }
+
+  .continue-item {
+    padding: 0.5rem 0.65rem;
+  }
+
+  .continue-item-body strong {
+    font-size: 0.78rem;
+  }
+
+  .weekly-chart {
+    height: 70px;
+  }
+
+  .weekly-bar {
+    max-width: 20px;
+  }
+
+  .achievements-list {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .achievement-item {
+    padding: 0.5rem 0.4rem;
+  }
+
+  .achievement-title {
+    font-size: 0.65rem;
+  }
+
+  .profile-header {
+    padding: 1rem;
+  }
+
+  .profile-avatar {
+    width: 52px;
+    height: 52px;
+  }
+
+  .profile-avatar span {
+    font-size: 1rem;
+  }
+
+  .profile-info h2 {
+    font-size: 1rem;
+  }
+
+  .mini-stat strong {
+    font-size: 0.95rem;
+  }
+
+  .mini-stat {
+    min-width: 40px;
+  }
+
+  .profile-section {
+    padding: 0.8rem;
+  }
+
+  .profile-section .section-head h3 {
+    font-size: 0.9rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem;
+  }
+
+  .stat-card {
+    padding: 0.6rem;
+  }
+
+  .stat-card strong {
+    font-size: 1.1rem;
+  }
+
+  .achievements-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .achievement-card {
+    padding: 0.6rem;
+  }
+
+  .achievement-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 1.3rem;
+  }
+
+  .level-progress-item {
+    padding: 0.5rem 0.65rem;
+  }
+
+  .level-name {
+    font-size: 0.82rem;
+  }
+
+  .bio-counter {
+    font-size: 0.72rem;
+  }
+}
+
 /* ── Profile Page ── */
 .profile-header {
   display:flex;

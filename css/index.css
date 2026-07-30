@@ -1274,5 +1274,268 @@ h1, h2, h3 {
     bottom: 0.75rem;
     font-size: 0.7rem;
   }
+
+  .stats-strip {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+    padding: 0.8rem;
+  }
+
+  .stat-item strong {
+    font-size: 1.3rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero-highlights {
+    justify-content: center;
+  }
+
+  .topbar-landing {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .topbar-landing h1 {
+    font-size: 0.85rem;
+  }
+
+  .topbar-landing nav {
+    gap: 0.4rem;
+  }
+
+  .topbar-landing nav a {
+    font-size: 0.72rem;
+  }
+
+  .btn-nav {
+    padding: 0.3rem 0.7rem;
+    font-size: 0.7rem;
+  }
+
+  .gallery-grid-modern {
+    grid-auto-rows: 180px;
+    gap: 0.6rem;
+  }
+
+  .cta-strip {
+    padding: 1.2rem 0.8rem !important;
+  }
+
+  .cta-strip h2 {
+    font-size: 1.3rem;
+  }
+
+  .cta-strip p {
+    font-size: 0.85rem;
+  }
+
+  .split-section {
+    gap: 0.6rem;
+  }
+
+  .hero-copy-panel {
+    padding: 1.2rem;
+  }
+
+  .hero-copy-panel p {
+    font-size: 0.9rem;
+  }
+
+  .hero-panel {
+    padding: 0.7rem;
+  }
+
+  .hero-panel h3 {
+    font-size: 0.9rem;
+  }
+
+  .term-grid {
+    gap: 0.5rem;
+  }
+
+  .term-grid article {
+    padding: 0.55rem 0.65rem;
+  }
+
+  .audience-grid {
+    gap: 0.6rem;
+  }
+
+  .landing-section h2 {
+    font-size: 1.2rem;
+  }
+
+  .signal-strip {
+    gap: 0.5rem;
+    padding: 0.8rem;
+  }
+
+  .signal-item {
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .landing {
+    width: 96%;
+    margin-top: 0.5rem;
+    gap: 0.8rem;
+  }
+
+  .hero-copy-panel h1 {
+    font-size: clamp(1.4rem, 7vw, 1.8rem);
+  }
+
+  .hero-copy-panel {
+    padding: 0.8rem;
+  }
+
+  .hero-copy-panel p {
+    font-size: 0.82rem;
+  }
+
+  .hero-viewport {
+    min-height: 220px;
+  }
+
+  .stats-strip {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
+    padding: 0.6rem;
+  }
+
+  .stat-item {
+    padding: 0.4rem;
+  }
+
+  .stat-item strong {
+    font-size: 1.1rem;
+  }
+
+  .stat-item span {
+    font-size: 0.6rem;
+  }
+
+  .gallery-grid-modern {
+    grid-auto-rows: 150px;
+    gap: 0.4rem;
+  }
+
+  .gallery-overlay span {
+    font-size: 0.65rem;
+  }
+
+  .cta-strip {
+    padding: 1rem 0.6rem !important;
+  }
+
+  .cta-strip h2 {
+    font-size: 1.1rem;
+  }
+
+  .cta-strip p {
+    font-size: 0.78rem;
+  }
+
+  .hero-highlights {
+    gap: 0.3rem;
+  }
+
+  .hero-highlights .pill {
+    font-size: 0.72rem;
+    padding: 0.2rem 0.5rem;
+  }
+
+  .hero-actions {
+    gap: 0.4rem;
+  }
+
+  .hero-actions .btn {
+    font-size: 0.75rem;
+    padding: 0.45rem 0.8rem;
+  }
+
+  .topbar-landing {
+    padding: 0.4rem 0.5rem;
+  }
+
+  .topbar-landing h1 {
+    font-size: 0.78rem;
+  }
+
+  .topbar-landing nav a {
+    font-size: 0.68rem;
+  }
+
+  .btn-nav {
+    padding: 0.25rem 0.55rem;
+    font-size: 0.65rem;
+  }
+
+  .landing-section h2 {
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .term-grid {
+    gap: 0.35rem;
+  }
+
+  .term-grid article {
+    padding: 0.45rem 0.55rem;
+  }
+
+  .term-grid strong {
+    font-size: 0.82rem;
+  }
+
+  .term-grid span {
+    font-size: 0.78rem;
+  }
+
+  .split-section {
+    gap: 0.4rem;
+  }
+
+  .hero-panel {
+    padding: 0.55rem;
+  }
+
+  .hero-panel h3 {
+    font-size: 0.82rem;
+  }
+
+  .hero-points {
+    font-size: 0.78rem;
+  }
+
+  .audience-grid {
+    gap: 0.4rem;
+  }
+
+  .signal-strip {
+    gap: 0.35rem;
+    padding: 0.6rem;
+  }
+
+  .signal-item {
+    font-size: 0.72rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  .hero-slide figcaption {
+    left: 0.5rem;
+    bottom: 0.5rem;
+    font-size: 0.6rem;
+    padding: 0.25rem 0.5rem;
+  }
 }
    
