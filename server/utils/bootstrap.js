@@ -45,9 +45,9 @@ async function ensureUsers() {
   const forcePasswordChange = String(process.env.DEFAULT_ADMIN_FORCE_PASSWORD_CHANGE || 'true') !== 'false';
 
   if (adminUsername && adminPassword) {
+    const hashedAdmin = await hashPassword(adminPassword);
     const adminResult = await query('SELECT id FROM users WHERE LOWER(username) = $1 LIMIT 1', [adminUsername]);
     if (adminResult.rows.length === 0) {
-      const hashedAdmin = await hashPassword(adminPassword);
       await query(
         `INSERT INTO users (name, username, password, role, active, must_change_password)
          VALUES ($1, $2, $3, $4, $5, $6)`,
@@ -59,7 +59,12 @@ async function ensureUsers() {
         mustChangePassword: forcePasswordChange,
       });
     } else {
-      console.log(`[BOOTSTRAP] Admin user already exists (username=${adminUsername}), skipping`);
+      // Update password to ensure it matches the configured one
+      await query(
+        'UPDATE users SET password = $1, name = $2, role = $3, active = $4, must_change_password = $5 WHERE LOWER(username) = $6',
+        [hashedAdmin, adminName, 'admin', true, forcePasswordChange, adminUsername]
+      );
+      console.log(`[BOOTSTRAP] Admin user updated (username=${adminUsername})`);
     }
   } else {
     log.warn('Skipping default admin seed because credentials were not configured');
@@ -71,12 +76,12 @@ async function ensureUsers() {
   const userName = process.env.DEFAULT_USER_NAME || 'Usuario';
 
   if (userUsername && userPassword) {
+    const hashedUser = await hashPassword(userPassword);
     const userResult = await query(
       'SELECT id FROM users WHERE LOWER(username) = $1 LIMIT 1',
       [userUsername]
     );
     if (userResult.rows.length === 0) {
-      const hashedUser = await hashPassword(userPassword);
       await query(
         `INSERT INTO users (name, username, password, role, active, must_change_password)
          VALUES ($1, $2, $3, $4, $5, $6)`,
@@ -87,7 +92,12 @@ async function ensureUsers() {
         username: userUsername,
       });
     } else {
-      console.log(`[BOOTSTRAP] Standard user already exists (username=${userUsername}), skipping`);
+      // Update password to ensure it matches the configured one
+      await query(
+        'UPDATE users SET password = $1, name = $2, role = $3, active = $4 WHERE LOWER(username) = $5',
+        [hashedUser, userName, 'user', true, userUsername]
+      );
+      console.log(`[BOOTSTRAP] Standard user updated (username=${userUsername})`);
     }
   } else {
     log.warn('Skipping default user seed because credentials were not configured');
