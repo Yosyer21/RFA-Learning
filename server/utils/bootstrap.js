@@ -36,19 +36,17 @@ async function ensureConfig() {
 }
 
 async function ensureUsers() {
-  const result = await query('SELECT COUNT(*) FROM users');
-  const count = parseInt(result.rows[0].count, 10);
+  const isProduction = process.env.NODE_ENV === 'production';
 
-  if (count === 0) {
-    const isProduction = process.env.NODE_ENV === 'production';
+  // ── Admin user ──
+  const adminUsername = process.env.DEFAULT_ADMIN_USERNAME || (isProduction ? '' : 'admin');
+  const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD || (isProduction ? '' : 'Admin1234');
+  const adminName = process.env.DEFAULT_ADMIN_NAME || 'Admin';
+  const forcePasswordChange = String(process.env.DEFAULT_ADMIN_FORCE_PASSWORD_CHANGE || 'true') !== 'false';
 
-    // ── Admin user ──
-    const adminUsername = process.env.DEFAULT_ADMIN_USERNAME || (isProduction ? '' : 'admin');
-    const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD || (isProduction ? '' : 'Admin1234');
-    const adminName = process.env.DEFAULT_ADMIN_NAME || 'Admin';
-    const forcePasswordChange = String(process.env.DEFAULT_ADMIN_FORCE_PASSWORD_CHANGE || 'true') !== 'false';
-
-    if (adminUsername && adminPassword) {
+  if (adminUsername && adminPassword) {
+    const adminResult = await query('SELECT id FROM users WHERE role = $1 LIMIT 1', ['admin']);
+    if (adminResult.rows.length === 0) {
       const hashedAdmin = await hashPassword(adminPassword);
       await query(
         `INSERT INTO users (name, username, password, role, active, must_change_password)
@@ -60,15 +58,23 @@ async function ensureUsers() {
         mustChangePassword: forcePasswordChange,
       });
     } else {
-      log.warn('Skipping default admin seed because credentials were not configured');
+      log.debug('Admin user already exists, skipping');
     }
+  } else {
+    log.warn('Skipping default admin seed because credentials were not configured');
+  }
 
-    // ── Standard test user ──
-    const userUsername = process.env.DEFAULT_USER_USERNAME || (isProduction ? '' : 'user');
-    const userPassword = process.env.DEFAULT_USER_PASSWORD || (isProduction ? '' : 'User1234');
-    const userName = process.env.DEFAULT_USER_NAME || 'Usuario';
+  // ── Standard test user ──
+  const userUsername = process.env.DEFAULT_USER_USERNAME || (isProduction ? '' : 'user');
+  const userPassword = process.env.DEFAULT_USER_PASSWORD || (isProduction ? '' : 'User1234');
+  const userName = process.env.DEFAULT_USER_NAME || 'Usuario';
 
-    if (userUsername && userPassword) {
+  if (userUsername && userPassword) {
+    const userResult = await query(
+      'SELECT id FROM users WHERE LOWER(username) = $1 LIMIT 1',
+      [userUsername.toLowerCase()]
+    );
+    if (userResult.rows.length === 0) {
       const hashedUser = await hashPassword(userPassword);
       await query(
         `INSERT INTO users (name, username, password, role, active, must_change_password)
@@ -79,8 +85,10 @@ async function ensureUsers() {
         username: userUsername.toLowerCase(),
       });
     } else {
-      log.warn('Skipping default user seed because credentials were not configured');
+      log.debug('Standard user already exists, skipping');
     }
+  } else {
+    log.warn('Skipping default user seed because credentials were not configured');
   }
 }
 
