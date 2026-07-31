@@ -105,22 +105,29 @@ async function ensureUsers() {
 }
 
 async function ensureClasses() {
-  const result = await query('SELECT COUNT(*) FROM classes');
-  const count = parseInt(result.rows[0].count, 10);
+  const classesResult = await query('SELECT id, title, category, content FROM classes ORDER BY id');
+  const existingByTitle = {};
+  for (const row of classesResult.rows) {
+    existingByTitle[row.title] = row;
+  }
 
-  if (count === 0) {
-    for (const lesson of footballSeedClasses) {
-      const enriched = enrichLessonContent(lesson);
+  // Insertar clases nuevas que no existen por título
+  for (const lesson of footballSeedClasses) {
+    const enriched = enrichLessonContent(lesson);
+    const contentJson = JSON.stringify(enriched.content);
+
+    if (!existingByTitle[lesson.title]) {
       await query(
         `INSERT INTO classes (title, category, level, content)
          VALUES ($1, $2, $3, $4)`,
-        [enriched.title, enriched.category, enriched.level, JSON.stringify(enriched.content)]
+        [enriched.title, enriched.category, enriched.level, contentJson]
       );
+      console.log(`[BOOTSTRAP] Class created: ${enriched.title}`);
+      log.info('Seed class created', { title: enriched.title });
     }
-    return;
   }
 
-  const classesResult = await query('SELECT id, title, category, content FROM classes ORDER BY id');
+  // Actualizar contenido de clases existentes
   for (const row of classesResult.rows) {
     if (!Array.isArray(row.content) || row.content.length === 0) {
       continue;
@@ -140,6 +147,7 @@ async function ensureClasses() {
     }
   }
 }
+
 
 async function bootstrapDatabase() {
   await initDatabase();
