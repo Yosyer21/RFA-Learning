@@ -489,7 +489,10 @@ async function getHomeData(req, res) {
   const totalScore = parseInt(quizStats.total_score) || 0;
   const totalQuestions = parseInt(quizStats.total_questions) || 0;
   const accuracy = totalQuestions > 0 ? Math.round((totalScore / totalQuestions) * 100) : 0;
-  const streak = 0;
+
+  // Calculate real streak from quiz history (consecutive days with activity)
+  const streak = calculateStreak(lastQuizzesResult.rows);
+
 
   if (completedIds.length >= 1) achievements.push({ id: 'first_class', icon: 'FC', titleEs: 'Primera clase', titleEn: 'First Class', descEs: 'Completaste tu primera clase', descEn: 'You completed your first class', unlocked: true });
   if (completedIds.length >= 5) achievements.push({ id: 'five_classes', icon: '5C', titleEs: 'Estrella del aprendizaje', titleEn: 'Learning Star', descEs: 'Completaste 5 clases', descEn: 'You completed 5 classes', unlocked: true });
@@ -524,7 +527,7 @@ async function getHomeData(req, res) {
   const nextLevel = nextLevelIdx < levelOrder.length ? levelOrder[nextLevelIdx] : null;
 
   return res.json({
-    progress,
+    progress: { ...progress, streak },
     completedIds,
     totalClasses: allClasses.length,
     allClasses,
@@ -548,6 +551,87 @@ async function getHomeData(req, res) {
       completedInLevel: currentLevelDone,
     },
   });
+
+}
+
+// ── Streak calculation (consecutive days with quiz activity) ──
+function calculateStreak(quizzes) {
+  if (!Array.isArray(quizzes) || quizzes.length === 0) return 0;
+
+  // Collect unique dates (YYYY-MM-DD)
+  const dates = new Set();
+  quizzes.forEach((q) => {
+    const d = new Date(q.completedAt);
+    if (!Number.isNaN(d.getTime())) {
+      dates.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
+    }
+  });
+
+  const uniqueDates = Array.from(dates).sort().reverse();
+  if (uniqueDates.length === 0) return 0;
+
+  // Today and yesterday
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+
+  // Streak only counts if most recent activity is today or yesterday
+  if (uniqueDates[0] !== today && uniqueDates[0] !== yesterdayStr) return 0;
+
+  let streak = 1;
+  for (let i = 1; i < uniqueDates.length; i++) {
+    const prev = new Date(uniqueDates[i - 1]);
+    const curr = new Date(uniqueDates[i]);
+    const diffDays = Math.round((prev - curr) / (1000 * 60 * 60 * 24));
+    if (diffDays === 1) {
+      streak++;
+    } else {
+      break;
+    }
+  }
+
+  return streak;
+}
+
+// ── Spaced Repetition (SRS): suggest classes based on past mistakes ──
+async function getReviewSuggestions(req, res) {
+  const userId = req.user.id;
+
+  // Fetch all quiz answers for this user
+  const quizzesResult = await query(
+    `SELECT q.class_id AS "classId", q.answers, q.completed_at AS "completedAt"
+     FROM quizzes q WHERE q.user_id = $1 ORDER BY q.completed_at DESC`,
+    [userId]
+  );
+
+  // Count mistakes per class
+  const mistakesByClass = {};
+  quizzesResult.rows.forEach((quiz) => {
+    const answers = Array.isArray(quiz.answers) ? quiz.answers : [];
+    const wrongCount = answers.filter((a) => a && a.correct === false).length;
+    if (wrongCount > 0) {
+      mistakesByClass[quiz.classId] = (mistakesByClass[quiz.classId] || 0) + wrongCount;
+    }
+  });
+
+  // Fetch all classes
+  const classesResult = await query('SELECT * FROM classes ORDER BY id');
+  const allClasses = classesResult.rows;
+
+  // Build suggestions: classes with mistakes, sorted by mistake count desc
+  const suggestions = Object.entries(mistakesByClass)
+    .map(([classId, mistakes]) => {
+      const cls = allClasses.find((c) => c.id === Number(classId));
+      if (!cls) return null;
+      return { ...cls, mistakes };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.mistakes - a.mistakes)
+    .slice(0, 5);
+
+  return res.json({ suggestions });
 }
 
 module.exports = {
@@ -563,4 +647,7 @@ module.exports = {
   submitMultipleChoiceQuiz,
   getQuizHistory,
   getHomeData,
+  getReviewSuggestions,
 };
+
+

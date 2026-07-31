@@ -15,10 +15,19 @@ const toggleClassFormBtn = document.getElementById('toggle-class-form');
 const cancelUserFormBtn = document.getElementById('cancel-user-form');
 const cancelClassFormBtn = document.getElementById('cancel-class-form');
 const refreshStatsBtn = document.getElementById('refresh-stats');
+const usersRoleFilter = document.getElementById('users-role-filter');
+const usersActiveFilter = document.getElementById('users-active-filter');
+const usersSortBy = document.getElementById('users-sort-by');
+const usersSortOrder = document.getElementById('users-sort-order');
 let currentUsersPage = 1;
 let currentClassesPage = 1;
 let usersSearchTerm = '';
 let classesSearchTerm = '';
+let usersRoleFilterValue = '';
+let usersActiveFilterValue = '';
+let usersSortByValue = 'id';
+let usersSortOrderValue = 'asc';
+
 
 /* ── Sidebar Navigation with active state ── */
 function initSidebarNav() {
@@ -94,7 +103,29 @@ function initSearch() {
     classesSearchTerm = e.target.value.trim().toLowerCase();
     loadClasses(1);
   });
+
+  // Advanced user filters
+  usersRoleFilter?.addEventListener('change', (e) => {
+    usersRoleFilterValue = e.target.value;
+    loadUsers(1);
+  });
+
+  usersActiveFilter?.addEventListener('change', (e) => {
+    usersActiveFilterValue = e.target.value;
+    loadUsers(1);
+  });
+
+  usersSortBy?.addEventListener('change', (e) => {
+    usersSortByValue = e.target.value;
+    loadUsers(1);
+  });
+
+  usersSortOrder?.addEventListener('change', (e) => {
+    usersSortOrderValue = e.target.value;
+    loadUsers(1);
+  });
 }
+
 
 /* ── Refresh stats ── */
 function initRefresh() {
@@ -354,8 +385,13 @@ async function loadUsers(page = 1) {
   currentUsersPage = page;
   const query = new URLSearchParams({ page, limit: 20 });
   if (usersSearchTerm) query.set('search', usersSearchTerm);
+  if (usersRoleFilterValue) query.set('role', usersRoleFilterValue);
+  if (usersActiveFilterValue) query.set('active', usersActiveFilterValue);
+  if (usersSortByValue) query.set('sortBy', usersSortByValue);
+  if (usersSortOrderValue) query.set('sortOrder', usersSortOrderValue);
   const result = await apiJson(`/api/users?${query.toString()}`);
   if (!result) return;
+
 
   const { data: users, pagination } = result.data;
   usersList.innerHTML = users.map(userRow).join('');

@@ -13,7 +13,9 @@ const {
   submitMultipleChoiceQuiz,
   getQuizHistory,
   getHomeData,
+  getReviewSuggestions,
 } = require('../controllers/class.controller');
+
 const { requireRole } = require('../middleware/role.middleware');
 const { asyncHandler } = require('../middleware/error.middleware');
 const { validate, createClassSchema, updateClassSchema, progressSchema } = require('../utils/validators');
@@ -30,6 +32,8 @@ router.post('/quiz', asyncHandler(submitQuiz));
 router.post('/quiz/multiple-choice', asyncHandler(submitMultipleChoiceQuiz));
 router.get('/quiz/history', asyncHandler(getQuizHistory));
 router.get('/home-data', asyncHandler(getHomeData));
+router.get('/review-suggestions', asyncHandler(getReviewSuggestions));
+
 
 router.post('/', requireRole('admin'), validate(createClassSchema), asyncHandler(createClass));
 router.put('/:id', requireRole('admin'), validate(updateClassSchema), asyncHandler(updateClass));

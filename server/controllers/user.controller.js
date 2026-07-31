@@ -11,30 +11,51 @@ function mapUser(row) {
     role: row.role,
     active: row.active,
     mustChangePassword: row.must_change_password,
+    createdAt: row.created_at,
   };
 }
 
+
 async function getUsers(req, res) {
-  const { page, limit, search } = req.query;
+  const { page, limit, search, role, active, sortBy, sortOrder } = req.query;
   const pageNum = Math.max(1, parseInt(page) || 1);
   const pageSize = Math.min(100, Math.max(1, parseInt(limit) || 50));
   const offset = (pageNum - 1) * pageSize;
 
-  let whereSql = '';
+  const conditions = [];
   const params = [];
   let paramIndex = 1;
 
   if (search) {
-    whereSql = ` WHERE (LOWER(name) LIKE $${paramIndex} OR LOWER(username) LIKE $${paramIndex})`;
+    conditions.push(`(LOWER(name) LIKE $${paramIndex} OR LOWER(username) LIKE $${paramIndex})`);
     params.push(`%${search.toLowerCase()}%`);
     paramIndex++;
   }
+
+  if (role && ['admin', 'student'].includes(role)) {
+    conditions.push(`role = $${paramIndex}`);
+    params.push(role);
+    paramIndex++;
+  }
+
+  if (active === 'true' || active === 'false') {
+    conditions.push(`active = $${paramIndex}`);
+    params.push(active === 'true');
+    paramIndex++;
+  }
+
+  const whereSql = conditions.length > 0 ? ` WHERE ${conditions.join(' AND ')}` : '';
+
+  // Sorting (whitelist to prevent SQL injection)
+  const allowedSort = ['id', 'name', 'username', 'role', 'active', 'created_at'];
+  const sortColumn = allowedSort.includes(sortBy) ? sortBy : 'id';
+  const sortDir = sortOrder === 'desc' ? 'DESC' : 'ASC';
 
   const countResult = await query(`SELECT COUNT(*) FROM users${whereSql}`, params);
   const total = parseInt(countResult.rows[0].count, 10);
 
   const result = await query(
-    `SELECT id, name, username, role, active, must_change_password FROM users${whereSql} ORDER BY id LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`,
+    `SELECT id, name, username, role, active, must_change_password, created_at FROM users${whereSql} ORDER BY ${sortColumn} ${sortDir} LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`,
     [...params, pageSize, offset]
   );
 
@@ -43,6 +64,7 @@ async function getUsers(req, res) {
     pagination: { page: pageNum, limit: pageSize, total, pages: Math.ceil(total / pageSize) },
   });
 }
+
 
 
 async function createUser(req, res) {

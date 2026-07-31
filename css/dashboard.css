@@ -226,7 +226,39 @@
   padding-left: 2.3rem;
 }
 
+/* ── Advanced Filters ── */
+.dashboard-filters {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  padding: 0.7rem;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface-2) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 20%, transparent);
+}
+
+.dashboard-filters select {
+  flex: 1;
+  min-width: 140px;
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--border) 40%, transparent);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.dashboard-filters select:hover,
+.dashboard-filters select:focus {
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+  outline: none;
+}
+
 /* ── Create Forms ── */
+
 .create-form {
   border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
   border-radius: 12px;

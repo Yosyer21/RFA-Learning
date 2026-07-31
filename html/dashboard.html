@@ -106,6 +106,32 @@
           </button>
         </div>
 
+        <div class="dashboard-filters">
+          <select id="users-role-filter" aria-label="Filtrar por rol">
+            <option value="">Todos los roles</option>
+            <option value="student" data-i18n="dashboard.roleStudent">Estudiante</option>
+            <option value="admin" data-i18n="dashboard.roleAdmin">Admin</option>
+          </select>
+          <select id="users-active-filter" aria-label="Filtrar por estado">
+            <option value="">Todos los estados</option>
+            <option value="true" data-i18n="dashboard.active">Activo</option>
+            <option value="false" data-i18n="dashboard.inactive">Inactivo</option>
+          </select>
+          <select id="users-sort-by" aria-label="Ordenar por">
+            <option value="id">ID</option>
+            <option value="name">Nombre</option>
+            <option value="username">Usuario</option>
+            <option value="role">Rol</option>
+            <option value="active">Estado</option>
+            <option value="created_at">Fecha de creación</option>
+          </select>
+          <select id="users-sort-order" aria-label="Dirección de orden">
+            <option value="asc">Ascendente</option>
+            <option value="desc">Descendente</option>
+          </select>
+        </div>
+
+
         <form id="create-user-form" class="form-inline create-form hidden">
           <input name="name" placeholder="Nombre" data-i18n-placeholder="dashboard.namePlaceholder" required>
           <input name="username" placeholder="Usuario" data-i18n-placeholder="dashboard.usernamePlaceholder" required>

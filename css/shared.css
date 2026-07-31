@@ -50,6 +50,11 @@
   transform: translateX(100%);
 }
 
+.toast.toast-in {
+  animation: toastIn 0.35s ease;
+}
+
+
 .toast-success { border-left: 4px solid var(--success); }
 .toast-error { border-left: 4px solid var(--danger); }
 .toast-info { border-left: 4px solid var(--accent); }

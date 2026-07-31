@@ -27,9 +27,34 @@ const TOAST_ICONS = {
   warning: '⚠',
 };
 
+// Toast queue system for better UX
+const toastQueue = [];
+let toastProcessing = false;
+const MAX_TOASTS = 4;
+
 function showToast(message, type = 'info', duration = 4000) {
+  toastQueue.push({ message, type, duration });
+  processToastQueue();
+}
+
+function processToastQueue() {
+  if (toastProcessing) return;
+  if (toastQueue.length === 0) return;
+
+  toastProcessing = true;
+  const { message, type, duration } = toastQueue.shift();
+
+  // Limit concurrent toasts
+  const currentToasts = toastContainer.querySelectorAll('.toast').length;
+  if (currentToasts >= MAX_TOASTS) {
+    const oldest = toastContainer.querySelector('.toast');
+    if (oldest) removeToast(oldest);
+  }
+
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
+  toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
+
   const icon = document.createElement('span');
   icon.className = 'toast-icon';
   icon.textContent = TOAST_ICONS[type] || '';
@@ -45,18 +70,34 @@ function showToast(message, type = 'info', duration = 4000) {
 
   toast.append(icon, text, close);
 
-  close.addEventListener('click', () => removeToast(toast));
+  close.addEventListener('click', () => {
+    removeToast(toast);
+    processToastQueue();
+  });
+
   toastContainer.appendChild(toast);
 
+  // Animate in
+  requestAnimationFrame(() => toast.classList.add('toast-in'));
+
   if (duration > 0) {
-    setTimeout(() => removeToast(toast), duration);
+    setTimeout(() => {
+      removeToast(toast);
+      processToastQueue();
+    }, duration);
+  } else {
+    // If duration is 0, still process next after a short delay
+    setTimeout(() => processToastQueue(), 100);
   }
 }
 
 function removeToast(toast) {
+  if (toast.dataset.removing) return;
+  toast.dataset.removing = 'true';
   toast.classList.add('toast-out');
   setTimeout(() => toast.remove(), 300);
 }
+
 
 // ── Loading Spinner ──
 let spinnerCount = 0;
