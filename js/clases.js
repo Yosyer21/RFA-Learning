@@ -369,7 +369,7 @@ function getClassDescription(lesson) {
   return CATEGORY_DESCRIPTIONS[lesson.category] || `${getTermCount(lesson)} términos para dominar`;
 }
 
-function renderClassCard(lesson) {
+function renderClassCard(lesson, masteryData) {
   const classTitle = translateClassTitle(lesson.title);
   const classCategory = translateClassCategory(lesson.category);
   const classLevel = translateClassLevel(lesson.level);
@@ -381,6 +381,24 @@ function renderClassCard(lesson) {
 
   const starSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
   const starOutlineSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+
+  // Mastery progress bar
+  let masteryHtml = '';
+  if (masteryData && masteryData[lesson.id] !== undefined) {
+    const pct = Math.min(100, Math.max(0, masteryData[lesson.id]));
+    const statusClass = pct >= 100 ? 'mastered' : (pct > 0 ? 'in-progress' : '');
+    const statusText = pct >= 100 ? t('classes.progressMastered') : (pct > 0 ? t('classes.progressInProgress') : t('classes.progressNotStarted'));
+    masteryHtml = `
+      <div class="class-mastery-bar">
+        <div class="class-mastery-track">
+          <div class="class-mastery-fill" style="width:${pct}%"></div>
+        </div>
+        <div class="class-mastery-label">
+          <span>${t('classes.progressLabel')}</span>
+          <span class="mastery-status ${statusClass}">${statusText} · ${pct}%</span>
+        </div>
+      </div>`;
+  }
 
   return `
     <article class="class-card-modern" data-class-id="${lesson.id}">
@@ -394,6 +412,7 @@ function renderClassCard(lesson) {
         <h3>${escapeHtml(classTitle)}</h3>
         <span class="class-card-category">${categoryIcon} ${escapeHtml(classCategory)}</span>
         <p class="class-card-desc">${escapeHtml(desc)}</p>
+        ${masteryHtml}
       </div>
       <div class="class-card-footer">
         <span class="class-terms-count">
@@ -406,6 +425,27 @@ function renderClassCard(lesson) {
           </button>
           <button class="btn-modern btn-modern-primary quiz-btn" data-class-id="${lesson.id}" type="button">
             ${t('classes.takeQuiz')}
+          </button>
+        </div>
+      </div>
+      <div class="practice-mode-bar">
+        <span class="practice-mode-label">${t('classes.modeLabel')}</span>
+        <div class="practice-mode-buttons">
+          <button class="practice-mode-btn" type="button" data-study-mode="${lesson.id}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            ${t('classes.studyMode')}
+          </button>
+          <button class="practice-mode-btn" type="button" data-flashcards-mode="${lesson.id}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+            ${t('classes.flashcardsMode')}
+          </button>
+          <button class="practice-mode-btn" type="button" data-writing-mode="${lesson.id}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            ${t('classes.writingMode')}
+          </button>
+          <button class="practice-mode-btn" type="button" data-quiz-mode="${lesson.id}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            ${t('classes.quizMode')}
           </button>
         </div>
       </div>
@@ -480,9 +520,10 @@ async function loadClasses(page = 1) {
   if (currentLevelFilter) params.set('level', currentLevelFilter);
 
   showLoading();
-  const [result, progressResult] = await Promise.all([
+  const [result, progressResult, quizHistoryResult] = await Promise.all([
     apiJson(`/api/classes?${params}`),
     apiJson('/api/classes/progress'),
+    apiJson('/api/classes/quiz/history'),
   ]);
   hideLoading();
 
@@ -490,6 +531,7 @@ async function loadClasses(page = 1) {
 
   const { data: classes, pagination } = result.data;
   const progress = progressResult?.data || {};
+  const quizHistory = Array.isArray(quizHistoryResult?.data) ? quizHistoryResult.data : [];
   const container = document.getElementById('classes-container');
   const completedIds = getCompletedClassIds(progress);
   const favoriteIds = getFavoriteIds();
@@ -500,8 +542,11 @@ async function loadClasses(page = 1) {
   document.getElementById('hero-favorites').textContent = favoriteIds.length;
 
   renderClassFilters(category);
-  container.innerHTML = classes.map(renderClassCard).join('');
+  // Compute mastery data from progress + quiz history
+  const masteryData = computeMasteryData(progress, classes, quizHistory);
+  container.innerHTML = classes.map((lesson) => renderClassCard(lesson, masteryData)).join('');
   renderClassHighlights(classes, progress);
+  renderReviewSuggestions(classes, quizHistory);
   syncSpeechModeSelector();
 
   // Quiz buttons
@@ -516,6 +561,38 @@ async function loadClasses(page = 1) {
       const nowFavorite = toggleFavoriteClass(classId);
       showToast(nowFavorite ? t('classes.favoriteAdded') : t('classes.favoriteRemoved'), nowFavorite ? 'success' : 'info');
       loadClasses(currentClassesPage);
+    });
+  });
+
+  // Practice mode buttons
+  container.querySelectorAll('[data-study-mode]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const classId = Number(btn.dataset.studyMode);
+      const lesson = classes.find((c) => c.id === classId);
+      if (lesson) showStudyView(lesson, classes);
+    });
+  });
+
+  container.querySelectorAll('[data-flashcards-mode]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const classId = Number(btn.dataset.flashcardsMode);
+      const lesson = classes.find((c) => c.id === classId);
+      if (lesson) openFlashcards(lesson);
+    });
+  });
+
+  container.querySelectorAll('[data-writing-mode]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const classId = Number(btn.dataset.writingMode);
+      const lesson = classes.find((c) => c.id === classId);
+      if (lesson) openWritingPractice(lesson);
+    });
+  });
+
+  container.querySelectorAll('[data-quiz-mode]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const classId = Number(btn.dataset.quizMode);
+      startQuiz(classId, classes);
     });
   });
 
@@ -881,6 +958,328 @@ function startQuiz(classId, classes, options = {}) {
   overlay.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') overlay.remove();
   });
+}
+
+// ── Mastery Data Computation ──
+function computeMasteryData(progress, classes, quizHistory) {
+  const mastery = {};
+  if (!progress) return mastery;
+
+  // Extract quiz history / attempts per class
+  const attempts = Array.isArray(quizHistory) && quizHistory.length
+    ? quizHistory
+    : Array.isArray(progress.quizHistory) ? progress.quizHistory
+    : Array.isArray(progress.attempts) ? progress.attempts
+    : Array.isArray(progress.quizzes) ? progress.quizzes
+    : [];
+
+  // Build a map of classId -> best percentage
+  const bestByClass = {};
+  attempts.forEach((entry) => {
+    const classId = Number(entry.classId ?? entry.class_id ?? entry.class ?? entry.lessonId);
+    if (!Number.isFinite(classId)) return;
+    // quizHistory entries have score & total; compute percentage
+    const total = Number(entry.total);
+    const score = Number(entry.score);
+    let pct = Number(entry.percentage ?? entry.scorePct);
+    if (!Number.isFinite(pct) && Number.isFinite(total) && total > 0 && Number.isFinite(score)) {
+      pct = Math.round((score / total) * 100);
+    }
+    if (!Number.isFinite(pct)) return;
+    const normalized = Math.min(100, Math.max(0, pct));
+    if (!bestByClass[classId] || normalized > bestByClass[classId]) {
+      bestByClass[classId] = normalized;
+    }
+  });
+
+  // Also consider completed classes as 100%
+  const completedIds = getCompletedClassIds(progress);
+  completedIds.forEach((id) => {
+    if (!bestByClass[id] || bestByClass[id] < 100) bestByClass[id] = 100;
+  });
+
+  // Map to lesson ids present in current view
+  classes.forEach((lesson) => {
+    if (bestByClass[lesson.id] !== undefined) {
+      mastery[lesson.id] = bestByClass[lesson.id];
+    }
+  });
+
+  return mastery;
+}
+
+// ── Review Suggestions (SRS) ──
+function renderReviewSuggestions(classes, quizHistory) {
+  const container = document.getElementById('classes-suggestions');
+  if (!container) return;
+
+  // Determine classes with mistakes (below 70% or failed attempts)
+  const suggestions = [];
+  const attempts = Array.isArray(quizHistory) ? quizHistory : [];
+
+  const mistakeCountByClass = {};
+  attempts.forEach((entry) => {
+    const classId = Number(entry.classId ?? entry.class_id ?? entry.class ?? entry.lessonId);
+    if (!Number.isFinite(classId)) return;
+    const total = Number(entry.total);
+    const score = Number(entry.score);
+    let pct = Number(entry.percentage ?? entry.scorePct);
+    if (!Number.isFinite(pct) && Number.isFinite(total) && total > 0 && Number.isFinite(score)) {
+      pct = Math.round((score / total) * 100);
+    }
+    if (!Number.isFinite(pct)) return;
+    if (pct < 70) {
+      mistakeCountByClass[classId] = (mistakeCountByClass[classId] || 0) + 1;
+    }
+  });
+
+  classes.forEach((lesson) => {
+    const mistakes = mistakeCountByClass[lesson.id] || 0;
+    if (mistakes > 0) {
+      suggestions.push({ lesson, mistakes });
+    }
+  });
+
+  // Sort by most mistakes first
+  suggestions.sort((a, b) => b.mistakes - a.mistakes);
+
+  if (suggestions.length === 0) {
+    container.innerHTML = `
+      <div class="suggestions-empty">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        ${t('classes.suggestionsEmpty')}
+      </div>`;
+    return;
+  }
+
+  const warningIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+
+  container.innerHTML = `
+    <div class="section-head">
+      <span class="kicker">${t('classes.suggestionsTitle')}</span>
+      <h3>${t('classes.suggestionsSubtitle')}</h3>
+    </div>
+    <div class="suggestions-modern-grid">
+      ${suggestions.map(({ lesson, mistakes }) => `
+        <div class="suggestion-card-modern" data-suggestion-class="${lesson.id}">
+          <span class="suggestion-card-icon">${warningIcon}</span>
+          <div class="suggestion-card-body">
+            <h4>${escapeHtml(translateClassTitle(lesson.title))}</h4>
+            <p>${t('classes.suggestionsMistakes', mistakes)}</p>
+          </div>
+          <div class="suggestion-card-actions">
+            <button class="btn-modern btn-modern-primary" type="button" data-review-class="${lesson.id}">${t('classes.suggestionsReview')}</button>
+          </div>
+        </div>`).join('')}
+    </div>`;
+
+  container.querySelectorAll('[data-review-class]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const classId = Number(btn.dataset.reviewClass);
+      const lesson = classes.find((c) => c.id === classId);
+      if (lesson) {
+        // Open flashcards for review
+        openFlashcards(lesson);
+      }
+    });
+  });
+}
+
+// ── Flashcards Mode ──
+function openFlashcards(lesson) {
+  const terms = lesson.content || [];
+  if (!terms.length) {
+    showToast(t('classes.noQuizContent'), 'warning');
+    return;
+  }
+
+  const classTitle = translateClassTitle(lesson.title);
+  const currentLang = getCurrentLang();
+  const shuffled = shuffleArray(terms);
+  let currentIndex = 0;
+  let knownCount = 0;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'quiz-overlay';
+  overlay.innerHTML = `
+    <div class="flashcard-modal" role="dialog" aria-label="${escapeHtml(classTitle)}">
+      <h2>${t('classes.flashcardsTitle')}</h2>
+      <p class="flashcard-counter">${t('classes.flashcardsCard', 1, shuffled.length)}</p>
+      <div class="flashcard-card" id="flashcard-card">
+        <div class="flashcard-inner">
+          <div class="flashcard-face flashcard-face-front">
+            <span id="flashcard-spanish">${escapeHtml(shuffled[0].spanish)}</span>
+          </div>
+          <div class="flashcard-face flashcard-face-back">
+            <span class="flashcard-english" id="flashcard-english">${escapeHtml(shuffled[0].english)}</span>
+            <span class="flashcard-example" id="flashcard-example">${escapeHtml(buildExamplePair(lesson, shuffled[0])[currentLang === 'en' ? 'english' : 'spanish'])}</span>
+          </div>
+        </div>
+      </div>
+      <p class="flashcard-hint">${t('classes.flashcardsFlip')}</p>
+      <div class="flashcard-actions">
+        <button class="btn-modern btn-modern-ghost" type="button" id="flashcard-known">${t('classes.flashcardsKnown')}</button>
+        <button class="btn-modern btn-modern-primary" type="button" id="flashcard-unknown">${t('classes.flashcardsUnknown')}</button>
+      </div>
+      <div class="flashcard-nav">
+        <button class="btn-modern btn-modern-ghost" type="button" id="flashcard-prev">${t('classes.flashcardsPrev')}</button>
+        <button class="btn-modern btn-modern-ghost" type="button" id="flashcard-next">${t('classes.flashcardsNext')}</button>
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+
+  const card = overlay.querySelector('#flashcard-card');
+  const spanishEl = overlay.querySelector('#flashcard-spanish');
+  const englishEl = overlay.querySelector('#flashcard-english');
+  const exampleEl = overlay.querySelector('#flashcard-example');
+  const counterEl = overlay.querySelector('.flashcard-counter');
+
+  function renderCard() {
+    const term = shuffled[currentIndex];
+    spanishEl.textContent = term.spanish;
+    englishEl.textContent = term.english;
+    exampleEl.textContent = buildExamplePair(lesson, term)[currentLang === 'en' ? 'english' : 'spanish'];
+    counterEl.textContent = t('classes.flashcardsCard', currentIndex + 1, shuffled.length);
+    card.classList.remove('flipped');
+  }
+
+  function showDone() {
+    overlay.querySelector('.flashcard-modal').innerHTML = `
+      <div class="flashcard-done">
+        <h3>${t('classes.flashcardsDone')}</h3>
+        <p>${t('classes.flashcardsKnown')}: ${knownCount} / ${shuffled.length}</p>
+        <button class="btn-modern btn-modern-primary" type="button" id="flashcard-close">${t('ui.close')}</button>
+      </div>`;
+    overlay.querySelector('#flashcard-close').addEventListener('click', () => overlay.remove());
+  }
+
+  card.addEventListener('click', () => card.classList.toggle('flipped'));
+
+  overlay.querySelector('#flashcard-known').addEventListener('click', () => {
+    knownCount++;
+    if (currentIndex < shuffled.length - 1) {
+      currentIndex++;
+      renderCard();
+    } else {
+      showDone();
+    }
+  });
+
+  overlay.querySelector('#flashcard-unknown').addEventListener('click', () => {
+    if (currentIndex < shuffled.length - 1) {
+      currentIndex++;
+      renderCard();
+    } else {
+      showDone();
+    }
+  });
+
+  overlay.querySelector('#flashcard-prev').addEventListener('click', () => {
+    if (currentIndex > 0) {
+      currentIndex--;
+      renderCard();
+    }
+  });
+
+  overlay.querySelector('#flashcard-next').addEventListener('click', () => {
+    if (currentIndex < shuffled.length - 1) {
+      currentIndex++;
+      renderCard();
+    }
+  });
+
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+  overlay.addEventListener('keydown', (e) => { if (e.key === 'Escape') overlay.remove(); });
+}
+
+// ── Writing Practice Mode ──
+function openWritingPractice(lesson) {
+  const terms = lesson.content || [];
+  if (!terms.length) {
+    showToast(t('classes.noQuizContent'), 'warning');
+    return;
+  }
+
+  const classTitle = translateClassTitle(lesson.title);
+  const shuffled = shuffleArray(terms);
+  let currentIndex = 0;
+  let score = 0;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'quiz-overlay';
+  overlay.innerHTML = `
+    <div class="writing-modal" role="dialog" aria-label="${escapeHtml(classTitle)}">
+      <h2>${t('classes.writingTitle')}</h2>
+      <p class="writing-counter">${t('classes.flashcardsCard', 1, shuffled.length)}</p>
+      <div class="writing-term-display">
+        <span class="writing-term-text" id="writing-term">${escapeHtml(shuffled[0].spanish)}</span>
+      </div>
+      <div class="writing-input-wrap">
+        <input type="text" id="writing-input" placeholder="${t('classes.writingPlaceholder')}" autocomplete="off">
+      </div>
+      <div id="writing-feedback"></div>
+      <div class="writing-actions">
+        <span class="writing-score" id="writing-score">${t('classes.writingScore', 0, shuffled.length)}</span>
+        <button class="btn-modern btn-modern-primary" type="button" id="writing-check">${t('classes.writingCheck')}</button>
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+
+  const termEl = overlay.querySelector('#writing-term');
+  const inputEl = overlay.querySelector('#writing-input');
+  const feedbackEl = overlay.querySelector('#writing-feedback');
+  const scoreEl = overlay.querySelector('#writing-score');
+  const checkBtn = overlay.querySelector('#writing-check');
+
+  function renderTerm() {
+    termEl.textContent = shuffled[currentIndex].spanish;
+    inputEl.value = '';
+    inputEl.focus();
+    feedbackEl.innerHTML = '';
+    overlay.querySelector('.writing-counter').textContent = t('classes.flashcardsCard', currentIndex + 1, shuffled.length);
+    scoreEl.textContent = t('classes.writingScore', score, shuffled.length);
+  }
+
+  function showDone() {
+    overlay.querySelector('.writing-modal').innerHTML = `
+      <div class="writing-done">
+        <h3>${t('classes.writingDone')}</h3>
+        <p>${t('classes.writingScore', score, shuffled.length)}</p>
+        <button class="btn-modern btn-modern-primary" type="button" id="writing-close">${t('ui.close')}</button>
+      </div>`;
+    overlay.querySelector('#writing-close').addEventListener('click', () => overlay.remove());
+  }
+
+  function checkAnswer() {
+    const answer = inputEl.value.trim().toLowerCase();
+    const correct = String(shuffled[currentIndex].english || '').trim().toLowerCase();
+    const isCorrect = answer === correct;
+
+    if (isCorrect) score++;
+
+    feedbackEl.innerHTML = isCorrect
+      ? `<div class="writing-feedback correct">${t('classes.writingCorrect')}</div>`
+      : `<div class="writing-feedback incorrect">${t('classes.writingIncorrect', escapeHtml(shuffled[currentIndex].english))}</div>`;
+
+    scoreEl.textContent = t('classes.writingScore', score, shuffled.length);
+
+    setTimeout(() => {
+      if (currentIndex < shuffled.length - 1) {
+        currentIndex++;
+        renderTerm();
+      } else {
+        showDone();
+      }
+    }, 1200);
+  }
+
+  checkBtn.addEventListener('click', checkAnswer);
+  inputEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') checkAnswer(); });
+
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+  overlay.addEventListener('keydown', (e) => { if (e.key === 'Escape') overlay.remove(); });
 }
 
 // ── Level Tabs ──
