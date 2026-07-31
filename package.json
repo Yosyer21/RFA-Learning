@@ -6,8 +6,16 @@
     "scripts": {
         "start": "node server/app.js",
         "dev": "node --watch server/app.js",
-        "test": "jest --verbose"
+        "test": "jest --verbose",
+        "test:silent": "jest --silent",
+        "context": "node scripts/context.js",
+        "index:functions": "node scripts/index-functions.js",
+        "seed:railway": "node scripts/seed-classes-railway.js",
+        "seed:users": "node scripts/seed-users-railway.js",
+        "deploy": "git push origin master"
+
     },
+
     "keywords": [],
     "author": "",
     "license": "ISC",

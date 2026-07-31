@@ -2,6 +2,8 @@
 
 Plataforma web para aprender lenguaje del futbol en ingles y espanol.
 
+> **Para agentes de IA**: lee primero [`AGENTS.md`](./AGENTS.md) — contiene el contexto completo del proyecto para trabajar sin explorar archivos innecesariamente (ahorra tokens).
+
 ## Stack
 - Node.js + Express
 - PostgreSQL + `pg`
@@ -14,17 +16,26 @@ Plataforma web para aprender lenguaje del futbol en ingles y espanol.
 ## Estructura
 - `html/`: vistas
 - `js/`: scripts por vista
-- `css/style.css`: estilos globales
+- `css/`: estilos (base, modern, shared, por vista)
 - `Database/`: ejemplos y datos de referencia
 - `server/`: backend modular (routes/controllers/middleware/utils)
+- `scripts/`: utilidades (seed, context)
+- `tests/`: suite de tests (Jest + Supertest)
 
-## Ejecutar
+## Comandos
 ```bash
-npm install
-npm run start
+npm install          # Instalar dependencias
+npm run dev          # Servidor en desarrollo (puerto 3000, DB embebida pg-mem)
+npm start            # Servidor en producción (requiere DATABASE_URL)
+npm test             # Suite de tests
+npm run context      # Resumen del estado del proyecto (estructura, git, Railway)
+npm run seed:railway # Sincroniza clases en BD de Railway
+npm run seed:users   # Crea/verifica usuarios en BD de Railway
+npm run deploy       # Despliega a Railway (push a master)
 ```
 
 Abrir `http://localhost:3000`.
+
 
 Si no defines `DATABASE_URL`, la app usa una base embebida para desarrollo local. Eso permite iniciar el proyecto sin tener PostgreSQL instalado.
 Si quieres usar un archivo `.env`, copia `.env.example` a `.env` y ajusta los valores necesarios. En Railway, el proyecto está creado como `RFA-Learning`.
