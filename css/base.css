@@ -14,6 +14,7 @@
   --border: rgba(111, 160, 255, 0.28);
   --glow: 0 8px 32px rgba(23, 80, 199, 0.2);
   --shadow-strong: 0 14px 35px rgba(6, 14, 32, 0.45);
+  --bg-gradient: linear-gradient(180deg, #040810 0%, #071020 40%, #0a1830 100%);
 }
 
 :root[data-theme='light'] {
@@ -31,6 +32,7 @@
   --border: rgba(63, 106, 190, 0.26);
   --glow: 0 8px 24px rgba(80, 124, 206, 0.15);
   --shadow-strong: 0 14px 28px rgba(94, 127, 184, 0.24);
+  --bg-gradient: linear-gradient(180deg, #eef4ff 0%, #e3edff 40%, #d6e4ff 100%);
 }
 
 * {
@@ -47,7 +49,7 @@ body {
     radial-gradient(ellipse 80% 60% at 10% 12%, color-mix(in srgb, var(--accent) 14%, transparent), transparent),
     radial-gradient(ellipse 70% 50% at 90% 8%, color-mix(in srgb, var(--primary) 18%, transparent), transparent),
     radial-gradient(ellipse 50% 40% at 50% 90%, color-mix(in srgb, var(--primary) 8%, transparent), transparent),
-    linear-gradient(180deg, #040810 0%, #071020 40%, #0a1830 100%);
+    var(--bg-gradient);
 }
 
 body::before {

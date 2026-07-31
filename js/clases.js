@@ -70,7 +70,11 @@ function getFavoriteIds() {
 
 function getSpeechMode() {
   const saved = localStorage.getItem(SPEECH_MODE_KEY);
-  return saved === 'es' ? 'es' : 'en';
+  if (saved === 'es' || saved === 'en') return saved;
+  // Fallback: read voice preference saved from profile (rfa-voice: 'english'/'spanish')
+  const profileVoice = localStorage.getItem('rfa-voice');
+  if (profileVoice === 'spanish') return 'es';
+  return 'en';
 }
 
 function getSavedClassFilters() {
@@ -506,6 +510,20 @@ async function loadClasses(page = 1) {
   const meResult = await apiJson('/api/auth/me');
   if (!meResult) return;
   currentUser = meResult.data.user;
+
+  // Sync speech mode with profile voice preference (preferredVoice: 'english'/'spanish')
+  if (currentUser.preferredVoice) {
+    const profileMode = currentUser.preferredVoice === 'spanish' ? 'es' : 'en';
+    if (!localStorage.getItem(SPEECH_MODE_KEY)) {
+      localStorage.setItem(SPEECH_MODE_KEY, profileMode);
+    }
+    localStorage.setItem('rfa-voice', currentUser.preferredVoice);
+  }
+
+  // Apply theme from server preference (overrides localStorage default)
+  if (currentUser.preferredTheme && typeof window.applyThemeFromServer === 'function') {
+    window.applyThemeFromServer(currentUser.preferredTheme);
+  }
 
   if (currentUser.role === 'admin') {
     document.getElementById('dashboard-link').classList.remove('hidden');
@@ -1307,7 +1325,9 @@ document.getElementById('filter-category')?.addEventListener('change', () => {
 });
 
 document.getElementById('speech-language')?.addEventListener('change', (event) => {
-  setSpeechMode(event.target.value);
+  const mode = setSpeechMode(event.target.value);
+  // Keep profile voice preference in sync (rfa-voice: 'english'/'spanish')
+  localStorage.setItem('rfa-voice', mode === 'es' ? 'spanish' : 'english');
   showToast(t('classes.voiceSaved'), 'success');
 });
 

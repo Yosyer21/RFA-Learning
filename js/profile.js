@@ -51,6 +51,15 @@ async function loadProfile() {
   document.getElementById('preferred-voice').value = currentUser.preferredVoice || 'english';
   document.getElementById('preferred-theme').value = currentUser.preferredTheme || 'dark';
 
+  // Apply saved theme from server (overrides localStorage default)
+  if (currentUser.preferredTheme && typeof window.applyThemeFromServer === 'function') {
+    window.applyThemeFromServer(currentUser.preferredTheme);
+  }
+  // Sync voice preference to localStorage for classes page
+  if (currentUser.preferredVoice) {
+    localStorage.setItem('rfa-voice', currentUser.preferredVoice);
+  }
+
   // Load quiz history + stats
   const [historyResult, homeDataResult] = await Promise.all([
     apiJson('/api/classes/quiz/history'),
@@ -475,13 +484,12 @@ document.getElementById('save-preferences-btn')?.addEventListener('click', async
   if (result?.ok) {
     showToast(t('profile.preferencesSaved'), 'success');
 
-    // Apply theme immediately
-    if (preferredTheme === 'light') {
-      document.body.classList.add('light-mode');
-      document.documentElement.classList.add('light-mode');
+    // Apply theme immediately (consistent with theme.js)
+    if (typeof window.applyThemeFromServer === 'function') {
+      window.applyThemeFromServer(preferredTheme);
     } else {
-      document.body.classList.remove('light-mode');
-      document.documentElement.classList.remove('light-mode');
+      document.documentElement.setAttribute('data-theme', preferredTheme === 'light' ? 'light' : 'dark');
+      localStorage.setItem('rfa-theme', preferredTheme === 'light' ? 'light' : 'dark');
     }
 
     // Save voice preference to localStorage for classes page

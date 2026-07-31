@@ -16,7 +16,7 @@ body {
     radial-gradient(ellipse 75% 55% at 95% 6%, color-mix(in srgb, var(--primary) 15%, transparent), transparent),
     radial-gradient(ellipse 60% 45% at 50% 92%, color-mix(in srgb, var(--primary) 8%, transparent), transparent),
     radial-gradient(ellipse 50% 40% at 30% 50%, color-mix(in srgb, var(--accent) 5%, transparent), transparent),
-    linear-gradient(180deg, #030712 0%, #060e1f 30%, #091428 60%, #0a1830 100%);
+    var(--bg-gradient);
   overflow-x: hidden;
 }
 

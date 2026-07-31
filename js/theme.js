@@ -6,6 +6,18 @@
     localStorage.setItem(STORAGE_KEY, theme);
   }
 
+  // Persist theme preference to the server (if logged in)
+  function persistTheme(theme) {
+    const preferredTheme = theme === 'light' ? 'light' : 'dark';
+    try {
+      fetch('/api/auth/preferences', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ preferredTheme }),
+      }).catch(() => {});
+    } catch (e) { /* ignore */ }
+  }
+
   function nextTheme(current) {
     return current === 'light' ? 'dark' : 'light';
   }
@@ -22,6 +34,13 @@
   const theme = savedTheme === 'light' ? 'light' : 'dark';
   applyTheme(theme);
 
+  // Expose a helper so pages can apply the server theme and sync the toggle button
+  window.applyThemeFromServer = function (preferredTheme) {
+    const t = preferredTheme === 'light' ? 'light' : 'dark';
+    applyTheme(t);
+    updateButtonState(t);
+  };
+
   window.addEventListener('DOMContentLoaded', () => {
     updateButtonState(theme);
 
@@ -31,6 +50,7 @@
         const newTheme = nextTheme(currentTheme);
         applyTheme(newTheme);
         updateButtonState(newTheme);
+        persistTheme(newTheme);
       });
     });
   });

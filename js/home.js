@@ -254,8 +254,14 @@ async function loadHome() {
   const meResult = await apiJson('/api/auth/me');
   if (!meResult) { hideLoading(); return; }
 
-  const name = meResult.data.user.name;
+  const user = meResult.data.user;
+  const name = user.name;
   document.getElementById('welcome').textContent = `${getGreeting()}, ${name}`;
+
+  // Apply theme from server preference (overrides localStorage default)
+  if (user.preferredTheme && typeof window.applyThemeFromServer === 'function') {
+    window.applyThemeFromServer(user.preferredTheme);
+  }
 
   // Fetch all data from new consolidated endpoint
   const [homeDataRes, classesRes] = await Promise.all([
