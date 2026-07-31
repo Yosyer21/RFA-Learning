@@ -163,9 +163,10 @@ async function me(req, res) {
 
   // Fetch fresh user data from DB to include email and other fields
   const result = await query(
-    'SELECT id, name, username, role, active, must_change_password, bio, avatar_color, preferred_voice, preferred_theme FROM users WHERE id = $1',
+    'SELECT id, name, username, role, active, must_change_password, bio, avatar_color, avatar_url, preferred_voice, preferred_theme FROM users WHERE id = $1',
     [req.session.user.id]
   );
+
   const user = result.rows[0];
 
   if (!user) {
@@ -182,9 +183,11 @@ async function me(req, res) {
     mustChangePassword: Boolean(user.must_change_password),
     bio: user.bio || '',
     avatarColor: user.avatar_color || '#6c5ce7',
+    avatarUrl: user.avatar_url || '',
     preferredVoice: user.preferred_voice || 'english',
     preferredTheme: user.preferred_theme || 'dark',
   };
+
 
   return res.json({ user: userData });
 }
@@ -194,7 +197,7 @@ async function updatePreferences(req, res) {
     return res.status(401).json({ message: 'No autorizado' });
   }
 
-  const { bio, avatarColor, preferredVoice, preferredTheme } = req.body;
+  const { bio, avatarColor, avatarUrl, preferredVoice, preferredTheme } = req.body;
 
   const updates = [];
   const params = [];
@@ -208,6 +211,20 @@ async function updatePreferences(req, res) {
     updates.push(`avatar_color = $${idx++}`);
     params.push(String(avatarColor));
   }
+  if (avatarUrl !== undefined) {
+    // Validate: must be empty string or a data URL (base64 image)
+    const value = String(avatarUrl);
+    if (value !== '' && !/^data:image\/(jpeg|png|webp);base64,/.test(value)) {
+      return res.status(400).json({ message: 'Formato de imagen inválido' });
+    }
+    // Limit size to ~300KB (base64)
+    if (value.length > 400000) {
+      return res.status(400).json({ message: 'La imagen es demasiado grande' });
+    }
+    updates.push(`avatar_url = $${idx++}`);
+    params.push(value);
+  }
+
   if (preferredVoice !== undefined) {
     updates.push(`preferred_voice = $${idx++}`);
     params.push(String(preferredVoice));

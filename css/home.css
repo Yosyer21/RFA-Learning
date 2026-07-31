@@ -1299,7 +1299,55 @@
   max-width:40ch;
 }
 
+/* ── Profile: Avatar photo uploader ── */
+.avatar-photo-uploader {
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  flex-wrap:wrap;
+}
+
+.avatar-photo-preview {
+  width:80px;
+  height:80px;
+  border-radius:50%;
+  background:var(--accent);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'Archivo',sans-serif;
+  font-weight:700;
+  font-size:1.5rem;
+  color:#fff;
+  flex-shrink:0;
+  overflow:hidden;
+  box-shadow:0 4px 12px rgba(0,0,0,.2);
+}
+
+.avatar-photo-actions {
+  display:flex;
+  flex-direction:column;
+  gap:.5rem;
+  align-items:flex-start;
+}
+
+.avatar-photo-hint {
+  font-size:.75rem;
+  color:var(--muted);
+}
+
+.btn-danger-ghost {
+  color:#e74c3c;
+  border-color:color-mix(in srgb,#e74c3c 40%,transparent);
+}
+
+.btn-danger-ghost:hover {
+  background:color-mix(in srgb,#e74c3c 12%,transparent);
+  border-color:#e74c3c;
+}
+
 /* ── Responsive ── */
+
 @media(max-width:780px){
   .profile-header {
     flex-wrap:wrap;

@@ -92,6 +92,20 @@
       </div>
       <div class="preferences-grid">
         <div class="form-group">
+          <label data-i18n="profile.avatarPhoto">Foto de perfil</label>
+          <div class="avatar-photo-uploader">
+            <div class="avatar-photo-preview" id="avatar-photo-preview">
+              <span id="avatar-photo-initials">RF</span>
+            </div>
+            <div class="avatar-photo-actions">
+              <input type="file" id="avatar-photo-input" accept="image/jpeg,image/png,image/webp" hidden>
+              <button type="button" id="avatar-photo-upload-btn" class="btn btn-modern btn-modern-ghost" data-i18n="profile.uploadPhoto">Subir foto</button>
+              <button type="button" id="avatar-photo-remove-btn" class="btn btn-modern btn-modern-ghost btn-danger-ghost" data-i18n="profile.removePhoto">Quitar foto</button>
+              <small class="avatar-photo-hint" data-i18n="profile.photoHint">JPG, PNG o WebP. Máx 200x200px.</small>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
           <label data-i18n="profile.avatarColor">Color de avatar</label>
           <div class="avatar-color-picker">
             <input type="color" id="avatar-color-input" value="#6c5ce7">
@@ -109,6 +123,7 @@
         </div>
       </div>
     </section>
+
 
     <!-- Personalización: Biografía -->
     <section class="glass-card profile-section">

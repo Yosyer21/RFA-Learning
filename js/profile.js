@@ -16,6 +16,10 @@ async function loadProfile() {
   const avatarContainer = document.getElementById('profile-avatar-container');
   avatarContainer.style.backgroundColor = currentUser.avatarColor || '#6c5ce7';
 
+  // Avatar photo (if set)
+  renderAvatarPhoto(currentUser);
+
+
   // Bio
   const bioDisplay = document.getElementById('profile-bio-display');
   if (currentUser.bio) {
@@ -233,6 +237,141 @@ function getInitials(name) {
     .join('')
     .toUpperCase() || '?';
 }
+
+// ── Avatar photo ──
+function renderAvatarPhoto(user) {
+  const avatarContainer = document.getElementById('profile-avatar-container');
+  const initialsSpan = document.getElementById('profile-initials');
+  const preview = document.getElementById('avatar-photo-preview');
+  const previewInitials = document.getElementById('avatar-photo-initials');
+
+  const hasPhoto = user.avatarUrl && user.avatarUrl.startsWith('data:image/');
+
+  // Header avatar
+  if (hasPhoto) {
+    avatarContainer.style.backgroundImage = `url(${user.avatarUrl})`;
+    avatarContainer.style.backgroundSize = 'cover';
+    avatarContainer.style.backgroundPosition = 'center';
+    initialsSpan.style.display = 'none';
+  } else {
+    avatarContainer.style.backgroundImage = 'none';
+    initialsSpan.style.display = '';
+  }
+
+  // Preview in customization section
+  if (preview) {
+    if (hasPhoto) {
+      preview.style.backgroundImage = `url(${user.avatarUrl})`;
+      preview.style.backgroundSize = 'cover';
+      preview.style.backgroundPosition = 'center';
+      previewInitials.style.display = 'none';
+    } else {
+      preview.style.backgroundImage = 'none';
+      previewInitials.style.display = '';
+    }
+  }
+
+  // Toggle remove button visibility
+  const removeBtn = document.getElementById('avatar-photo-remove-btn');
+  if (removeBtn) {
+    removeBtn.style.display = hasPhoto ? '' : 'none';
+  }
+}
+
+// Resize and compress image to max 200x200, returns data URL (JPEG)
+function resizeImage(file, maxSize = 200, quality = 0.8) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let { width, height } = img;
+        if (width > height) {
+          if (width > maxSize) {
+            height = Math.round((height * maxSize) / width);
+            width = maxSize;
+          }
+        } else {
+          if (height > maxSize) {
+            width = Math.round((width * maxSize) / height);
+            height = maxSize;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = () => reject(new Error('Invalid image'));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => reject(new Error('Read error'));
+    reader.readAsDataURL(file);
+  });
+}
+
+// ── Upload photo ──
+document.getElementById('avatar-photo-upload-btn')?.addEventListener('click', () => {
+  document.getElementById('avatar-photo-input').click();
+});
+
+document.getElementById('avatar-photo-input')?.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  // Validate type
+  if (!/^image\/(jpeg|png|webp)$/.test(file.type)) {
+    showToast(t('profile.photoInvalidType'), 'error');
+    e.target.value = '';
+    return;
+  }
+
+  // Validate size (max 5MB original)
+  if (file.size > 5 * 1024 * 1024) {
+    showToast(t('profile.photoTooLarge'), 'error');
+    e.target.value = '';
+    return;
+  }
+
+  try {
+    const dataUrl = await resizeImage(file);
+    const result = await apiJson('/api/auth/preferences', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ avatarUrl: dataUrl }),
+    });
+
+    if (result?.ok) {
+      showToast(t('profile.photoSaved'), 'success');
+      loadProfile();
+    } else {
+      showToast(result?.data?.message || t('profile.preferencesError'), 'error');
+    }
+  } catch (err) {
+    showToast(t('profile.photoInvalidType'), 'error');
+  }
+
+  e.target.value = '';
+});
+
+// ── Remove photo ──
+document.getElementById('avatar-photo-remove-btn')?.addEventListener('click', async () => {
+  const result = await apiJson('/api/auth/preferences', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ avatarUrl: '' }),
+  });
+
+  if (result?.ok) {
+    showToast(t('profile.photoRemoved'), 'success');
+    loadProfile();
+  } else {
+    showToast(t('profile.preferencesError'), 'error');
+  }
+});
+
 
 // ── Save name ──
 document.getElementById('profile-form')?.addEventListener('submit', async (event) => {
