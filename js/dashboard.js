@@ -8,21 +8,113 @@ const paidSyncStatus = document.getElementById('paid-sync-status');
 const createUserForm = document.getElementById('create-user-form');
 const createClassForm = document.getElementById('create-class-form');
 const csvImportForm = document.getElementById('csv-import-form');
+const usersSearch = document.getElementById('users-search');
+const classesSearch = document.getElementById('classes-search');
+const toggleUserFormBtn = document.getElementById('toggle-user-form');
+const toggleClassFormBtn = document.getElementById('toggle-class-form');
+const cancelUserFormBtn = document.getElementById('cancel-user-form');
+const cancelClassFormBtn = document.getElementById('cancel-class-form');
+const refreshStatsBtn = document.getElementById('refresh-stats');
 let currentUsersPage = 1;
 let currentClassesPage = 1;
+let usersSearchTerm = '';
+let classesSearchTerm = '';
 
-function smoothSectionNav() {
-  document.querySelectorAll('.dashboard-nav a').forEach((link) => {
+/* ── Sidebar Navigation with active state ── */
+function initSidebarNav() {
+  const links = document.querySelectorAll('.dashboard-nav-link');
+  const sections = document.querySelectorAll('.dashboard-section');
+
+  links.forEach((link) => {
     link.addEventListener('click', (event) => {
       event.preventDefault();
-      const targetId = link.getAttribute('href');
-      const target = document.querySelector(targetId);
+      const targetId = link.dataset.navTarget;
+      const target = document.getElementById(targetId);
       if (target) {
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setActiveNav(link);
       }
     });
   });
+
+  // Highlight active section on scroll
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const activeLink = document.querySelector(`.dashboard-nav-link[data-nav-target="${entry.target.id}"]`);
+          if (activeLink) setActiveNav(activeLink);
+        }
+      });
+    },
+    { rootMargin: '-20% 0px -70% 0px' }
+  );
+
+  sections.forEach((section) => observer.observe(section));
 }
+
+function setActiveNav(link) {
+  document.querySelectorAll('.dashboard-nav-link').forEach((l) => l.classList.remove('active'));
+  link.classList.add('active');
+}
+
+/* ── Toggle create forms ── */
+function initFormToggles() {
+  toggleUserFormBtn?.addEventListener('click', () => {
+    createUserForm.classList.toggle('hidden');
+    if (!createUserForm.classList.contains('hidden')) {
+      createUserForm.querySelector('input[name="name"]')?.focus();
+    }
+  });
+  cancelUserFormBtn?.addEventListener('click', () => {
+    createUserForm.classList.add('hidden');
+    createUserForm.reset();
+  });
+
+  toggleClassFormBtn?.addEventListener('click', () => {
+    createClassForm.classList.toggle('hidden');
+    if (!createClassForm.classList.contains('hidden')) {
+      createClassForm.querySelector('input[name="title"]')?.focus();
+    }
+  });
+  cancelClassFormBtn?.addEventListener('click', () => {
+    createClassForm.classList.add('hidden');
+    createClassForm.reset();
+  });
+}
+
+/* ── Search filters ── */
+function initSearch() {
+  usersSearch?.addEventListener('input', (e) => {
+    usersSearchTerm = e.target.value.trim().toLowerCase();
+    loadUsers(1);
+  });
+
+  classesSearch?.addEventListener('input', (e) => {
+    classesSearchTerm = e.target.value.trim().toLowerCase();
+    loadClasses(1);
+  });
+}
+
+/* ── Refresh stats ── */
+function initRefresh() {
+  refreshStatsBtn?.addEventListener('click', async () => {
+    const icon = refreshStatsBtn.querySelector('.refresh-icon');
+    icon?.classList.add('spinning');
+    await Promise.all([loadStats(), loadPaidAccounts(), loadUsers(currentUsersPage), loadClasses(currentClassesPage)]);
+    setTimeout(() => icon?.classList.remove('spinning'), 600);
+  });
+}
+
+/* ── Stats ── */
+const STAT_ICONS = {
+  users: '👥',
+  admins: '🛡️',
+  students: '🎓',
+  active: '✅',
+  classes: '📚',
+  progress: '📈',
+};
 
 async function loadStats() {
   const result = await apiJson('/api/admin/stats');
@@ -30,26 +122,27 @@ async function loadStats() {
 
   const data = result.data;
   const items = [
-    [t('dashboard.statUsers'), data.totalUsers ?? 0],
-    [t('dashboard.statAdmins'), data.totalAdmins ?? 0],
-    [t('dashboard.statStudents'), data.totalStudents ?? 0],
-    [t('dashboard.statActive'), data.activeStudents ?? 0],
-    [t('dashboard.statClasses'), data.totalClasses ?? 0],
-    [t('dashboard.statProgress'), data.progressRecords ?? 0],
+    { key: 'users', label: t('dashboard.statUsers'), value: data.totalUsers ?? 0 },
+    { key: 'admins', label: t('dashboard.statAdmins'), value: data.totalAdmins ?? 0 },
+    { key: 'students', label: t('dashboard.statStudents'), value: data.totalStudents ?? 0 },
+    { key: 'active', label: t('dashboard.statActive'), value: data.activeStudents ?? 0 },
+    { key: 'classes', label: t('dashboard.statClasses'), value: data.totalClasses ?? 0 },
+    { key: 'progress', label: t('dashboard.statProgress'), value: data.progressRecords ?? 0 },
   ];
 
   statsCards.innerHTML = items
     .map(
-      ([label, value]) => `
-      <article class="stat-card">
-        <span>${label}</span>
+      ({ key, label, value }) => `
+      <article class="stat-card-modern">
+        <span class="stat-icon">${STAT_ICONS[key] || '📊'}</span>
         <strong>${value}</strong>
+        <span>${label}</span>
       </article>
     `
     )
     .join('');
 
-  statsData.textContent = JSON.stringify(data, null, 2);
+  if (statsData) statsData.textContent = JSON.stringify(data, null, 2);
 }
 
 function formatDashboardDate(value) {
@@ -259,7 +352,9 @@ function classRow(lesson) {
 
 async function loadUsers(page = 1) {
   currentUsersPage = page;
-  const result = await apiJson(`/api/users?page=${page}&limit=20`);
+  const query = new URLSearchParams({ page, limit: 20 });
+  if (usersSearchTerm) query.set('search', usersSearchTerm);
+  const result = await apiJson(`/api/users?${query.toString()}`);
   if (!result) return;
 
   const { data: users, pagination } = result.data;
@@ -317,7 +412,9 @@ async function loadUsers(page = 1) {
 
 async function loadClasses(page = 1) {
   currentClassesPage = page;
-  const result = await apiJson(`/api/classes?page=${page}&limit=20`);
+  const query = new URLSearchParams({ page, limit: 20 });
+  if (classesSearchTerm) query.set('search', classesSearchTerm);
+  const result = await apiJson(`/api/classes?${query.toString()}`);
   if (!result) return;
 
   const { data: classes, pagination } = result.data;
@@ -376,6 +473,7 @@ createUserForm?.addEventListener('submit', async (event) => {
 
   if (result.ok) {
     createUserForm.reset();
+    createUserForm.classList.add('hidden');
     await Promise.all([loadUsers(), loadStats()]);
   }
 });
@@ -401,6 +499,7 @@ createClassForm?.addEventListener('submit', async (event) => {
 
   if (result.ok) {
     createClassForm.reset();
+    createClassForm.classList.add('hidden');
     await Promise.all([loadClasses(), loadStats()]);
   }
 });
@@ -441,5 +540,8 @@ window.addEventListener('languagechange', () => {
   Promise.all([loadStats(), loadPaidAccounts(), loadUsers(currentUsersPage), loadClasses(currentClassesPage)]);
 });
 
-smoothSectionNav();
+initSidebarNav();
+initFormToggles();
+initSearch();
+initRefresh();
 Promise.all([loadStats(), loadPaidAccounts(), loadUsers(), loadClasses()]);

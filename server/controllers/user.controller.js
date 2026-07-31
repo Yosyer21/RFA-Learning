@@ -15,17 +15,27 @@ function mapUser(row) {
 }
 
 async function getUsers(req, res) {
-  const { page, limit } = req.query;
+  const { page, limit, search } = req.query;
   const pageNum = Math.max(1, parseInt(page) || 1);
   const pageSize = Math.min(100, Math.max(1, parseInt(limit) || 50));
   const offset = (pageNum - 1) * pageSize;
 
-  const countResult = await query('SELECT COUNT(*) FROM users');
+  let whereSql = '';
+  const params = [];
+  let paramIndex = 1;
+
+  if (search) {
+    whereSql = ` WHERE (LOWER(name) LIKE $${paramIndex} OR LOWER(username) LIKE $${paramIndex})`;
+    params.push(`%${search.toLowerCase()}%`);
+    paramIndex++;
+  }
+
+  const countResult = await query(`SELECT COUNT(*) FROM users${whereSql}`, params);
   const total = parseInt(countResult.rows[0].count, 10);
 
   const result = await query(
-    'SELECT id, name, username, role, active, must_change_password FROM users ORDER BY id LIMIT $1 OFFSET $2',
-    [pageSize, offset]
+    `SELECT id, name, username, role, active, must_change_password FROM users${whereSql} ORDER BY id LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`,
+    [...params, pageSize, offset]
   );
 
   return res.json({
@@ -33,6 +43,7 @@ async function getUsers(req, res) {
     pagination: { page: pageNum, limit: pageSize, total, pages: Math.ceil(total / pageSize) },
   });
 }
+
 
 async function createUser(req, res) {
   const { name, username, password, role, active, mustChangePassword } = req.body;
