@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════
 // RFA.Learning — Mobile Navigation
-// Menú hamburguesa + Bottom nav + PWA install prompt
+// Bottom nav (todas las páginas) + PWA install prompt
 // ═══════════════════════════════════════════════════════════
 
 (function () {
@@ -15,116 +15,11 @@
     return (typeof window.t === 'function' && window.t(key)) || key;
   }
 
-  // ── Build hamburger toggle ──
-  function buildNavToggle() {
-    const topbar = document.querySelector('.topbar, .topbar-landing');
-    if (!topbar) return null;
-
-    // No duplicar si ya existe
-    if (topbar.querySelector('.nav-toggle')) {
-      return topbar.querySelector('.nav-toggle');
-    }
-
-    const toggle = document.createElement('button');
-    toggle.className = 'nav-toggle';
-    toggle.type = 'button';
-    toggle.setAttribute('aria-label', t('nav.menu') || 'Menú');
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.innerHTML = '<span></span><span></span><span></span>';
-    topbar.appendChild(toggle);
-    return toggle;
-  }
-
-  // ── Build mobile menu ──
-  function buildMobileMenu(toggle) {
-    if (document.querySelector('.mobile-menu')) return;
-
-    const topbar = document.querySelector('.topbar, .topbar-landing');
-    if (!topbar) return;
-
-    // Clonar los enlaces del nav del topbar
-    const nav = topbar.querySelector('nav');
-    const links = nav ? Array.from(nav.children) : [];
-
-    const menu = document.createElement('div');
-    menu.className = 'mobile-menu';
-    menu.setAttribute('role', 'dialog');
-    menu.setAttribute('aria-modal', 'true');
-    menu.setAttribute('aria-label', t('nav.menu') || 'Menú');
-
-    const header = document.createElement('div');
-    header.className = 'mobile-menu-header';
-
-    const brand = document.createElement('div');
-    brand.className = 'topbar-brand';
-    brand.innerHTML = '<span class="brand-icon"></span><h1>RFA<span class="brand-dot">.</span>Learning</h1>';
-
-    const close = document.createElement('button');
-    close.className = 'mobile-menu-close';
-    close.type = 'button';
-    close.setAttribute('aria-label', t('ui.close') || 'Cerrar');
-    close.textContent = '×';
-
-    header.append(brand, close);
-    menu.appendChild(header);
-
-    // Añadir enlaces clonados
-    links.forEach((link) => {
-      const clone = link.cloneNode(true);
-      clone.addEventListener('click', closeMenu);
-
-      // Si es el botón de logout, delegar al original para que funcione
-      if (link.id === 'logout-btn') {
-        clone.addEventListener('click', (e) => {
-          e.preventDefault();
-          const original = document.getElementById('logout-btn');
-          if (original) original.click();
-        });
-      }
-
-      menu.appendChild(clone);
-    });
-
-
-    // Overlay
-    const overlay = document.createElement('div');
-    overlay.className = 'mobile-menu-overlay';
-    overlay.addEventListener('click', closeMenu);
-
-    document.body.appendChild(overlay);
-    document.body.appendChild(menu);
-
-    // Eventos
-    toggle.addEventListener('click', () => {
-      const isOpen = menu.classList.toggle('is-open');
-      overlay.classList.toggle('is-visible', isOpen);
-      toggle.setAttribute('aria-expanded', String(isOpen));
-      document.body.style.overflow = isOpen ? 'hidden' : '';
-    });
-
-    close.addEventListener('click', closeMenu);
-
-    function closeMenu() {
-      menu.classList.remove('is-open');
-      overlay.classList.remove('is-visible');
-      toggle.setAttribute('aria-expanded', 'false');
-      document.body.style.overflow = '';
-    }
-
-    // Cerrar con tecla Escape
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeMenu();
-    });
-  }
-
   // ── Build bottom nav ──
   function buildBottomNav() {
     if (document.querySelector('.bottom-nav')) return;
 
-    // Solo en páginas autenticadas (con logout-btn)
-    const hasLogout = document.querySelector('#logout-btn');
-    if (!hasLogout) return;
-
+    const hasLogout = !!document.querySelector('#logout-btn');
     const isAdmin = !!document.querySelector('#dashboard-link');
 
     // Iconos SVG minimalistas (stroke-based)
@@ -133,18 +28,31 @@
       clases: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
       perfil: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
       dashboard: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>',
+      login: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>',
+      register: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>',
+      logout: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
     };
 
-    const items = [
-      { href: '/home', icon: icons.home, label: t('nav.home') || 'Home', active: location.pathname === '/home' },
-      { href: '/clases', icon: icons.clases, label: t('nav.clases') || 'Clases', active: location.pathname === '/clases' },
-      { href: '/profile', icon: icons.perfil, label: t('nav.perfil') || 'Perfil', active: location.pathname === '/profile' },
-    ];
+    let items = [];
 
-    if (isAdmin) {
-      items.push({ href: '/dashboard', icon: icons.dashboard, label: t('nav.dashboard') || 'Dashboard', active: location.pathname === '/dashboard' });
+    if (hasLogout) {
+      // Páginas autenticadas
+      items = [
+        { href: '/home', icon: icons.home, label: t('nav.home') || 'Home', active: location.pathname === '/home' },
+        { href: '/clases', icon: icons.clases, label: t('nav.clases') || 'Clases', active: location.pathname === '/clases' },
+        { href: '/profile', icon: icons.perfil, label: t('nav.perfil') || 'Perfil', active: location.pathname === '/profile' },
+      ];
+      if (isAdmin) {
+        items.push({ href: '/dashboard', icon: icons.dashboard, label: t('nav.dashboard') || 'Dashboard', active: location.pathname === '/dashboard' });
+      }
+    } else {
+      // Páginas no autenticadas (landing, login, register)
+      items = [
+        { href: '/', icon: icons.home, label: t('nav.inicio') || 'Inicio', active: location.pathname === '/' },
+        { href: '/login', icon: icons.login, label: t('nav.login') || 'Iniciar sesión', active: location.pathname === '/login' },
+        { href: '/register', icon: icons.register, label: t('nav.registro') || 'Registrarse', active: location.pathname === '/register' },
+      ];
     }
-
 
     const nav = document.createElement('nav');
     nav.className = 'bottom-nav';
@@ -160,6 +68,20 @@
       a.innerHTML = `<span class="bn-icon">${item.icon}</span><span>${item.label}</span>`;
       inner.appendChild(a);
     });
+
+    // Botón de cerrar sesión (solo autenticado)
+    if (hasLogout) {
+      const logout = document.createElement('button');
+      logout.type = 'button';
+      logout.className = 'bottom-nav-item bottom-nav-logout';
+      logout.setAttribute('aria-label', t('nav.salir') || 'Cerrar sesión');
+      logout.innerHTML = `<span class="bn-icon">${icons.logout}</span><span>${t('nav.salir') || 'Salir'}</span>`;
+      logout.addEventListener('click', () => {
+        const original = document.getElementById('logout-btn');
+        if (original) original.click();
+      });
+      inner.appendChild(logout);
+    }
 
     nav.appendChild(inner);
     document.body.appendChild(nav);
@@ -207,8 +129,6 @@
 
   // ── Init ──
   function init() {
-    const toggle = buildNavToggle();
-    buildMobileMenu(toggle);
     buildBottomNav();
     setupPwaInstall();
     registerServiceWorker();
@@ -220,5 +140,3 @@
     init();
   }
 })();
-
-

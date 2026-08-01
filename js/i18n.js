@@ -1057,10 +1057,12 @@ function translatePage() {
   });
 }
 
-// ── Language toggle (injected into nav) ──
+// ── Language toggle (injected into topbar) ──
 function injectLangToggle() {
-  const nav = document.querySelector('header nav');
-  if (!nav) return;
+  const header = document.querySelector('header');
+  if (!header) return;
+  // No duplicar si ya existe
+  if (document.getElementById('lang-toggle')) return;
   const btn = document.createElement('button');
   btn.className = 'btn btn-small btn-lang';
   btn.id = 'lang-toggle';
@@ -1069,7 +1071,7 @@ function injectLangToggle() {
   btn.addEventListener('click', () => {
     setLanguage(currentLang === 'es' ? 'en' : 'es');
   });
-  nav.insertBefore(btn, nav.firstChild);
+  header.appendChild(btn);
 }
 
 function updateLangToggle() {

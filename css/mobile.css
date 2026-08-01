@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════
    RFA.Learning — Mobile Optimization
-   Menú hamburguesa · Bottom nav · Touch UX · Grids móviles
+   Bottom nav · Touch UX · Grids móviles
    ═══════════════════════════════════════════════════════════ */
 
 /* ── Touch UX: eliminar retraso de 300ms y mejorar táctil ── */
@@ -29,182 +29,6 @@ button,
 a {
   touch-action: manipulation;
 }
-
-/* ── Botón hamburguesa ── */
-.nav-toggle {
-  display: none;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 5px;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 1px solid color-mix(in srgb, var(--border) 40%, transparent);
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--surface-2) 30%, transparent);
-  cursor: pointer;
-  transition: all 0.25s ease;
-  flex-shrink: 0;
-}
-
-.nav-toggle span {
-  display: block;
-  width: 20px;
-  height: 2px;
-  border-radius: 2px;
-  background: var(--text);
-  transition: all 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
-}
-
-.nav-toggle:hover {
-  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
-  background: color-mix(in srgb, var(--accent) 8%, transparent);
-}
-
-.nav-toggle[aria-expanded='true'] span:nth-child(1) {
-  transform: translateY(7px) rotate(45deg);
-}
-
-.nav-toggle[aria-expanded='true'] span:nth-child(2) {
-  opacity: 0;
-}
-
-.nav-toggle[aria-expanded='true'] span:nth-child(3) {
-  transform: translateY(-7px) rotate(-45deg);
-}
-
-/* ── Menú móvil desplegable ── */
-.mobile-menu {
-  display: none;
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: min(320px, 85vw);
-  z-index: 200;
-  background: color-mix(in srgb, var(--bg) 92%, transparent);
-  backdrop-filter: blur(24px) saturate(1.3);
-  -webkit-backdrop-filter: blur(24px) saturate(1.3);
-  border-left: 1px solid color-mix(in srgb, var(--border) 30%, transparent);
-  box-shadow: -12px 0 40px rgba(0, 0, 0, 0.3);
-  padding: 1.2rem 1rem;
-  flex-direction: column;
-  gap: 0.4rem;
-  transform: translateX(100%);
-  visibility: hidden;
-  transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0.35s;
-  overflow-y: auto;
-}
-
-.mobile-menu.is-open {
-  display: flex;
-  transform: translateX(0);
-  visibility: visible;
-}
-
-
-
-.mobile-menu-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 0.8rem;
-  margin-bottom: 0.6rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--border) 25%, transparent);
-}
-
-.mobile-menu-header .topbar-brand {
-  gap: 0.5rem;
-}
-
-.mobile-menu-close {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid color-mix(in srgb, var(--border) 40%, transparent);
-  border-radius: 10px;
-  background: transparent;
-  color: var(--text);
-  font-size: 1.4rem;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-.mobile-menu-close:hover {
-  border-color: color-mix(in srgb, var(--danger) 50%, transparent);
-  color: var(--danger);
-}
-
-.mobile-menu a,
-.mobile-menu button {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  width: 100%;
-  padding: 0.85rem 0.9rem;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: color-mix(in srgb, var(--text) 85%, var(--muted));
-  font-size: 0.92rem;
-  font-weight: 600;
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  text-decoration: none;
-}
-
-.mobile-menu a:hover,
-.mobile-menu button:hover {
-  background: color-mix(in srgb, var(--surface-2) 40%, transparent);
-  border-color: color-mix(in srgb, var(--border) 30%, transparent);
-  color: var(--accent);
-}
-
-.mobile-menu a.btn-nav-primary {
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  color: #fff;
-  justify-content: center;
-  border: none;
-}
-
-.mobile-menu a.btn-nav-danger {
-  background: color-mix(in srgb, var(--danger) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
-  color: var(--danger);
-  justify-content: center;
-}
-
-.mobile-menu a.btn-nav-ghost {
-  background: color-mix(in srgb, var(--surface-2) 30%, transparent);
-  border: 1px solid color-mix(in srgb, var(--border) 35%, transparent);
-  justify-content: center;
-}
-
-.mobile-menu-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 190;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(2px);
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity 0.3s ease, visibility 0.3s;
-}
-
-.mobile-menu-overlay.is-visible {
-  display: block;
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
-
-
 
 /* ── Bottom Navigation ── */
 .bottom-nav {
@@ -289,26 +113,31 @@ a {
   background: linear-gradient(90deg, var(--accent), var(--primary));
 }
 
+/* Botón de cerrar sesión en la barra inferior */
+.bottom-nav-logout {
+  color: var(--danger);
+}
+
+.bottom-nav-logout:hover {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+}
+
 /* Añadir padding inferior al contenido para no tapar el bottom nav */
 body.has-bottom-nav main,
 body.has-bottom-nav .container {
   padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
 }
 
-/* ── Responsive: activar menú móvil y bottom nav ── */
+/* ── Responsive: activar bottom nav ── */
 @media (max-width: 780px) {
-  /* Hamburguesa visible */
-  .nav-toggle {
-    display: flex;
-  }
-
   /* Ocultar nav horizontal en topbar */
   .topbar > nav,
   .topbar-landing > nav {
     display: none;
   }
 
-  /* Topbar en una sola fila con hamburguesa */
+  /* Topbar en una sola fila */
   .topbar,
   .topbar-landing {
     flex-direction: row;
@@ -324,17 +153,8 @@ body.has-bottom-nav .container {
     width: auto;
   }
 
-  /* Menú móvil disponible en todas las páginas */
-  .mobile-menu {
-    display: flex;
-  }
-
-  .mobile-menu-overlay {
-    display: block;
-  }
-
-  /* Bottom nav visible solo en páginas autenticadas */
-  body.has-bottom-nav .bottom-nav {
+  /* Bottom nav visible en todas las páginas */
+  .bottom-nav {
     display: block;
   }
 }
@@ -579,10 +399,6 @@ body.has-bottom-nav .container {
 
   .bottom-nav-item .bn-icon {
     font-size: 1.15rem;
-  }
-
-  .mobile-menu {
-    width: min(300px, 88vw);
   }
 }
 
