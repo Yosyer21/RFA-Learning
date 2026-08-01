@@ -3,7 +3,8 @@
    Caché de app shell + estrategia network-first para API
    ═══════════════════════════════════════════════════════════ */
 
-const CACHE_NAME = 'rfa-learning-v1';
+const CACHE_NAME = 'rfa-learning-v2';
+
 const APP_SHELL = [
   '/',
   '/login',

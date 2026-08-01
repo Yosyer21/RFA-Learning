@@ -92,13 +92,18 @@ a {
   flex-direction: column;
   gap: 0.4rem;
   transform: translateX(100%);
-  transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+  visibility: hidden;
+  transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0.35s;
   overflow-y: auto;
 }
 
 .mobile-menu.is-open {
+  display: flex;
   transform: translateX(0);
+  visibility: visible;
 }
+
+
 
 .mobile-menu-header {
   display: flex;
@@ -187,12 +192,19 @@ a {
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(2px);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s ease, visibility 0.3s;
 }
 
 .mobile-menu-overlay.is-visible {
+  display: block;
   opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
+
+
 
 /* ── Bottom Navigation ── */
 .bottom-nav {
@@ -245,8 +257,17 @@ a {
 .bottom-nav-item .bn-icon {
   font-size: 1.25rem;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bottom-nav-item .bn-icon svg {
+  width: 22px;
+  height: 22px;
   display: block;
 }
+
 
 .bottom-nav-item:hover {
   color: var(--accent);
@@ -303,19 +324,21 @@ body.has-bottom-nav .container {
     width: auto;
   }
 
-  /* Bottom nav visible en páginas autenticadas */
-  body.has-bottom-nav .bottom-nav {
-    display: block;
-  }
-
-  body.has-bottom-nav .mobile-menu {
+  /* Menú móvil disponible en todas las páginas */
+  .mobile-menu {
     display: flex;
   }
 
-  body.has-bottom-nav .mobile-menu-overlay {
+  .mobile-menu-overlay {
+    display: block;
+  }
+
+  /* Bottom nav visible solo en páginas autenticadas */
+  body.has-bottom-nav .bottom-nav {
     display: block;
   }
 }
+
 
 /* ── Grids móviles ── */
 @media (max-width: 600px) {

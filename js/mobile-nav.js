@@ -72,8 +72,19 @@
     links.forEach((link) => {
       const clone = link.cloneNode(true);
       clone.addEventListener('click', closeMenu);
+
+      // Si es el botón de logout, delegar al original para que funcione
+      if (link.id === 'logout-btn') {
+        clone.addEventListener('click', (e) => {
+          e.preventDefault();
+          const original = document.getElementById('logout-btn');
+          if (original) original.click();
+        });
+      }
+
       menu.appendChild(clone);
     });
+
 
     // Overlay
     const overlay = document.createElement('div');
@@ -116,15 +127,24 @@
 
     const isAdmin = !!document.querySelector('#dashboard-link');
 
+    // Iconos SVG minimalistas (stroke-based)
+    const icons = {
+      home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+      clases: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+      perfil: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+      dashboard: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>',
+    };
+
     const items = [
-      { href: '/home', icon: '🏠', label: t('nav.home') || 'Home', active: location.pathname === '/home' },
-      { href: '/clases', icon: '📚', label: t('nav.clases') || 'Clases', active: location.pathname === '/clases' },
-      { href: '/profile', icon: '👤', label: t('nav.perfil') || 'Perfil', active: location.pathname === '/profile' },
+      { href: '/home', icon: icons.home, label: t('nav.home') || 'Home', active: location.pathname === '/home' },
+      { href: '/clases', icon: icons.clases, label: t('nav.clases') || 'Clases', active: location.pathname === '/clases' },
+      { href: '/profile', icon: icons.perfil, label: t('nav.perfil') || 'Perfil', active: location.pathname === '/profile' },
     ];
 
     if (isAdmin) {
-      items.push({ href: '/dashboard', icon: '📊', label: t('nav.dashboard') || 'Dashboard', active: location.pathname === '/dashboard' });
+      items.push({ href: '/dashboard', icon: icons.dashboard, label: t('nav.dashboard') || 'Dashboard', active: location.pathname === '/dashboard' });
     }
+
 
     const nav = document.createElement('nav');
     nav.className = 'bottom-nav';
