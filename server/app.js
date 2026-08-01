@@ -103,10 +103,12 @@ function createApp({ sessionSecret } = {}) {
   app.use('/css', express.static(path.join(__dirname, '..', 'css')));
   app.use('/js', express.static(path.join(__dirname, '..', 'js')));
   app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
+  app.use(express.static(path.join(__dirname, '..', 'public')));
 
   app.get('/', (_req, res) => {
     res.sendFile(path.join(__dirname, '..', 'html', 'index.html'));
   });
+
 
   app.get('/login', (_req, res) => {
     res.sendFile(path.join(__dirname, '..', 'html', 'login.html'));
