@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#3a7bff">
+  <title>Aula | RFA.Learning</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="/assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+  <link rel="stylesheet" href="../css/home.css">
+  <link rel="stylesheet" href="../css/classroom.css">
+  <link rel="stylesheet" href="../css/shared.css">
+  <link rel="stylesheet" href="../css/modern.css">
+  <link rel="stylesheet" href="../css/mobile.css">
+</head>
+
+<body>
+  <a href="#main" class="skip-link" data-i18n="skip.content">Ir al contenido</a>
+  <header class="topbar">
+    <div class="topbar-brand">
+      <span class="brand-icon"></span>
+      <h1>RFA<span class="brand-dot">.</span>Learning</h1>
+    </div>
+    <nav>
+      <a href="/clases" data-i18n="nav.clases">Clases</a>
+      <a href="/classrooms" class="btn-nav btn-nav-ghost" data-i18n="nav.aulas">Aulas</a>
+      <a href="/profile" class="btn-nav btn-nav-ghost" data-i18n="nav.perfil">Perfil</a>
+      <button id="logout-btn" class="btn-nav btn-nav-danger" data-i18n="nav.salir">Salir</button>
+    </nav>
+  </header>
+
+  <main id="main" class="container">
+    <!-- Hero del aula -->
+    <section class="hero-image-bg home-hero classroom-hero" style="min-height:240px;padding:2.5rem 2rem;margin-bottom:1.5rem;">
+      <img src="../assets/1.jpeg" alt="Football training background">
+      <div style="position:relative;z-index:2;width:100%;">
+        <a href="/classrooms" class="back-link" data-i18n="classroom.back">← Volver a aulas</a>
+        <div class="home-hero-copy" style="max-width:640px;">
+          <span class="kicker" data-i18n="classroom.kicker">Aula</span>
+          <h2 id="classroom-title" style="color:white;font-size:clamp(1.6rem,3.5vw,2.2rem);">Aula</h2>
+          <p id="classroom-description" class="hero-sub" style="color:rgba(255,255,255,0.8);max-width:52ch;"></p>
+          <div id="classroom-meta" class="classroom-hero-meta"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Formulario de publicación (profesor) -->
+    <section id="post-form-section" class="glass-card home-section" style="display:none;">
+      <div class="section-head">
+        <span class="kicker" data-i18n="classroom.postKicker">Publicar</span>
+        <h3 data-i18n="classroom.newPost">Publicar algo en el aula</h3>
+      </div>
+      <form id="create-post-form" class="post-form">
+        <textarea name="content" rows="3" placeholder="Escribe un anuncio o mensaje para el aula..." data-i18n-placeholder="classroom.postPlaceholder" required></textarea>
+        <div class="post-form-actions">
+          <button class="btn btn-modern btn-modern-primary" type="submit" data-i18n="classroom.publish">Publicar</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Formulario de tarea (profesor) -->
+    <section id="assignment-form-section" class="glass-card home-section" style="display:none;">
+      <div class="section-head">
+        <span class="kicker" data-i18n="classroom.assignmentKicker">Tarea</span>
+        <h3 data-i18n="classroom.newAssignment">Crear tarea</h3>
+      </div>
+      <form id="create-assignment-form" class="assignment-form">
+        <input name="title" placeholder="Título de la tarea" data-i18n-placeholder="classroom.assignmentTitlePlaceholder" required>
+        <textarea name="description" rows="2" placeholder="Descripción de la tarea (opcional)" data-i18n-placeholder="classroom.assignmentDescPlaceholder"></textarea>
+        <div class="assignment-form-row">
+          <div class="assignment-due">
+            <label for="assignment-due" data-i18n="classroom.dueDate">Fecha de entrega</label>
+            <input type="date" id="assignment-due" name="due_date">
+          </div>
+          <button class="btn btn-modern btn-modern-primary" type="submit" data-i18n="classroom.createAssignment">Crear tarea</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Muro de publicaciones -->
+    <section class="glass-card home-section">
+      <div class="section-head">
+        <span class="kicker" data-i18n="classroom.wallKicker">Muro</span>
+        <h3 data-i18n="classroom.wall">Publicaciones</h3>
+      </div>
+      <div id="posts-list" class="posts-list">
+        <div class="empty-state" data-i18n="classroom.noPosts">Aún no hay publicaciones.</div>
+      </div>
+    </section>
+
+    <!-- Tareas -->
+    <section class="glass-card home-section">
+      <div class="section-head">
+        <span class="kicker" data-i18n="classroom.assignmentsKicker">Tareas</span>
+        <h3 data-i18n="classroom.assignments">Tareas</h3>
+      </div>
+      <div id="assignments-list" class="assignments-list">
+        <div class="empty-state" data-i18n="classroom.noAssignments">Aún no hay tareas.</div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/theme.js"></script>
+  <script src="../js/shared.js"></script>
+  <script src="../js/classroom.js"></script>
+  <script src="../js/mobile-nav.js"></script>
+</body>
+</html>

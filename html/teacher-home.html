@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#3a7bff">
+  <title>Panel Profesor | RFA.Learning</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="/assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+  <link rel="stylesheet" href="../css/home.css">
+  <link rel="stylesheet" href="../css/teacher-home.css">
+  <link rel="stylesheet" href="../css/shared.css">
+  <link rel="stylesheet" href="../css/modern.css">
+  <link rel="stylesheet" href="../css/mobile.css">
+</head>
+
+<body>
+  <a href="#welcome" class="skip-link" data-i18n="skip.content">Ir al contenido</a>
+  <header class="topbar">
+    <div class="topbar-brand">
+      <span class="brand-icon"></span>
+      <h1>RFA<span class="brand-dot">.</span>Learning</h1>
+    </div>
+    <nav>
+      <a href="/clases" data-i18n="nav.clases">Clases</a>
+      <a href="/classrooms" data-i18n="nav.aulas">Aulas</a>
+      <a href="/profile" class="btn-nav btn-nav-ghost" data-i18n="nav.perfil">Perfil</a>
+      <button id="logout-btn" class="btn-nav btn-nav-danger" data-i18n="nav.salir">Salir</button>
+    </nav>
+
+  </header>
+
+  <main class="container">
+    <!-- Hero con imagen de fondo -->
+    <section class="hero-image-bg home-hero" style="min-height:380px;padding:2.5rem 2rem;margin-bottom:1.5rem;">
+      <img src="../assets/1.jpeg" alt="Football training background">
+      <div style="position:relative;z-index:2;width:100%;">
+        <div class="home-hero-copy" style="max-width:600px;">
+          <span class="kicker" data-i18n="teacher.kicker">Panel del profesor</span>
+          <h2 id="welcome" style="color:white;font-size:clamp(1.6rem,3.5vw,2.2rem);" data-i18n="ui.loading">Cargando...</h2>
+          <p id="greeting-sub" class="hero-sub" style="color:rgba(255,255,255,0.8);max-width:40ch;" data-i18n="teacher.subtitle">Gestiona tus aulas y acompaña a tus estudiantes.</p>
+          <div class="hero-actions" style="margin-top:1.1rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+            <button id="toggle-classroom-form" class="btn btn-modern btn-modern-primary hero-cta" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span data-i18n="teacher.newClassroom">Nueva aula</span>
+            </button>
+            <a href="/clases" class="btn btn-modern btn-modern-ghost hero-cta" data-i18n="teacher.viewClasses">Ver clases</a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats con diseño moderno -->
+    <section class="home-stats">
+      <div class="stat-card-modern">
+        <strong id="stat-classrooms">0</strong>
+        <span data-i18n="teacher.statClassrooms">Aulas</span>
+      </div>
+      <div class="stat-card-modern">
+        <strong id="stat-members">0</strong>
+        <span data-i18n="teacher.statMembers">Estudiantes</span>
+      </div>
+      <div class="stat-card-modern">
+        <strong id="stat-classes">0</strong>
+        <span data-i18n="teacher.statClasses">Clases</span>
+      </div>
+      <div class="stat-card-modern">
+        <strong id="stat-profile">--</strong>
+        <span data-i18n="teacher.statProfile">Perfil</span>
+      </div>
+    </section>
+
+
+
+    <!-- Barra de progreso de aulas -->
+    <section class="glass-card xp-section">
+      <div class="xp-header">
+        <div class="xp-info">
+          <span class="kicker" data-i18n="teacher.progressKicker">Progreso</span>
+          <h3 id="xp-level-label" data-i18n="teacher.progressTitle">Mis aulas</h3>
+        </div>
+        <div class="xp-next">
+          <small id="xp-next-label" data-i18n="teacher.progressNext">Crea aulas para empezar</small>
+        </div>
+      </div>
+      <div class="xp-bar-track">
+        <div id="xp-bar-fill" class="xp-bar-fill" style="width:0%"></div>
+      </div>
+      <div class="xp-bar-footer">
+        <span id="xp-progress-text">0%</span>
+        <span id="xp-classes-text" data-i18n="teacher.progressClasses">0 aulas</span>
+      </div>
+    </section>
+
+    <!-- Grid principal: 2 columnas -->
+    <div class="home-grid">
+      <!-- Mis aulas -->
+      <section class="glass-card home-section">
+        <div class="section-head">
+          <span class="kicker" data-i18n="teacher.classroomsKicker">Aulas</span>
+          <h3 data-i18n="teacher.classroomsTitle">Mis aulas</h3>
+        </div>
+
+        <form id="create-classroom-form" class="form-inline create-form hidden">
+          <input name="name" placeholder="Nombre del aula" data-i18n-placeholder="teacher.namePlaceholder" required>
+          <input name="description" placeholder="Descripción (opcional)" data-i18n-placeholder="teacher.descriptionPlaceholder">
+          <button class="btn btn-modern btn-modern-primary" type="submit" data-i18n="teacher.createClassroom">Crear aula</button>
+          <button class="btn btn-modern btn-modern-ghost" type="button" id="cancel-classroom-form" data-i18n="dashboard.cancel">Cancelar</button>
+        </form>
+
+        <div id="classrooms-list" class="classrooms-list">
+          <div class="empty-state" data-i18n="teacher.classroomsEmpty">Aún no tienes aulas. Crea la primera para empezar.</div>
+        </div>
+      </section>
+
+      <!-- Accesos rápidos -->
+      <section class="glass-card home-section">
+        <div class="section-head">
+          <span class="kicker" data-i18n="teacher.quickKicker">Accesos</span>
+          <h3 data-i18n="teacher.quickTitle">Accesos rápidos</h3>
+        </div>
+        <div class="quick-actions">
+          <button id="toggle-classroom-form-2" class="quick-action" type="button">
+            <span class="quick-action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            </span>
+            <strong data-i18n="teacher.newClassroom">Nueva aula</strong>
+            <small data-i18n="teacher.quickNewClassroom">Crea un aula y comparte su código</small>
+          </button>
+          <a href="/clases" class="quick-action">
+            <span class="quick-action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            </span>
+            <strong data-i18n="teacher.viewClasses">Ver clases</strong>
+            <small data-i18n="teacher.quickClasses">Explora el contenido de fútbol</small>
+          </a>
+          <a href="/profile" class="quick-action">
+            <span class="quick-action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </span>
+            <strong data-i18n="nav.perfil">Perfil</strong>
+            <small data-i18n="teacher.quickProfile">Edita tu información y preferencias</small>
+          </a>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/theme.js"></script>
+  <script src="../js/shared.js"></script>
+  <script src="../js/teacher-home.js"></script>
+  <script src="../js/mobile-nav.js"></script>
+</body>
+</html>

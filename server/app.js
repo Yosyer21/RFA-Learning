@@ -17,6 +17,8 @@ const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
 const classRoutes = require('./routes/class.routes');
 const adminRoutes = require('./routes/admin.routes');
+const classroomRoutes = require('./routes/classroom.routes');
+
 const { bootstrapDatabase } = require('./utils/bootstrap');
 const { pool, isEmbeddedDatabase } = require('./utils/db');
 const { log } = require('./utils/logger');
@@ -80,6 +82,18 @@ function createApp({ sessionSecret } = {}) {
     message: { message: 'Demasiados intentos de autenticación, intenta más tarde' },
   });
 
+  // Límite generoso para /api/auth/me: se llama en cada carga de página
+  // (desde el script de la vista y desde mobile-nav), por lo que un límite
+  // estricto provoca respuestas 429 y hace que las aulas "aparezcan y
+  // desaparezcan" de forma inconsistente.
+  const meLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 300,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: 'Demasiadas solicitudes, intenta más tarde' },
+  });
+
   app.use(requestLogger);
   app.use(express.json({ limit: '1mb' }));
   app.use(express.urlencoded({ extended: false }));
@@ -118,9 +132,18 @@ function createApp({ sessionSecret } = {}) {
     res.sendFile(path.join(__dirname, '..', 'html', 'register.html'));
   });
 
-  app.get('/home', requireAuth, (_req, res) => {
+  app.get('/home', requireAuth, (req, res) => {
+    if (req.user.role === 'teacher') {
+      return res.redirect('/teacher-home');
+    }
     res.sendFile(path.join(__dirname, '..', 'html', 'home.html'));
   });
+
+
+  app.get('/teacher-home', requireAuth, requireRole('teacher'), (_req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'html', 'teacher-home.html'));
+  });
+
 
   app.get('/change-password', requireAuth, (_req, res) => {
     res.sendFile(path.join(__dirname, '..', 'html', 'change-password.html'));
@@ -138,10 +161,29 @@ function createApp({ sessionSecret } = {}) {
     res.sendFile(path.join(__dirname, '..', 'html', 'clases.html'));
   });
 
+  app.get('/classrooms', requireAuth, (_req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'html', 'classrooms.html'));
+  });
+
+  app.get('/classroom/:id', requireAuth, (_req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'html', 'classroom.html'));
+  });
+
+
+  // /api/auth/me se llama en cada carga de página (varias veces), por lo que
+  // usa un límite generoso. El resto de rutas de auth (login, register,
+  // change-password) mantienen el límite estricto anti fuerza bruta.
+  app.use('/api/auth/me', meLimiter, requireAuth, (req, res, next) => {
+    // Re-enrutar al controlador 'me' de authRoutes
+    const { me } = require('./controllers/auth.controller');
+    me(req, res, next);
+  });
   app.use('/api/auth', authLimiter, authRoutes);
   app.use('/api/users', apiLimiter, requireAuth, requireRole('admin'), userRoutes);
   app.use('/api/classes', apiLimiter, requireAuth, classRoutes);
   app.use('/api/admin', apiLimiter, requireAuth, requireRole('admin'), adminRoutes);
+  app.use('/api/classrooms', apiLimiter, requireAuth, classroomRoutes);
+
 
   app.use((_req, res) => {
     res.status(404).json({ message: 'Route not found' });

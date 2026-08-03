@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#3a7bff">
+  <title>Aulas | RFA.Learning</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="/assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+  <link rel="stylesheet" href="../css/home.css">
+  <link rel="stylesheet" href="../css/classrooms.css">
+  <link rel="stylesheet" href="../css/shared.css">
+  <link rel="stylesheet" href="../css/modern.css">
+  <link rel="stylesheet" href="../css/mobile.css">
+</head>
+
+<body>
+  <a href="#main" class="skip-link" data-i18n="skip.content">Ir al contenido</a>
+  <header class="topbar">
+    <div class="topbar-brand">
+      <span class="brand-icon"></span>
+      <h1>RFA<span class="brand-dot">.</span>Learning</h1>
+    </div>
+    <nav>
+      <a href="/clases" data-i18n="nav.clases">Clases</a>
+      <a href="/classrooms" class="btn-nav btn-nav-ghost" data-i18n="nav.aulas">Aulas</a>
+      <a href="/profile" class="btn-nav btn-nav-ghost" data-i18n="nav.perfil">Perfil</a>
+      <button id="logout-btn" class="btn-nav btn-nav-danger" data-i18n="nav.salir">Salir</button>
+    </nav>
+  </header>
+
+  <main id="main" class="container">
+    <!-- Hero -->
+    <section class="hero-image-bg home-hero" style="min-height:260px;padding:2.5rem 2rem;margin-bottom:1.5rem;">
+      <img src="../assets/1.jpeg" alt="Football training background">
+      <div style="position:relative;z-index:2;width:100%;">
+        <div class="home-hero-copy" style="max-width:600px;">
+          <span class="kicker" data-i18n="classrooms.kicker">Aulas</span>
+          <h2 id="page-title" style="color:white;font-size:clamp(1.6rem,3.5vw,2.2rem);" data-i18n="classrooms.title">Mis aulas</h2>
+          <p id="page-subtitle" class="hero-sub" style="color:rgba(255,255,255,0.8);max-width:44ch;" data-i18n="classrooms.subtitle">Gestiona tus aulas y estudiantes.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Vista profesor: crear aula -->
+    <section id="teacher-create-section" class="glass-card home-section" style="display:none;">
+      <div class="section-head">
+        <span class="kicker" data-i18n="classrooms.kicker">Aulas</span>
+        <h3 data-i18n="classrooms.newClassroom">Nueva aula</h3>
+      </div>
+      <form id="create-classroom-form" class="form-inline create-form">
+        <input name="name" placeholder="Nombre del aula" data-i18n-placeholder="classrooms.namePlaceholder" required>
+        <input name="description" placeholder="Descripción (opcional)" data-i18n-placeholder="classrooms.descriptionPlaceholder">
+        <button class="btn btn-modern btn-modern-primary" type="submit" data-i18n="classrooms.createClassroom">Crear aula</button>
+      </form>
+    </section>
+
+    <!-- Vista estudiante: invitaciones pendientes -->
+    <section id="student-invitations-section" class="glass-card home-section" style="display:none;">
+      <div class="section-head">
+        <span class="kicker" data-i18n="classrooms.invitationsTitle">Invitaciones</span>
+        <h3 data-i18n="classrooms.invitationsTitle">Invitaciones pendientes</h3>
+      </div>
+      <div id="invitations-list" class="classrooms-list">
+        <div class="empty-state" data-i18n="classrooms.invitationsEmpty">No tienes invitaciones pendientes.</div>
+      </div>
+    </section>
+
+    <!-- Lista de aulas (profesor: sus aulas / estudiante: aulas a las que pertenece) -->
+    <section class="glass-card home-section">
+      <div class="section-head">
+        <span class="kicker" data-i18n="classrooms.myClassrooms">Mis aulas</span>
+        <h3 id="list-title" data-i18n="classrooms.myClassrooms">Mis aulas</h3>
+      </div>
+      <div id="classrooms-list" class="classrooms-list">
+        <div class="empty-state" data-i18n="classrooms.classroomsEmpty">Aún no tienes aulas.</div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/theme.js"></script>
+  <script src="../js/shared.js"></script>
+  <script src="../js/classrooms.js"></script>
+  <script src="../js/mobile-nav.js"></script>
+</body>
+</html>

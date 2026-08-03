@@ -7,6 +7,7 @@ async function dashboardStats(_req, res) {
       COUNT(*)::int AS total_users,
       SUM(CASE WHEN role = 'admin' THEN 1 ELSE 0 END)::int AS total_admins,
       SUM(CASE WHEN role = 'student' THEN 1 ELSE 0 END)::int AS total_students,
+      SUM(CASE WHEN role = 'teacher' THEN 1 ELSE 0 END)::int AS total_teachers,
       SUM(CASE WHEN role = 'student' AND active = true THEN 1 ELSE 0 END)::int AS active_students
     FROM users
   `);
@@ -18,10 +19,12 @@ async function dashboardStats(_req, res) {
     totalUsers: stats.total_users,
     totalAdmins: stats.total_admins,
     totalStudents: stats.total_students,
+    totalTeachers: stats.total_teachers,
     activeStudents: stats.active_students,
     totalClasses: classesResult.rows[0].count,
     progressRecords: progressResult.rows[0].count,
   });
+
 }
 
 async function paidAccounts(_req, res) {

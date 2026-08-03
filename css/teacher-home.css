@@ -1,0 +1,230 @@
+/* ═══════════════════════════════════════════════════════════
+   RFA.Learning — Teacher Home
+   Home personalizado del profesor: estadísticas, accesos y aulas
+   ═══════════════════════════════════════════════════════════ */
+
+.teacher-hero {
+  border-radius: 1.25rem;
+  overflow: hidden;
+}
+
+.teacher-section {
+  padding: 1.5rem;
+}
+
+.teacher-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+/* ── Stats del profesor ── */
+.home-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.stat-card-modern {
+  background: color-mix(in srgb, var(--surface-2) 22%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 30%, transparent);
+  border-radius: 1rem;
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  transition: all 0.3s ease;
+}
+
+.stat-card-modern:hover {
+  background: color-mix(in srgb, var(--surface-2) 38%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 25%, transparent);
+  transform: translateY(-2px);
+}
+
+.stat-icon {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 0.65rem;
+  display: grid;
+  place-items: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+
+.stat-icon svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.stat-icon-level,
+.stat-icon-completed,
+.stat-icon-score,
+.stat-icon-streak {
+  background: transparent;
+}
+
+
+.stat-card-modern strong {
+  font-family: 'Archivo', sans-serif;
+  font-size: 1.6rem;
+  background: linear-gradient(135deg, var(--accent), var(--primary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.stat-card-modern > span:last-child {
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Accesos rápidos ── */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.9rem;
+}
+
+.quick-action {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--border) 30%, transparent);
+  border-radius: 0.9rem;
+  background: color-mix(in srgb, var(--surface-2) 16%, transparent);
+  color: var(--text);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  text-align: left;
+  cursor: pointer;
+  font-family: 'Manrope', sans-serif;
+}
+
+.quick-action:hover {
+  background: color-mix(in srgb, var(--surface-2) 34%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  transform: translateY(-2px);
+  color: var(--text);
+}
+
+.quick-action-icon {
+  width: 2.4rem;
+  height: 2.4rem;
+  display: grid;
+  place-items: center;
+  border-radius: 0.7rem;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+  margin-bottom: 0.4rem;
+}
+
+.quick-action-icon svg {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+
+.quick-action strong {
+  font-size: 0.95rem;
+}
+
+.quick-action small {
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+/* ── Lista de aulas ── */
+.classrooms-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+
+.classroom-card {
+  background: color-mix(in srgb, var(--surface-2) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 30%, transparent);
+  border-radius: 0.9rem;
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.classroom-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glow);
+  border-color: color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.classroom-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.classroom-icon {
+  width: 2.4rem;
+  height: 2.4rem;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 0.7rem;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+}
+
+.classroom-icon svg {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+
+.classroom-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.classroom-card-body strong {
+  font-size: 1.05rem;
+}
+
+.classroom-card-body p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.classroom-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+/* ── Formulario ── */
+.create-form {
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 780px) {
+  .teacher-toolbar {
+    justify-content: stretch;
+  }
+  .teacher-toolbar .btn-nav {
+    width: 100%;
+  }
+  .quick-actions {
+    grid-template-columns: 1fr;
+  }
+
+}

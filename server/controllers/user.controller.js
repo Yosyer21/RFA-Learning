@@ -32,7 +32,8 @@ async function getUsers(req, res) {
     paramIndex++;
   }
 
-  if (role && ['admin', 'student'].includes(role)) {
+  if (role && ['admin', 'student', 'teacher'].includes(role)) {
+
     conditions.push(`role = $${paramIndex}`);
     params.push(role);
     paramIndex++;

@@ -142,10 +142,12 @@ const STAT_ICONS = {
   users: '👥',
   admins: '🛡️',
   students: '🎓',
+  teachers: '🧑‍🏫',
   active: '✅',
   classes: '📚',
   progress: '📈',
 };
+
 
 async function loadStats() {
   const result = await apiJson('/api/admin/stats');
@@ -156,10 +158,12 @@ async function loadStats() {
     { key: 'users', label: t('dashboard.statUsers'), value: data.totalUsers ?? 0 },
     { key: 'admins', label: t('dashboard.statAdmins'), value: data.totalAdmins ?? 0 },
     { key: 'students', label: t('dashboard.statStudents'), value: data.totalStudents ?? 0 },
+    { key: 'teachers', label: t('dashboard.statTeachers'), value: data.totalTeachers ?? 0 },
     { key: 'active', label: t('dashboard.statActive'), value: data.activeStudents ?? 0 },
     { key: 'classes', label: t('dashboard.statClasses'), value: data.totalClasses ?? 0 },
     { key: 'progress', label: t('dashboard.statProgress'), value: data.progressRecords ?? 0 },
   ];
+
 
   statsCards.innerHTML = items
     .map(
@@ -309,12 +313,13 @@ function escapeHtml(text) {
 }
 
 function userRow(user) {
-  const roleBadge = user.role === 'admin' ? 'badge-admin' : 'badge-student';
+  const roleBadge = user.role === 'admin' ? 'badge-admin' : (user.role === 'teacher' ? 'badge-teacher' : 'badge-student');
   const stateBadge = user.active ? 'badge-active' : 'badge-inactive';
   const translatedRole = translateUserRole(user.role);
-  const roleOptions = ['student', 'admin']
+  const roleOptions = ['student', 'admin', 'teacher']
     .map((role) => `<option value="${role}" ${user.role === role ? 'selected' : ''}>${escapeHtml(translateUserRole(role))}</option>`)
     .join('');
+
   const activeOptions = [
     { value: 'true', label: t('dashboard.active'), selected: user.active },
     { value: 'false', label: t('dashboard.inactive'), selected: !user.active },

@@ -24,8 +24,10 @@
     <nav>
       <a href="/home" data-i18n="nav.home">Home</a>
       <a href="/clases" data-i18n="nav.clases">Clases</a>
+      <a href="/classrooms" data-i18n="nav.aulas">Aulas</a>
       <button id="logout-btn" class="btn-nav btn-nav-danger" data-i18n="nav.salir">Salir</button>
     </nav>
+
   </header>
 
   <main class="container dashboard-layout">
@@ -117,8 +119,10 @@
             <option value="">Todos los roles</option>
             <option value="student" data-i18n="dashboard.roleStudent">Estudiante</option>
             <option value="admin" data-i18n="dashboard.roleAdmin">Admin</option>
+            <option value="teacher" data-i18n="dashboard.roleTeacher">Profesor</option>
           </select>
           <select id="users-active-filter" aria-label="Filtrar por estado">
+
             <option value="">Todos los estados</option>
             <option value="true" data-i18n="dashboard.active">Activo</option>
             <option value="false" data-i18n="dashboard.inactive">Inactivo</option>
@@ -145,7 +149,9 @@
           <select name="role">
             <option value="student" data-i18n="dashboard.roleStudent">student</option>
             <option value="admin" data-i18n="dashboard.roleAdmin">admin</option>
+            <option value="teacher" data-i18n="dashboard.roleTeacher">teacher</option>
           </select>
+
           <button class="btn btn-modern btn-modern-primary" type="submit" data-i18n="dashboard.createUser">Crear</button>
           <button class="btn btn-modern btn-modern-ghost" type="button" id="cancel-user-form" data-i18n="dashboard.cancel">Cancelar</button>
         </form>

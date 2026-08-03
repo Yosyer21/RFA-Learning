@@ -44,5 +44,11 @@ form?.addEventListener('submit', async (event) => {
     return;
   }
 
+  if (result.data.user.role === 'teacher') {
+    window.location.href = '/teacher-home';
+    return;
+  }
+
   window.location.href = '/home';
+
 });

@@ -40,7 +40,7 @@ const createUserSchema = z.object({
   name: z.string().trim().min(1, 'Nombre requerido').max(100),
   username: usernameSchema,
   password: passwordSchema,
-  role: z.enum(['admin', 'student']).optional().default('student'),
+  role: z.enum(['admin', 'student', 'teacher']).optional().default('student'),
   active: booleanFromInput.optional().default(true),
   mustChangePassword: booleanFromInput.optional().default(false),
 });
@@ -49,7 +49,8 @@ const updateUserSchema = z.object({
   name: z.string().trim().min(1).max(100).optional(),
   username: z.string().trim().min(1).max(50).transform((value) => value.toLowerCase()).optional(),
   password: z.union([passwordSchema, z.literal('')]).optional(),
-  role: z.enum(['admin', 'student']).optional(),
+  role: z.enum(['admin', 'student', 'teacher']).optional(),
+
   active: booleanFromInput.optional(),
   mustChangePassword: booleanFromInput.optional(),
 });

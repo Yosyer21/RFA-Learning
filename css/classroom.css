@@ -1,0 +1,352 @@
+/* ═══════════════════════════════════════════════════════════
+   RFA.Learning — Classroom detail
+   Vista detallada de un aula: muro y tareas
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Separación entre secciones ── */
+main.container > .glass-card {
+  margin-bottom: 1.75rem;
+}
+
+.classroom-hero {
+  border-radius: 1.25rem;
+  overflow: hidden;
+}
+
+.classroom-hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.classroom-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+}
+
+.classroom-code svg {
+  width: 16px;
+  height: 16px;
+}
+
+.classroom-hero-meta .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+.classroom-hero-meta .badge svg {
+  width: 15px;
+  height: 15px;
+}
+
+.back-link {
+  display: inline-block;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  transition: opacity 0.2s;
+}
+
+.back-link:hover {
+  opacity: 0.8;
+}
+
+/* ── Formularios ── */
+.post-form,
+.assignment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.post-form textarea,
+.assignment-form textarea,
+.assignment-form input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border, #d9e2f0);
+  background: var(--surface-2, #fff);
+  color: var(--text, #1a2b4a);
+  font-size: 0.95rem;
+  resize: vertical;
+}
+
+.post-form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.assignment-form-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.assignment-due {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--muted, #5a6b8c);
+}
+
+.assignment-due input {
+  width: auto;
+}
+
+/* ── Muro de publicaciones ── */
+.posts-list,
+.assignments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.post-card {
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e3e9f3);
+  border-radius: 0.9rem;
+  padding: 1rem 1.25rem;
+}
+
+.post-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.post-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3a7bff, #6a5cff);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.post-author {
+  display: flex;
+  flex-direction: column;
+}
+
+.post-author strong {
+  font-size: 0.95rem;
+}
+
+.post-author small {
+  color: var(--muted, #5a6b8c);
+  font-size: 0.8rem;
+}
+
+.post-content {
+  margin: 0;
+  color: var(--text, #1a2b4a);
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+/* ── Tareas ── */
+.assignment-card {
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e3e9f3);
+  border-radius: 0.9rem;
+  padding: 1rem 1.25rem;
+}
+
+.assignment-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.assignment-title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.assignment-title strong {
+  font-size: 1.05rem;
+}
+
+.assignment-title small {
+  color: var(--muted, #5a6b8c);
+  font-size: 0.82rem;
+}
+
+.assignment-status {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.status-submitted {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+}
+
+.status-pending {
+  background: rgba(234, 179, 8, 0.15);
+  color: #ca8a04;
+}
+
+.assignment-desc {
+  margin: 0.75rem 0 0;
+  color: var(--text, #1a2b4a);
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.assignment-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  font-size: 0.82rem;
+  color: var(--muted, #5a6b8c);
+}
+
+.assignment-due-badge {
+  font-weight: 600;
+  color: #ca8a04;
+}
+
+.assignment-actions {
+  margin-top: 0.9rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* ── Modales ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 20, 40, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1000;
+}
+
+.modal-card {
+  background: var(--surface, #fff);
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 520px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border, #e3e9f3);
+}
+
+.modal-head h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--muted, #5a6b8c);
+}
+
+.modal-body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-body .form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border, #d9e2f0);
+  background: var(--surface-2, #fff);
+  color: var(--text, #1a2b4a);
+  font-size: 0.95rem;
+  resize: vertical;
+}
+
+.submission-row {
+  border: 1px solid var(--border, #e3e9f3);
+  border-radius: 0.75rem;
+  padding: 0.9rem 1rem;
+}
+
+.submission-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+}
+
+.submission-head small {
+  color: var(--muted, #5a6b8c);
+  font-size: 0.8rem;
+}
+
+.submission-content {
+  margin: 0;
+  color: var(--text, #1a2b4a);
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .assignment-form-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .assignment-due input {
+    width: 100%;
+  }
+
+  .assignment-head {
+    flex-direction: column;
+  }
+}

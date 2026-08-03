@@ -16,11 +16,26 @@
   }
 
   // ── Build bottom nav ──
-  function buildBottomNav() {
+  async function buildBottomNav() {
     if (document.querySelector('.bottom-nav')) return;
 
     const hasLogout = !!document.querySelector('#logout-btn');
     const isAdmin = !!document.querySelector('#dashboard-link');
+
+    // Determinar el rol del usuario autenticado (para mostrar la home correcta)
+    let role = null;
+    if (hasLogout) {
+      try {
+        const res = await fetch('/api/auth/me', { credentials: 'same-origin' });
+        if (res.ok) {
+          const json = await res.json();
+          role = json?.data?.user?.role || null;
+        }
+      } catch (_e) {
+        // Silencioso: si falla, se usa la ruta actual como fallback
+      }
+    }
+    const isTeacher = role === 'teacher';
 
     // Iconos SVG minimalistas (stroke-based)
     const icons = {
@@ -28,6 +43,9 @@
       clases: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
       perfil: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
       dashboard: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>',
+      teacher: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>',
+      aulas: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>',
+
       login: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>',
       register: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>',
       logout: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
@@ -37,14 +55,24 @@
 
     if (hasLogout) {
       // Páginas autenticadas
-      items = [
-        { href: '/home', icon: icons.home, label: t('nav.home') || 'Home', active: location.pathname === '/home' },
-        { href: '/clases', icon: icons.clases, label: t('nav.clases') || 'Clases', active: location.pathname === '/clases' },
-        { href: '/profile', icon: icons.perfil, label: t('nav.perfil') || 'Perfil', active: location.pathname === '/profile' },
-      ];
-      if (isAdmin) {
-        items.push({ href: '/dashboard', icon: icons.dashboard, label: t('nav.dashboard') || 'Dashboard', active: location.pathname === '/dashboard' });
+      if (isTeacher) {
+        items = [
+          { href: '/teacher-home', icon: icons.teacher, label: t('nav.teacherHome') || 'Panel', active: location.pathname === '/teacher-home' },
+          { href: '/classrooms', icon: icons.aulas, label: t('nav.aulas') || 'Aulas', active: location.pathname === '/classrooms' },
+          { href: '/profile', icon: icons.perfil, label: t('nav.perfil') || 'Perfil', active: location.pathname === '/profile' },
+        ];
+      } else {
+        items = [
+          { href: '/home', icon: icons.home, label: t('nav.home') || 'Home', active: location.pathname === '/home' },
+          { href: '/clases', icon: icons.clases, label: t('nav.clases') || 'Clases', active: location.pathname === '/clases' },
+          { href: '/classrooms', icon: icons.aulas, label: t('nav.aulas') || 'Aulas', active: location.pathname === '/classrooms' },
+          { href: '/profile', icon: icons.perfil, label: t('nav.perfil') || 'Perfil', active: location.pathname === '/profile' },
+        ];
+        if (isAdmin) {
+          items.push({ href: '/dashboard', icon: icons.dashboard, label: t('nav.dashboard') || 'Dashboard', active: location.pathname === '/dashboard' });
+        }
       }
+
     } else {
       // Páginas no autenticadas (landing, login, register)
       items = [
@@ -53,6 +81,7 @@
         { href: '/register', icon: icons.register, label: t('nav.registro') || 'Registrarse', active: location.pathname === '/register' },
       ];
     }
+
 
     const nav = document.createElement('nav');
     nav.className = 'bottom-nav';

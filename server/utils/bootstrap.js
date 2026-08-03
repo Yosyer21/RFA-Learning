@@ -85,7 +85,7 @@ async function ensureUsers() {
       await query(
         `INSERT INTO users (name, username, password, role, active, must_change_password)
          VALUES ($1, $2, $3, $4, $5, $6)`,
-        [userName, userUsername, hashedUser, 'user', true, false]
+        [userName, userUsername, hashedUser, 'student', true, false]
       );
       console.log(`[BOOTSTRAP] Standard user created: ${userUsername} / ${userPassword}`);
       log.info('Default standard user created', {
@@ -95,14 +95,48 @@ async function ensureUsers() {
       // Update password to ensure it matches the configured one
       await query(
         'UPDATE users SET password = $1, name = $2, role = $3, active = $4 WHERE LOWER(username) = $5',
-        [hashedUser, userName, 'user', true, userUsername]
+        [hashedUser, userName, 'student', true, userUsername]
       );
       console.log(`[BOOTSTRAP] Standard user updated (username=${userUsername})`);
     }
   } else {
     log.warn('Skipping default user seed because credentials were not configured');
   }
+
+  // ── Teacher test user ──
+  const teacherUsername = (process.env.DEFAULT_TEACHER_USERNAME || 'teacher').toLowerCase();
+  const teacherPassword = process.env.DEFAULT_TEACHER_PASSWORD || (isProduction ? '' : 'Teacher1234');
+  const teacherName = process.env.DEFAULT_TEACHER_NAME || 'Profesor';
+
+  if (teacherUsername && teacherPassword) {
+    const hashedTeacher = await hashPassword(teacherPassword);
+    const teacherResult = await query(
+      'SELECT id FROM users WHERE LOWER(username) = $1 LIMIT 1',
+      [teacherUsername]
+    );
+    if (teacherResult.rows.length === 0) {
+      await query(
+        `INSERT INTO users (name, username, password, role, active, must_change_password)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [teacherName, teacherUsername, hashedTeacher, 'teacher', true, false]
+      );
+      console.log(`[BOOTSTRAP] Teacher user created: ${teacherUsername} / ${teacherPassword}`);
+      log.info('Default teacher user created', {
+        username: teacherUsername,
+      });
+    } else {
+      // Update password to ensure it matches the configured one
+      await query(
+        'UPDATE users SET password = $1, name = $2, role = $3, active = $4 WHERE LOWER(username) = $5',
+        [hashedTeacher, teacherName, 'teacher', true, teacherUsername]
+      );
+      console.log(`[BOOTSTRAP] Teacher user updated (username=${teacherUsername})`);
+    }
+  } else {
+    log.warn('Skipping default teacher seed because credentials were not configured');
+  }
 }
+
 
 async function ensureClasses() {
   const classesResult = await query('SELECT id, title, category, content FROM classes ORDER BY id');
