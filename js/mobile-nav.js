@@ -20,9 +20,9 @@
     if (document.querySelector('.bottom-nav')) return;
 
     const hasLogout = !!document.querySelector('#logout-btn');
-    const isAdmin = !!document.querySelector('#dashboard-link');
 
-    // Determinar el rol del usuario autenticado (para mostrar la home correcta)
+    // Determinar el rol del usuario autenticado (para mostrar la home correcta
+    // y decidir qué enlaces mostrar, p.ej. Dashboard solo para admins).
     let role = null;
     if (hasLogout) {
       try {
@@ -36,6 +36,7 @@
       }
     }
     const isTeacher = role === 'teacher';
+    const isAdmin = role === 'admin';
 
     // Iconos SVG minimalistas (stroke-based)
     const icons = {
