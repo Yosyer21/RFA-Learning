@@ -1,0 +1,128 @@
+/* ═══════════════════════════════════════════════════════════
+   RFA.Learning — Meeting (Jitsi Meet)
+   Página dedicada de videollamada de un aula
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Lobby (pantalla previa) ── */
+.meeting-lobby {
+  max-width: 560px;
+  margin: 2rem auto;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.meeting-lobby-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--accent, #3a7bff), var(--accent-2, #6a5cff));
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.meeting-lobby-icon svg {
+  width: 34px;
+  height: 34px;
+}
+
+.meeting-title {
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+  margin: 0;
+  color: var(--text, #1a1a2e);
+}
+
+.meeting-sub {
+  color: var(--text-muted, #6b7280);
+  margin: 0;
+  max-width: 42ch;
+}
+
+.meeting-role-badge {
+  margin-top: 0.25rem;
+}
+
+.badge-teacher {
+  background: rgba(58, 123, 255, 0.15);
+  color: var(--accent, #3a7bff);
+}
+
+.meeting-lobby-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.btn-lg {
+  padding: 0.85rem 1.75rem;
+  font-size: 1.05rem;
+}
+
+.meeting-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted, #6b7280);
+  margin: 0.5rem 0 0;
+  max-width: 44ch;
+}
+
+/* ── Escenario de la videollamada ── */
+.meeting-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.meeting-stage-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.meeting-stage-title {
+  font-weight: 600;
+  color: var(--text, #1a1a2e);
+}
+
+.jitsi-container {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 220px);
+  min-height: 480px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.jitsi-container iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .meeting-lobby {
+    margin: 1rem auto;
+    padding: 1.75rem 1.25rem;
+  }
+
+  .jitsi-container {
+    height: calc(100vh - 180px);
+    min-height: 360px;
+    border-radius: 12px;
+  }
+}

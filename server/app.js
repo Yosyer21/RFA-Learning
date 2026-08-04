@@ -7,6 +7,9 @@ const PgSession = require('connect-pg-simple')(session);
 const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
+const multer = require('multer');
+const fs = require('fs');
+
 
 const { requestLogger } = require('./middleware/logger.middleware');
 const { requireAuth } = require('./middleware/auth.middleware');
@@ -18,6 +21,7 @@ const userRoutes = require('./routes/user.routes');
 const classRoutes = require('./routes/class.routes');
 const adminRoutes = require('./routes/admin.routes');
 const classroomRoutes = require('./routes/classroom.routes');
+const publicRoutes = require('./routes/public.routes');
 
 const { bootstrapDatabase } = require('./utils/bootstrap');
 const { pool, isEmbeddedDatabase } = require('./utils/db');
@@ -48,11 +52,15 @@ function createApp({ sessionSecret } = {}) {
       useDefaults: true,
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", 'data:'],
-        connectSrc: ["'self'"],
-        fontSrc: ["'self'", 'data:'],
+        scriptSrc: ["'self'", 'https://meet.jit.si'],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://meet.jit.si'],
+        imgSrc: ["'self'", 'data:', 'blob:', 'https://meet.jit.si'],
+        connectSrc: ["'self'", 'https://meet.jit.si', 'wss://meet.jit.si', 'https://*.jit.si', 'wss://*.jit.si'],
+        fontSrc: ["'self'", 'data:', 'https://meet.jit.si'],
+        mediaSrc: ["'self'", 'blob:', 'https://meet.jit.si'],
+        workerSrc: ["'self'", 'blob:', 'https://meet.jit.si'],
+        frameSrc: ["'self'", 'https://meet.jit.si'],
+        childSrc: ["'self'", 'https://meet.jit.si'],
         objectSrc: ["'none'"],
         baseUri: ["'self'"],
         formAction: ["'self'"],
@@ -119,6 +127,14 @@ function createApp({ sessionSecret } = {}) {
   app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
   app.use(express.static(path.join(__dirname, '..', 'public')));
 
+  // Directorio de archivos subidos (adjuntos de aulas)
+  const uploadsDir = path.join(__dirname, '..', 'uploads');
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+  app.use('/uploads', express.static(uploadsDir));
+
+
   app.get('/', (_req, res) => {
     res.sendFile(path.join(__dirname, '..', 'html', 'index.html'));
   });
@@ -168,6 +184,15 @@ function createApp({ sessionSecret } = {}) {
   app.get('/classroom/:id', requireAuth, (_req, res) => {
     res.sendFile(path.join(__dirname, '..', 'html', 'classroom.html'));
   });
+  // Página dedicada de videollamada (Jitsi Meet) de un aula
+  app.get('/meeting/:id', requireAuth, (_req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'html', 'meeting.html'));
+  });
+
+  // Vista pública del perfil (no requiere autenticación)
+  app.get('/u/:username', (_req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'html', 'public-profile.html'));
+  });
 
 
   // /api/auth/me se llama en cada carga de página (varias veces), por lo que
@@ -183,6 +208,8 @@ function createApp({ sessionSecret } = {}) {
   app.use('/api/classes', apiLimiter, requireAuth, classRoutes);
   app.use('/api/admin', apiLimiter, requireAuth, requireRole('admin'), adminRoutes);
   app.use('/api/classrooms', apiLimiter, requireAuth, classroomRoutes);
+  // Endpoints públicos (sin autenticación): perfil público, etc.
+  app.use('/api/public', apiLimiter, publicRoutes);
 
 
   app.use((_req, res) => {

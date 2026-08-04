@@ -41,6 +41,17 @@
           <h2 id="classroom-title" style="color:white;font-size:clamp(1.6rem,3.5vw,2.2rem);">Aula</h2>
           <p id="classroom-description" class="hero-sub" style="color:rgba(255,255,255,0.8);max-width:52ch;"></p>
           <div id="classroom-meta" class="classroom-hero-meta"></div>
+          <div class="classroom-hero-actions">
+            <button id="meeting-btn" class="btn btn-modern btn-modern-primary" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+              <span data-i18n="classroom.joinMeeting">Unirse a reunión</span>
+            </button>
+            <button id="share-meeting-btn" class="btn btn-modern btn-modern-ghost" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              <span data-i18n="classroom.shareMeeting">Compartir enlace</span>
+            </button>
+          </div>
+
         </div>
       </div>
     </section>
@@ -53,6 +64,14 @@
       </div>
       <form id="create-post-form" class="post-form">
         <textarea name="content" rows="3" placeholder="Escribe un anuncio o mensaje para el aula..." data-i18n-placeholder="classroom.postPlaceholder" required></textarea>
+        <div class="attachment-upload">
+          <label class="attachment-label" for="post-attachment">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+            <span data-i18n="classroom.attachFile">Adjuntar archivo</span>
+          </label>
+          <input type="file" id="post-attachment" class="attachment-input" hidden>
+          <span id="post-attachment-name" class="attachment-name"></span>
+        </div>
         <div class="post-form-actions">
           <button class="btn btn-modern btn-modern-primary" type="submit" data-i18n="classroom.publish">Publicar</button>
         </div>
@@ -68,6 +87,14 @@
       <form id="create-assignment-form" class="assignment-form">
         <input name="title" placeholder="Título de la tarea" data-i18n-placeholder="classroom.assignmentTitlePlaceholder" required>
         <textarea name="description" rows="2" placeholder="Descripción de la tarea (opcional)" data-i18n-placeholder="classroom.assignmentDescPlaceholder"></textarea>
+        <div class="attachment-upload">
+          <label class="attachment-label" for="assignment-attachment">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+            <span data-i18n="classroom.attachFile">Adjuntar archivo</span>
+          </label>
+          <input type="file" id="assignment-attachment" class="attachment-input" hidden>
+          <span id="assignment-attachment-name" class="attachment-name"></span>
+        </div>
         <div class="assignment-form-row">
           <div class="assignment-due">
             <label for="assignment-due" data-i18n="classroom.dueDate">Fecha de entrega</label>
@@ -77,6 +104,7 @@
         </div>
       </form>
     </section>
+
 
     <!-- Muro de publicaciones -->
     <section class="glass-card home-section">
@@ -100,7 +128,41 @@
       </div>
     </section>
 
+    <!-- Miembros y presencia (profesor) -->
+    <section id="members-section" class="glass-card home-section" style="display:none;">
+      <div class="section-head">
+        <span class="kicker" data-i18n="classroom.membersKicker">Miembros</span>
+        <h3 data-i18n="classroom.members">Miembros del aula</h3>
+      </div>
+      <div id="members-list" class="members-list">
+        <div class="empty-state" data-i18n="classroom.noMembers">Aún no hay miembros.</div>
+      </div>
+    </section>
+
+    <!-- Historial de reuniones -->
+    <section class="glass-card home-section">
+      <div class="section-head">
+        <span class="kicker" data-i18n="classroom.meetingsKicker">Reuniones</span>
+        <h3 data-i18n="classroom.meetingHistory">Historial de reuniones</h3>
+      </div>
+      <div id="meetings-list" class="meetings-list">
+        <div class="empty-state" data-i18n="classroom.noMeetings">Aún no hay reuniones.</div>
+      </div>
+    </section>
+
+    <!-- Calendario de tareas -->
+    <section class="glass-card home-section">
+      <div class="section-head">
+        <span class="kicker" data-i18n="classroom.calendarKicker">Calendario</span>
+        <h3 data-i18n="classroom.calendar">Próximas entregas</h3>
+      </div>
+      <div id="calendar-list" class="calendar-list">
+        <div class="empty-state" data-i18n="classroom.noCalendar">No hay entregas próximas.</div>
+      </div>
+    </section>
+
   </main>
+
 
   <script src="../js/i18n.js"></script>
   <script src="../js/theme.js"></script>

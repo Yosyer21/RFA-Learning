@@ -19,6 +19,19 @@
   const createAssignmentForm = document.getElementById('create-assignment-form');
   const postsList = document.getElementById('posts-list');
   const assignmentsList = document.getElementById('assignments-list');
+  const membersSection = document.getElementById('members-section');
+  const membersList = document.getElementById('members-list');
+  const meetingsList = document.getElementById('meetings-list');
+  const calendarList = document.getElementById('calendar-list');
+  const postAttachmentInput = document.getElementById('post-attachment');
+  const postAttachmentName = document.getElementById('post-attachment-name');
+  const assignmentAttachmentInput = document.getElementById('assignment-attachment');
+  const assignmentAttachmentName = document.getElementById('assignment-attachment-name');
+
+  // Estado de adjuntos pendientes de subir
+  let pendingPostAttachment = null;
+  let pendingAssignmentAttachment = null;
+
 
   // Obtener el id del aula desde la URL (/classroom/:id)
   function getClassroomIdFromUrl() {
@@ -64,6 +77,29 @@
     }
   }
 
+  // ── Subir un archivo adjunto ──
+  async function uploadFile(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    const result = await apiJson('/api/classrooms/upload', {
+      method: 'POST',
+      body: formData,
+    });
+    return result;
+  }
+
+  // ── Render adjunto ──
+  function renderAttachment(attachmentUrl, attachmentName) {
+    if (!attachmentUrl) return '';
+    const name = attachmentName || attachmentUrl.split('/').pop();
+    return `
+      <a class="attachment-link" href="${escapeHtml(attachmentUrl)}" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+        ${escapeHtml(name)}
+      </a>
+    `;
+  }
+
   // ── Render publicaciones ──
   function renderPosts(posts) {
     if (!postsList) return;
@@ -83,9 +119,78 @@
           </div>
         </div>
         <p class="post-content">${escapeHtml(p.content)}</p>
+        ${renderAttachment(p.attachment_url, p.attachment_name)}
+        <div class="post-comments">
+          <button class="comments-toggle-btn" type="button" data-id="${p.id}">
+            ${t('classroom.comments')} (${p.comment_count || 0})
+          </button>
+          <div class="comments-container" id="comments-${p.id}" hidden></div>
+        </div>
       </article>
     `).join('');
+
+    // Bind toggle de comentarios
+    postsList.querySelectorAll('.comments-toggle-btn').forEach((btn) => {
+      btn.addEventListener('click', () => toggleComments(btn.dataset.id, btn));
+    });
   }
+
+  // ── Mostrar/ocultar comentarios de una publicación ──
+  async function toggleComments(postId, btn) {
+    const container = document.getElementById(`comments-${postId}`);
+    if (!container) return;
+
+    if (!container.hidden) {
+      container.hidden = true;
+      return;
+    }
+
+    container.hidden = false;
+    container.innerHTML = `<div class="empty-state">${t('classroom.loading')}</div>`;
+
+    const result = await apiJson(`/api/classrooms/posts/${postId}/comments`);
+    if (!result) return;
+
+    const comments = result.data?.data || [];
+    container.innerHTML = `
+      ${comments.length === 0
+        ? `<div class="empty-state">${t('classroom.noComments')}</div>`
+        : comments.map((c) => `
+            <div class="comment-row">
+              <span class="comment-avatar">${escapeHtml(getInitial(c.author_name))}</span>
+              <div class="comment-body">
+                <div class="comment-head">
+                  <strong>${escapeHtml(c.author_name)}</strong>
+                  <small>${formatDateTime(c.created_at)}</small>
+                </div>
+                <p>${escapeHtml(c.content)}</p>
+              </div>
+            </div>
+          `).join('')}
+      <form class="comment-form" data-post="${postId}">
+        <input class="form-input" name="content" placeholder="${t('classroom.commentPlaceholder')}" required>
+        <button class="btn btn-modern btn-modern-primary btn-sm" type="submit">${t('classroom.comment')}</button>
+      </form>
+    `;
+
+    container.querySelector('.comment-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const input = e.currentTarget.querySelector('input[name="content"]');
+      const content = input.value.trim();
+      if (!content) return;
+      const res = await apiJson(`/api/classrooms/posts/${postId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content }),
+      });
+      if (res && res.ok) {
+        input.value = '';
+        await toggleComments(postId, btn);
+        await loadPosts();
+      }
+    });
+  }
+
 
   // ── Render tareas ──
   function renderAssignments(assignments) {
@@ -101,6 +206,12 @@
       const status = a.submitted
         ? `<span class="assignment-status status-submitted">${t('classroom.submitted')}</span>`
         : `<span class="assignment-status status-pending">${t('classroom.pending')}</span>`;
+
+      // Calificación visible para el estudiante
+      let gradeBadge = '';
+      if (!isTeacher && a.submission && a.submission.grade !== null && a.submission.grade !== undefined) {
+        gradeBadge = `<span class="assignment-grade-badge">${t('classroom.grade')}: ${escapeHtml(a.submission.grade)}</span>`;
+      }
 
       let actions = '';
       if (isTeacher) {
@@ -118,9 +229,13 @@
               <strong>${escapeHtml(a.title)}</strong>
               <small>${t('classrooms.teacher')}: ${escapeHtml(a.teacher_name || '')}</small>
             </div>
-            ${status}
+            <div class="assignment-status-group">
+              ${gradeBadge}
+              ${status}
+            </div>
           </div>
           ${a.description ? `<p class="assignment-desc">${escapeHtml(a.description)}</p>` : ''}
+          ${renderAttachment(a.attachment_url, a.attachment_name)}
           <div class="assignment-meta">
             ${due}
             <span class="assignment-created">${t('classroom.created')}: ${formatDate(a.created_at)}</span>
@@ -131,6 +246,7 @@
         </article>
       `;
     }).join('');
+
 
     // Bind events
     assignmentsList.querySelectorAll('.submit-btn').forEach((btn) => {
@@ -192,6 +308,13 @@
     });
   }
 
+  // ── Videollamada (Jitsi Meet) ──
+  // El botón "Unirse a reunión" navega a la página dedicada /meeting/:id
+  function goToMeeting() {
+    if (!classroomId) return;
+    window.location.href = `/meeting/${classroomId}`;
+  }
+
   // ── Modal de entregas (profesor) ──
   async function openSubmissionsModal(assignmentId) {
     const result = await apiJson(`/api/classrooms/assignments/${assignmentId}/submissions`);
@@ -216,6 +339,11 @@
                     <small>${formatDateTime(s.submitted_at)}</small>
                   </div>
                   <p class="submission-content">${escapeHtml(s.content)}</p>
+                  <div class="submission-grade">
+                    <input class="form-input grade-input" type="number" min="0" max="100" placeholder="${t('classroom.gradePlaceholder')}" value="${s.grade !== null && s.grade !== undefined ? escapeHtml(s.grade) : ''}" data-id="${s.id}">
+                    <input class="form-input feedback-input" type="text" placeholder="${t('classroom.feedbackPlaceholder')}" value="${s.feedback ? escapeHtml(s.feedback) : ''}" data-id="${s.id}">
+                    <button class="btn btn-modern btn-modern-primary btn-sm grade-btn" type="button" data-id="${s.id}">${t('classroom.saveGrade')}</button>
+                  </div>
                 </div>
               `).join('')}
         </div>
@@ -228,7 +356,127 @@
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) closeModal();
     });
+
+    // Bind calificación
+    overlay.querySelectorAll('.grade-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.id;
+        const grade = overlay.querySelector(`.grade-input[data-id="${id}"]`).value;
+        const feedback = overlay.querySelector(`.feedback-input[data-id="${id}"]`).value;
+        setButtonLoading(btn, true);
+        const res = await apiJson(`/api/classrooms/submissions/${id}/grade`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ grade: grade === '' ? null : Number(grade), feedback }),
+        });
+        setButtonLoading(btn, false);
+        if (!res) return;
+        showToast(res.ok ? t('classroom.gradeSaved') : (res.data.message || 'Error'), res.ok ? 'success' : 'error');
+      });
+    });
   }
+
+  // ── Render miembros y presencia (profesor) ──
+  async function loadMembers() {
+    if (!membersSection || !membersList) return;
+    const result = await apiJson(`/api/classrooms/${classroomId}/members`);
+    if (!result) return;
+
+    const members = result.data?.data || [];
+    membersSection.style.display = '';
+    if (members.length === 0) {
+      membersList.innerHTML = `<div class="empty-state">${t('classroom.noMembers')}</div>`;
+      return;
+    }
+
+    membersList.innerHTML = members.map((m) => `
+      <div class="member-row">
+        <span class="member-avatar">${escapeHtml(getInitial(m.name))}</span>
+        <div class="member-info">
+          <strong>${escapeHtml(m.name)}</strong>
+          <small>${escapeHtml(m.username)}</small>
+        </div>
+        <span class="presence-dot ${m.online ? 'online' : 'offline'}" title="${m.online ? t('classroom.online') : t('classroom.offline')}"></span>
+      </div>
+    `).join('');
+  }
+
+  // ── Render historial de reuniones ──
+  async function loadMeetings() {
+    if (!meetingsList) return;
+    const result = await apiJson(`/api/classrooms/${classroomId}/meetings`);
+    if (!result) return;
+
+    const meetings = result.data?.data || [];
+    if (meetings.length === 0) {
+      meetingsList.innerHTML = `<div class="empty-state">${t('classroom.noMeetings')}</div>`;
+      return;
+    }
+
+    meetingsList.innerHTML = meetings.map((m) => `
+      <div class="meeting-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+        <div class="meeting-info">
+          <strong>${escapeHtml(m.started_by_name)}</strong>
+          <small>${formatDateTime(m.started_at)}</small>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ── Render calendario de tareas ──
+  async function loadCalendar() {
+    if (!calendarList) return;
+    const result = await apiJson('/api/classrooms/calendar');
+    if (!result) return;
+
+    const items = result.data?.data || [];
+    if (items.length === 0) {
+      calendarList.innerHTML = `<div class="empty-state">${t('classroom.noCalendar')}</div>`;
+      return;
+    }
+
+    calendarList.innerHTML = items.map((item) => `
+      <a class="calendar-row" href="/classroom/${item.classroom_id}">
+        <div class="calendar-date">
+          <strong>${formatDate(item.due_date)}</strong>
+        </div>
+        <div class="calendar-info">
+          <strong>${escapeHtml(item.title)}</strong>
+          <small>${escapeHtml(item.classroom_name)}</small>
+        </div>
+      </a>
+    `).join('');
+  }
+
+  // ── Compartir enlace de reunión ──
+  async function shareMeetingLink() {
+    if (!classroomId) return;
+    const result = await apiJson(`/api/classrooms/${classroomId}/meeting`);
+    if (!result || !result.ok) return;
+
+    const data = result.data?.data;
+    if (!data) return;
+
+    const link = `${window.location.origin}/meeting/${classroomId}`;
+    try {
+      await navigator.clipboard.writeText(link);
+      showToast(t('classroom.linkCopied'), 'success');
+    } catch (err) {
+      showToast(link, 'info');
+    }
+  }
+
+  // ── Heartbeat de presencia ──
+  function startPresenceHeartbeat() {
+    if (!classroomId) return;
+    const send = () => {
+      apiJson(`/api/classrooms/${classroomId}/presence`, { method: 'POST' });
+    };
+    send();
+    setInterval(send, 60000); // cada minuto
+  }
+
 
   // ── Cargar detalle del aula ──
   async function loadClassroom() {
@@ -262,6 +510,24 @@
     renderAssignments(result.data?.data || []);
   }
 
+  // ── Selección de adjunto en publicación ──
+  postAttachmentInput?.addEventListener('change', () => {
+    const file = postAttachmentInput.files[0];
+    if (file) {
+      pendingPostAttachment = file;
+      if (postAttachmentName) postAttachmentName.textContent = file.name;
+    }
+  });
+
+  // ── Selección de adjunto en tarea ──
+  assignmentAttachmentInput?.addEventListener('change', () => {
+    const file = assignmentAttachmentInput.files[0];
+    if (file) {
+      pendingAssignmentAttachment = file;
+      if (assignmentAttachmentName) assignmentAttachmentName.textContent = file.name;
+    }
+  });
+
   // ── Crear publicación ──
   createPostForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -270,6 +536,15 @@
 
     const submitBtn = createPostForm.querySelector('button[type="submit"]');
     setButtonLoading(submitBtn, true);
+
+    // Subir adjunto si existe
+    if (pendingPostAttachment) {
+      const up = await uploadFile(pendingPostAttachment);
+      if (up && up.ok) {
+        body.attachment_url = up.data.data.url;
+        body.attachment_name = up.data.data.name;
+      }
+    }
 
     const result = await apiJson(`/api/classrooms/${classroomId}/posts`, {
       method: 'POST',
@@ -284,6 +559,8 @@
 
     if (result.ok) {
       createPostForm.reset();
+      pendingPostAttachment = null;
+      if (postAttachmentName) postAttachmentName.textContent = '';
       await loadPosts();
     }
   });
@@ -296,6 +573,15 @@
 
     const submitBtn = createAssignmentForm.querySelector('button[type="submit"]');
     setButtonLoading(submitBtn, true);
+
+    // Subir adjunto si existe
+    if (pendingAssignmentAttachment) {
+      const up = await uploadFile(pendingAssignmentAttachment);
+      if (up && up.ok) {
+        body.attachment_url = up.data.data.url;
+        body.attachment_name = up.data.data.name;
+      }
+    }
 
     const result = await apiJson(`/api/classrooms/${classroomId}/assignments`, {
       method: 'POST',
@@ -310,9 +596,12 @@
 
     if (result.ok) {
       createAssignmentForm.reset();
+      pendingAssignmentAttachment = null;
+      if (assignmentAttachmentName) assignmentAttachmentName.textContent = '';
       await loadAssignments();
     }
   });
+
 
   // ── Init ──
   async function init() {
@@ -332,7 +621,14 @@
     }
 
     await loadClassroom();
-    await Promise.all([loadPosts(), loadAssignments()]);
+
+    // Cargar secciones según rol
+    const loads = [loadPosts(), loadAssignments(), loadMeetings(), loadCalendar()];
+    if (isTeacher) loads.push(loadMembers());
+    await Promise.all(loads);
+
+    // Heartbeat de presencia
+    startPresenceHeartbeat();
   }
 
   document.getElementById('logout-btn')?.addEventListener('click', async () => {
@@ -340,10 +636,23 @@
     window.location.href = '/login';
   });
 
+  document.getElementById('meeting-btn')?.addEventListener('click', () => {
+    goToMeeting();
+  });
+
+  document.getElementById('share-meeting-btn')?.addEventListener('click', () => {
+    shareMeetingLink();
+  });
+
   window.addEventListener('languagechange', () => {
     loadPosts();
     loadAssignments();
+    loadMeetings();
+    loadCalendar();
+    if (isTeacher) loadMembers();
   });
 
   init();
 })();
+
+

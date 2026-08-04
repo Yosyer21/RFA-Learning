@@ -12,6 +12,12 @@ async function loadProfile() {
   document.getElementById('profile-username-display').textContent = '@' + currentUser.username;
   document.getElementById('profile-initials').textContent = getInitials(currentUser.name || currentUser.username);
 
+  // Enlace al perfil público
+  const publicLink = document.getElementById('public-profile-link');
+  if (publicLink) {
+    publicLink.href = '/u/' + encodeURIComponent(currentUser.username);
+  }
+
   // Avatar color
   const avatarContainer = document.getElementById('profile-avatar-container');
   avatarContainer.style.backgroundColor = currentUser.avatarColor || '#6c5ce7';

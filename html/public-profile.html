@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#3a7bff">
+  <title>Perfil público | RFA.Learning</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="/assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+  <link rel="stylesheet" href="../css/home.css">
+  <link rel="stylesheet" href="../css/shared.css">
+  <link rel="stylesheet" href="../css/modern.css">
+  <link rel="stylesheet" href="../css/mobile.css">
+</head>
+
+<body>
+  <a href="#public-profile-main" class="skip-link" data-i18n="skip.content">Ir al contenido</a>
+  <header class="topbar">
+    <div class="topbar-brand">
+      <span class="brand-icon"></span>
+      <h1>RFA<span class="brand-dot">.</span>Learning</h1>
+    </div>
+    <nav>
+      <a href="/" data-i18n="nav.inicio">Inicio</a>
+      <a href="/login" data-i18n="nav.login">Iniciar sesión</a>
+      <a href="/register" data-i18n="nav.registro">Registrarse</a>
+    </nav>
+  </header>
+
+  <main id="public-profile-main" class="container">
+    <!-- Estado de carga / error -->
+    <div id="public-profile-status" class="glass-card">
+      <p class="hint" data-i18n="ui.loading">Cargando...</p>
+    </div>
+
+    <!-- Contenido del perfil público (se rellena con JS) -->
+    <div id="public-profile-content" hidden>
+      <!-- Profile Header -->
+      <section class="profile-header glass-card">
+        <div class="profile-avatar" id="public-avatar-container">
+          <span id="public-initials">?</span>
+        </div>
+        <div class="profile-info">
+          <h2 id="public-display-name">...</h2>
+          <span id="public-role-badge" class="badge">Estudiante</span>
+          <p id="public-username-display" class="profile-username">@usuario</p>
+          <p id="public-bio-display" class="profile-bio"></p>
+          <p id="public-member-since" class="profile-member-since"></p>
+        </div>
+        <div class="profile-stats-mini">
+          <div class="mini-stat">
+            <strong id="public-mini-classes">0</strong>
+            <span data-i18n="profile.miniClasses">Clases</span>
+          </div>
+          <div class="mini-stat">
+            <strong id="public-mini-quizzes">0</strong>
+            <span data-i18n="profile.miniQuizzes">Quizzes</span>
+          </div>
+          <div class="mini-stat">
+            <strong id="public-mini-score">0</strong>
+            <span data-i18n="profile.miniScore">Puntos</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Estadísticas detalladas -->
+      <section class="glass-card profile-section">
+        <div class="section-head">
+          <span class="kicker" data-i18n="profile.statsKicker">Estadísticas</span>
+          <h3 data-i18n="profile.statsTitle">Rendimiento</h3>
+        </div>
+        <div id="public-stats-grid" class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-icon">AC</span>
+            <strong id="public-stat-accuracy">0%</strong>
+            <small data-i18n="profile.statAccuracy">Precisión</small>
+          </div>
+          <div class="stat-card">
+            <span class="stat-icon">RC</span>
+            <strong id="public-stat-streak">0</strong>
+            <small data-i18n="profile.statStreak">Racha (días)</small>
+          </div>
+          <div class="stat-card">
+            <span class="stat-icon">QZ</span>
+            <strong id="public-stat-total-quizzes">0</strong>
+            <small data-i18n="profile.statTotalQuizzes">Quizzes totales</small>
+          </div>
+          <div class="stat-card">
+            <span class="stat-icon">LV</span>
+            <strong id="public-stat-level">-</strong>
+            <small data-i18n="profile.statLevel">Nivel</small>
+          </div>
+        </div>
+      </section>
+
+      <!-- Progreso por nivel -->
+      <section class="glass-card profile-section">
+        <div class="section-head">
+          <span class="kicker" data-i18n="profile.levelProgressKicker">Niveles</span>
+          <h3 data-i18n="profile.levelProgressTitle">Progreso por nivel</h3>
+        </div>
+        <div id="public-level-progress" class="level-progress-list"></div>
+      </section>
+
+      <!-- Logros -->
+      <section class="glass-card profile-section">
+        <div class="section-head">
+          <span class="kicker" data-i18n="profile.achievementsKicker">Logros</span>
+          <h3 data-i18n="profile.achievementsTitle">Insignias</h3>
+        </div>
+        <div id="public-achievements" class="achievements-grid"></div>
+      </section>
+    </div>
+  </main>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/theme.js"></script>
+  <script src="../js/shared.js"></script>
+  <script src="../js/public-profile.js"></script>
+  <script src="../js/mobile-nav.js"></script>
+</body>
+</html>

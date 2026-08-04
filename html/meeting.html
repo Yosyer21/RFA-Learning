@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#3a7bff">
+  <title>Reunión | RFA.Learning</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="/assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png">
+  <link rel="stylesheet" href="../css/home.css">
+  <link rel="stylesheet" href="../css/meeting.css">
+  <link rel="stylesheet" href="../css/shared.css">
+  <link rel="stylesheet" href="../css/modern.css">
+  <link rel="stylesheet" href="../css/mobile.css">
+</head>
+
+<body>
+  <a href="#main" class="skip-link" data-i18n="skip.content">Ir al contenido</a>
+  <header class="topbar">
+    <div class="topbar-brand">
+      <span class="brand-icon"></span>
+      <h1>RFA<span class="brand-dot">.</span>Learning</h1>
+    </div>
+    <nav>
+      <a href="/classrooms" class="btn-nav btn-nav-ghost" data-i18n="nav.aulas">Aulas</a>
+      <a href="/profile" class="btn-nav btn-nav-ghost" data-i18n="nav.perfil">Perfil</a>
+      <button id="logout-btn" class="btn-nav btn-nav-danger" data-i18n="nav.salir">Salir</button>
+    </nav>
+  </header>
+
+  <main id="main" class="container">
+    <!-- Pantalla previa a la reunión -->
+    <section id="meeting-lobby" class="glass-card meeting-lobby">
+      <div class="meeting-lobby-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+      </div>
+      <span class="kicker" data-i18n="meeting.kicker">Videollamada</span>
+      <h2 id="meeting-classroom-name" class="meeting-title">Aula</h2>
+      <p id="meeting-classroom-desc" class="meeting-sub"></p>
+      <div id="meeting-role-badge" class="meeting-role-badge"></div>
+
+      <div class="meeting-lobby-actions">
+        <button id="meeting-start-btn" class="btn btn-modern btn-modern-primary btn-lg" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          <span id="meeting-start-label" data-i18n="meeting.join">Unirse a la reunión</span>
+        </button>
+        <button id="meeting-share-btn" class="btn btn-modern btn-modern-ghost" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          <span data-i18n="classroom.shareMeeting">Compartir enlace</span>
+        </button>
+        <a href="/classrooms" class="btn btn-modern btn-modern-ghost" data-i18n="meeting.cancel">Cancelar</a>
+      </div>
+
+
+      <p class="meeting-hint" data-i18n="meeting.hint">Se abrirá Jitsi Meet en esta página. Asegúrate de permitir el acceso a cámara y micrófono.</p>
+    </section>
+
+    <!-- Contenedor de la videollamada (se muestra al iniciar) -->
+    <section id="meeting-stage" class="meeting-stage" style="display:none;">
+      <div class="meeting-stage-head">
+        <a href="/classrooms" class="btn btn-modern btn-modern-ghost btn-sm" data-i18n="meeting.leave">Salir de la reunión</a>
+        <span id="meeting-stage-title" class="meeting-stage-title"></span>
+      </div>
+      <div id="jitsi-container" class="jitsi-container"></div>
+    </section>
+  </main>
+
+  <script src="../js/i18n.js"></script>
+  <script src="../js/theme.js"></script>
+  <script src="../js/shared.js"></script>
+  <script src="../js/meeting.js"></script>
+  <script src="../js/mobile-nav.js"></script>
+</body>
+</html>
